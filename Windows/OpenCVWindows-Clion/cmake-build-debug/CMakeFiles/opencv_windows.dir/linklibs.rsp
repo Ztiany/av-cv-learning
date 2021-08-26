@@ -1,0 +1,1 @@
+  -LD:/code/opencv/opencv4.1.1/mingw-build/install/x64/mingw/lib  -llibopencv_world411 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
