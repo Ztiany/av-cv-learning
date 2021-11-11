@@ -94,6 +94,27 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glClearColor(0.1, 0.4, 0.6, 1.0);//set "clear color" for background.
 
 	//-----------------------------------
+	// opengl：init
+	//-----------------------------------
+	//没有下面的矩阵，就没有办法将模型绘制到屏幕上。
+	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
+	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
+	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+
+	/*
+	GL_CULL_FACE 表示只展示正面，哪个是正面呢？
+		1. 取决于一个属性，ccw 还是 cw。
+		2. OpenGL 默认是 ccw 的，即 counter clock wind. 即逆时针方向的。
+		3. 意思就是就是摄像机所对的方向，逆时针绘制的图形的正面。
+
+	OpenGL 默认两个面都画，设置了 GL_CULL_FACE 可以提高效率，这样就不用绘制两面，只绘制正面。
+	*/
+	glEnable(GL_CULL_FACE);
+	//通过修改 front face 为 GL_CW，此时摄像机所对的方向，顺时针绘制的图形就是正面。
+	//glFrontFace(GL_CW);
+
+	//-----------------------------------
 	// step3：展示窗口。
 	//-----------------------------------
 	ShowWindow(hwnd, SW_SHOW);
@@ -120,6 +141,30 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//draw sence.
 		//【glClear：clear buffers to preset values.】
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
+
+		/*
+		glBegin(GL_TRIANGLES);//逆时针方向
+		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glColor4ub(0, 255, 0, 255);//change current color.
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glColor4ub(0, 0, 255, 255);//change current color.
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		glEnd();//drawing end. corresponding with glBegin.
+		*/
+
+		glBegin(GL_TRIANGLES);//顺时针方向
+		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glColor4ub(0, 0, 255, 255);//change current color.
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		glColor4ub(0, 255, 0, 255);//change current color.
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glEnd();//drawing end. corresponding with glBegin.
+
+		//同样，还有其他的绘制模式。
+		//GL_TRIANGLE_STRIP：该模型下，奇数个点与偶数个点的连线方式不同。
+		//GL_TRIANGLE_FAN：总是从第一个点开始。
 
 		//present scene.
 		SwapBuffers(dc);//其实就是交换缓冲区，将后缓冲区展示到前台。

@@ -94,6 +94,39 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glClearColor(0.1, 0.4, 0.6, 1.0);//set "clear color" for background.
 
 	//-----------------------------------
+	// opengl：init
+	//-----------------------------------
+	//没有下面的矩阵，就没有办法将模型绘制到屏幕上。
+	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
+	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
+	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+
+	/*
+	GL_CULL_FACE 表示只展示正面，哪个是正面呢？
+		1. 取决于一个属性，ccw 还是 cw。
+		2. OpenGL 默认是 ccw 的，即 counter clock wind. 即逆时针方向的。
+		3. 意思就是就是摄像机所对的方向，逆时针绘制的图形的正面。
+
+	OpenGL 默认两个面都画，设置了 GL_CULL_FACE 可以提高效率，这样就不用绘制两面，只绘制正面。
+	*/
+	glEnable(GL_CULL_FACE);
+
+	//点的大小
+	glPointSize(10.0F);
+	//点模式
+	glPolygonMode(GL_FRONT, GL_POINT);
+	//线框模式【描边模式】
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	//填充模式【默认】
+	//glPolygonMode(GL_FRONT, GL_FILL);
+
+	//画圆点，而不是画正方形点。
+	glEnable(GL_POINT_SMOOTH);
+	//有的机器上还需要设置这个才能画圆点，最终还是取决于硬件。
+	glEnable(GL_BLEND);
+
+	//-----------------------------------
 	// step3：展示窗口。
 	//-----------------------------------
 	ShowWindow(hwnd, SW_SHOW);
@@ -121,6 +154,32 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//【glClear：clear buffers to preset values.】
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
 
+		glBegin(GL_QUADS);//画四边形，每四个点画一个四边形。
+
+		glColor4ub(255, 0, 0, 255);
+		glVertex3f(0.0f, 0.0f, -10.0f);
+		glColor4ub(0, 0, 255, 255);
+		glVertex3f(-5.0f, -2.0f, -10.0f);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(-3.0f, -3.0f, -10.0f);
+		glColor4ub(0, 55, 100, 255);
+		glVertex3f(2.0F, -2.0F, -10.0F);
+
+		glColor4ub(255, 0, 0, 255);
+		glVertex3f(5.0f, 0.0f, -10.0f);
+		glColor4ub(0, 0, 255, 255);
+		glVertex3f(0.0f, -2.0f, -10.0f);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(2.0f, -3.0f, -10.0f);
+		glColor4ub(0, 55, 100, 255);
+		glVertex3f(7.0F, -2.0F, -10.0F);
+
+		glEnd();
+
+		//同样，还有其他模式
+		//GL_QUAD_STRIP：可以绘制 （n/2 -1） 个四边形。
+		//GL_PLOYGON：绘制多边形，依次将所有的点连起来，只有一个要求，这个多边形必须是凸的，不能是凹的。
+		
 		//present scene.
 		SwapBuffers(dc);//其实就是交换缓冲区，将后缓冲区展示到前台。
 	}

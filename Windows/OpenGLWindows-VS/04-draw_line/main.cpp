@@ -94,6 +94,15 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glClearColor(0.1, 0.4, 0.6, 1.0);//set "clear color" for background.
 
 	//-----------------------------------
+	// opengl：init
+	//-----------------------------------
+	//没有下面的矩阵，就没有办法将模型绘制到屏幕上。
+	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
+	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
+	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+
+	//-----------------------------------
 	// step3：展示窗口。
 	//-----------------------------------
 	ShowWindow(hwnd, SW_SHOW);
@@ -120,6 +129,38 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//draw sence.
 		//【glClear：clear buffers to preset values.】
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
+		
+		glLineWidth(4.0F);
+
+		/*
+		//模式1：两两成线，多余的点丢弃。【具体实现依赖于硬件】
+		glBegin(GL_LINES);
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		*/
+
+		/*
+		//模式2：首尾相连。
+		glBegin(GL_LINE_LOOP);
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		*/
+
+		//模式3：多点成线。
+		glBegin(GL_LINE_STRIP);
+		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glColor4ub(0, 255, 0, 255);//change current color.【会画出一条渐变的线】
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glColor4ub(0, 0, 255, 255);//change current color.
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+
+
+		glEnd();//drawing end. corresponding with glBegin.
 
 		//present scene.
 		SwapBuffers(dc);//其实就是交换缓冲区，将后缓冲区展示到前台。
