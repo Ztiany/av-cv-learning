@@ -1,6 +1,6 @@
 #include <Windows.h>
 
-//»Øµ÷º¯Êı£ºwndclass.lpfnWndProc
+//å›è°ƒå‡½æ•°ï¼šwndclass.lpfnWndProc
 LRESULT CALLBACK GLWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg) {
@@ -11,13 +11,13 @@ LRESULT CALLBACK GLWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-/**Windows ×ÀÃæ³ÌĞòµÄ Main ·½·¨*/
+/**Windows æ¡Œé¢ç¨‹åºçš„ Main æ–¹æ³•*/
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
 	OutputDebugString(L"Window Enter.");
 
-	//step1£º×¢²á´°¿Ú
-	WNDCLASSEX wndclass;//´°¿ÚµÄÊôĞÔ
+	//step1ï¼šæ³¨å†Œçª—å£
+	WNDCLASSEX wndclass;//çª—å£çš„å±æ€§
 	wndclass.cbClsExtra = 0;
 	wndclass.cbSize = sizeof(WNDCLASSEX);
 	wndclass.cbWndExtra = 0;
@@ -26,41 +26,41 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wndclass.hIcon = NULL;
 	wndclass.hIconSm = NULL;
 	wndclass.hInstance = hInstance;
-	wndclass.lpfnWndProc = GLWindowProc;//ÊÂ¼ş»Øµ÷£¬±ÈÈç¹Ø±Õ´°¿Ú¡£
+	wndclass.lpfnWndProc = GLWindowProc;//äº‹ä»¶å›è°ƒï¼Œæ¯”å¦‚å…³é—­çª—å£ã€‚
 	wndclass.lpszClassName = L"GLWindow";
 	wndclass.lpszMenuName = NULL;
 	wndclass.style = CS_VREDRAW | CS_HREDRAW;
-	ATOM atom = RegisterClassEx(&wndclass);//Ö´ĞĞ×¢²á
+	ATOM atom = RegisterClassEx(&wndclass);//æ‰§è¡Œæ³¨å†Œ
 	if (!atom) {
 		MessageBox(NULL, L"Register Fail", L"Error", MB_OK);
 		return 0;
 	}
 
-	//step2£º´´½¨´°¿Ú
+	//step2ï¼šåˆ›å»ºçª—å£
 	HWND hwnd = CreateWindowEx(
 		NULL,
-		//´°¿Ú×¢²áÃû£¬Óë wndclass.lpszClassName ±£³ÖÒ»ÖÂ
+		//çª—å£æ³¨å†Œåï¼Œä¸ wndclass.lpszClassName ä¿æŒä¸€è‡´
 		L"GLWindow",
-		//´°¿ÚÃû
+		//çª—å£å
 		L"OpenGL Window", WS_OVERLAPPEDWINDOW,
-		//´°¿ÚÎ»ÖÃ
+		//çª—å£ä½ç½®
 		100, 100,
-		//´°¿Ú´óĞ¡
+		//çª—å£å¤§å°
 		800, 600,
-		//ÆäËû²ÎÊı
+		//å…¶ä»–å‚æ•°
 		NULL, NULL, hInstance, NULL);
-	//step3£ºÕ¹Ê¾´°¿Ú
+	//step3ï¼šå±•ç¤ºçª—å£
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
 
-	//·ÀÖ¹´®¿Ú¸øÍË³ö£¬¿ªÊ¼¼àÌıÊÂ¼ş
-	MSG msg;//ÓÃÓÚ½ÓÊÕÏûÏ¢
+	//é˜²æ­¢çª—å£ç»™é€€å‡ºï¼Œå¼€å§‹ç›‘å¬äº‹ä»¶
+	MSG msg;//ç”¨äºæ¥æ”¶æ¶ˆæ¯
 	while (true) {
-		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {//½ÓÊÕÏûÏ¢
+		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {//æ¥æ”¶æ¶ˆæ¯
 			if (msg.message == WM_QUIT) {
 				break;
 			}
-			//×ª»»ÏûÏ¢£¬²¢·Ö·¢¸ø×Ô¼º
+			//è½¬æ¢æ¶ˆæ¯ï¼Œå¹¶åˆ†å‘ç»™è‡ªå·±
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
