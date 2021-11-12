@@ -26,7 +26,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	OutputDebugString(L"Window Enter.");
 
 	//-----------------------------------
-	// step1：注册窗口
+	// step1：注册窗口。
 	//-----------------------------------
 	WNDCLASSEX wndclass;//窗口的属性。
 	wndclass.cbClsExtra = 0;
@@ -48,7 +48,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//-----------------------------------
-	// step2：创建窗口
+	// step2：创建窗口。
 	//-----------------------------------
 	HWND hwnd = CreateWindowEx(
 		NULL,
@@ -75,8 +75,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	pfd.cStencilBits = 8;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	pfd.dwFlags =
-		PFD_DRAW_TO_WINDOW //画到窗口上。
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW //画到窗口上。
 		| PFD_SUPPORT_OPENGL //颜色要支持 OpenGL。
 		| PFD_DOUBLEBUFFER; //支持双缓冲。
 
@@ -86,7 +85,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetPixelFormat(dc, pixelFormat, &pfd);
 	//create context.
 	HGLRC rc = wglCreateContext(dc);
-	wglMakeCurrent(dc, rc);//rc 和 dc 作为当前的渲染
+	wglMakeCurrent(dc, rc);//rc 和 dc 作为当前的渲染。
 	//setup opengl context complete.
 
 	// 预设一个颜色。
@@ -102,7 +101,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//-----------------------------------
 	// step4：防止窗口退出，循环地监听事件。
 	//-----------------------------------
-	MSG msg;//用于接收消息
+	MSG msg;//用于接收消息。
 	while (true) {//这个 while 的执行跟刷新率有关系，比如 60hz 的刷新率每秒跑 60 次。
 		//接收消息
 		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {

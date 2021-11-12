@@ -68,7 +68,7 @@ INT WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
 	glEnable(GL_CULL_FACE);
-	//front face : ccw -> counter clock wind 
+	//front face : ccw -> counter clock wind.
 	MSG msg;
 	while (true)
 	{

@@ -26,7 +26,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	OutputDebugString(L"Window Enter.");
 
 	//-----------------------------------
-	// step1：注册窗口
+	// step1：注册窗口。
 	//-----------------------------------
 	WNDCLASSEX wndclass;//窗口的属性。
 	wndclass.cbClsExtra = 0;
@@ -48,7 +48,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//-----------------------------------
-	// step2：创建窗口
+	// step2：创建窗口。
 	//-----------------------------------
 	HWND hwnd = CreateWindowEx(
 		NULL,
@@ -75,8 +75,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	pfd.cStencilBits = 8;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	pfd.dwFlags =
-		PFD_DRAW_TO_WINDOW //画到窗口上。
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW //画到窗口上。
 		| PFD_SUPPORT_OPENGL //颜色要支持 OpenGL。
 		| PFD_DOUBLEBUFFER; //支持双缓冲。
 
@@ -100,7 +99,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
 	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
 	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
-	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用于模型矩阵。
 
 	//-----------------------------------
 	// step3：展示窗口。
@@ -130,7 +129,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//【glClear：clear buffers to preset values.】
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
 		glColor4ub(255, 255, 255, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
-		glPointSize(20.0F);
+		glPointSize(20.0F);//设置点的大小。
+
 		glBegin(GL_POINTS);//start to draw something.
 		glVertex3f(0.0F, 0.0F, -10.0F);//draw a point.
 		glVertex3f(5.0F, 0.0F, -10.0F);//draw other point.

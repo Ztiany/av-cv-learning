@@ -26,7 +26,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	OutputDebugString(L"Window Enter.");
 
 	//-----------------------------------
-	// step1：注册窗口
+	// step1：注册窗口。
 	//-----------------------------------
 	WNDCLASSEX wndclass;//窗口的属性。
 	wndclass.cbClsExtra = 0;
@@ -48,7 +48,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//-----------------------------------
-	// step2：创建窗口
+	// step2：创建窗口。
 	//-----------------------------------
 	HWND hwnd = CreateWindowEx(
 		NULL,
@@ -100,7 +100,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
 	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
 	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
-	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用于模型矩阵。
 
 	/*
 	GL_CULL_FACE 表示只展示正面，哪个是正面呢？

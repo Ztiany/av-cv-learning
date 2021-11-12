@@ -26,7 +26,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	OutputDebugString(L"Window Enter.");
 
 	//-----------------------------------
-	// step1：注册窗口
+	// step1：注册窗口。
 	//-----------------------------------
 	WNDCLASSEX wndclass;//窗口的属性。
 	wndclass.cbClsExtra = 0;
@@ -48,7 +48,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//-----------------------------------
-	// step2：创建窗口
+	// step2：创建窗口。
 	//-----------------------------------
 	HWND hwnd = CreateWindowEx(
 		NULL,
@@ -100,7 +100,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	glMatrixMode(GL_PROJECTION);//tell the gpu render that I would select the projection matrix. 投影矩阵
 	gluPerspective(50.0F, 800.0F / 600.0F, 0.1F, 1000.0F);//set some values to projection matrix. 透视矩阵
 	glMatrixMode(GL_MODELVIEW);//tell the gpu render that I would select the model view matrix. 模型矩阵
-	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用域模型矩阵。
+	glLoadIdentity();//给选择的矩阵传一个单位矩阵，因为 glLoadIdentity 调用之前选择的是模型矩阵（调用了 glMatrixMode），所以这个调用作用于模型矩阵。
 
 	/*
 	GL_CULL_FACE 表示只展示正面，哪个是正面呢？
@@ -141,26 +141,21 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//draw sence.
 		//【glClear：clear buffers to preset values.】
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
-
-		/*
-		glBegin(GL_TRIANGLES);//逆时针方向
 		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
-		glVertex3f(0.0F, 0.0F, -10.0F);
-		glColor4ub(0, 255, 0, 255);//change current color.
-		glVertex3f(-5.0F, 0.0F, -10.0F);
-		glColor4ub(0, 0, 255, 255);//change current color.
-		glVertex3f(-5.0F, -2.0F, -10.0F);
-		glEnd();//drawing end. corresponding with glBegin.
-		*/
 
-		glBegin(GL_TRIANGLES);//顺时针方向
-		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
+		//逆时针方向
+		glBegin(GL_TRIANGLES);
 		glVertex3f(0.0F, 0.0F, -10.0F);
-		glColor4ub(0, 0, 255, 255);//change current color.
-		glVertex3f(-5.0F, -2.0F, -10.0F);
-		glColor4ub(0, 255, 0, 255);//change current color.
 		glVertex3f(-5.0F, 0.0F, -10.0F);
-		glEnd();//drawing end. corresponding with glBegin.
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		glEnd();
+		
+		//顺时针方向
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, -2.0F, -10.0F);
+		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glEnd();
 
 		//同样，还有其他的绘制模式。
 		//GL_TRIANGLE_STRIP：该模型下，奇数个点与偶数个点的连线方式不同。

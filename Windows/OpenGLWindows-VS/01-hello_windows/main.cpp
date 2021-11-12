@@ -16,51 +16,53 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	OutputDebugString(L"Window Enter.");
 
-	//step1：注册窗口
-	WNDCLASSEX wndclass;//窗口的属性
+	//step1：注册窗口。
+	WNDCLASSEX wndclass;//窗口的属性。
 	wndclass.cbClsExtra = 0;
 	wndclass.cbSize = sizeof(WNDCLASSEX);
 	wndclass.cbWndExtra = 0;
 	wndclass.hbrBackground = NULL;
-	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);//让鼠标处于 Loading 状态。
 	wndclass.hIcon = NULL;
 	wndclass.hIconSm = NULL;
 	wndclass.hInstance = hInstance;
 	wndclass.lpfnWndProc = GLWindowProc;//事件回调，比如关闭窗口。
-	wndclass.lpszClassName = L"GLWindow";
+	wndclass.lpszClassName = L"GLWindow";//L 修饰的表示宽字符。
 	wndclass.lpszMenuName = NULL;
 	wndclass.style = CS_VREDRAW | CS_HREDRAW;
-	ATOM atom = RegisterClassEx(&wndclass);//执行注册
+
+	ATOM atom = RegisterClassEx(&wndclass);//执行注册。
 	if (!atom) {
 		MessageBox(NULL, L"Register Fail", L"Error", MB_OK);
 		return 0;
 	}
 
-	//step2：创建窗口
+	//step2：创建窗口。
 	HWND hwnd = CreateWindowEx(
 		NULL,
-		//窗口注册名，与 wndclass.lpszClassName 保持一致
+		//窗口注册名，与 wndclass.lpszClassName 保持一致。
 		L"GLWindow",
-		//窗口名
+		//窗口名。
 		L"OpenGL Window", WS_OVERLAPPEDWINDOW,
-		//窗口位置
+		//窗口位置。
 		100, 100,
-		//窗口大小
+		//窗口大小。
 		800, 600,
-		//其他参数
+		//其他参数。
 		NULL, NULL, hInstance, NULL);
 	//step3：展示窗口
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
 
-	//防止窗口给退出，开始监听事件
-	MSG msg;//用于接收消息
+	//防止窗口退出，开始监听事件。
+	MSG msg;//用于接收消息。
+	//接收消息。
 	while (true) {
-		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {//接收消息
+		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
 			if (msg.message == WM_QUIT) {
 				break;
 			}
-			//转换消息，并分发给自己
+			//转换消息，并分发给自己。
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
