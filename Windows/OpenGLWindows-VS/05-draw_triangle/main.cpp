@@ -112,7 +112,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	*/
 	glEnable(GL_CULL_FACE);
 	//通过修改 front face 为 GL_CW，此时摄像机所对的方向，顺时针绘制的图形就是正面。
-	//glFrontFace(GL_CW);
+	glFrontFace(GL_CW);
 
 	//-----------------------------------
 	// step3：展示窗口。
@@ -143,23 +143,41 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		glClear(GL_COLOR_BUFFER_BIT);//GL_COLOR_BUFFER_BIT 表示擦除的是颜色缓冲区，就是用上面 glClearColor 设置的颜色来擦除。
 		glColor4ub(255, 0, 0, 255);//set current color: white. 预设一个颜色，每次画都会取当前设置的颜色。
 
-		//逆时针方向
-		glBegin(GL_TRIANGLES);
-		glVertex3f(0.0F, 0.0F, -10.0F);
-		glVertex3f(-5.0F, 0.0F, -10.0F);
-		glVertex3f(-5.0F, -2.0F, -10.0F);
-		glEnd();
-		
 		//顺时针方向
 		glBegin(GL_TRIANGLES);
-		glVertex3f(0.0F, 0.0F, -10.0F);
-		glVertex3f(-5.0F, -2.0F, -10.0F);
-		glVertex3f(-5.0F, 0.0F, -10.0F);
+		glVertex3f(-5.0F, 4.0F, -10.0F);
+		glVertex3f(-2.0F, 1.0F, -10.0F);
+		glVertex3f(-5.0F, 1.0F, -10.0F);
 		glEnd();
 
-		//同样，还有其他的绘制模式。
+		//逆时针方向
+		glBegin(GL_TRIANGLES);
+		glVertex3f(0.0F, 4.0F, -10.0F);
+		glVertex3f(0.0F, 1.0F, -10.0F);
+		glVertex3f(3.0F, 1.0F, -10.0F);
+		glEnd();
+
 		//GL_TRIANGLE_STRIP：该模型下，奇数个点与偶数个点的连线方式不同。
-		//GL_TRIANGLE_FAN：总是从第一个点开始。
+		glBegin(GL_TRIANGLE_STRIP);
+		glVertex3f(-5.0F, -1.0F, -10.0F);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(-2.0F, -4.0F, -10.0F);
+		glColor4ub(0, 0, 250, 255);
+		glVertex3f(-5.0F, -4.0F, -10.0F);
+		glColor4ub(10, 10, 50, 255);
+		glVertex3f(-5.0F, -4.5F, -10.0F);
+		glEnd();
+
+		//GL_TRIANGLE_FAN：该模式，总是从第一个点开始。
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0.0F, -1.0F, -10.0F);
+		glColor4ub(0, 255, 0, 255);
+		glVertex3f(3.0F, -4.0F, -10.0F);
+		glColor4ub(0, 0, 250, 255);
+		glVertex3f(0.0F, -4.0F, -10.0F);
+		glColor4ub(110, 10, 50, 255);
+		glVertex3f(-2.0F, -2.5F, -10.0F);
+		glEnd();
 
 		//present scene.
 		SwapBuffers(dc);//其实就是交换缓冲区，将后缓冲区展示到前台。
