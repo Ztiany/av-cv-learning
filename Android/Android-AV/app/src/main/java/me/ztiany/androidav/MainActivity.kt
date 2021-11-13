@@ -1,9 +1,10 @@
 package me.ztiany.androidav
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import me.ztiany.androidav.databinding.ActivityMainBinding
+import me.ztiany.androidav.opengl.nwglsurv.NativeOpenGLESActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,24 +12,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
+        setUpView()
     }
 
-    /**
-     * A native method that is implemented by the 'androidav' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
-
-    companion object {
-        // Used to load the 'androidav' library on application startup.
-        init {
+    private fun setUpView() {
+        binding.btnInit.setOnClickListener {
             System.loadLibrary("androidav")
         }
+
+        binding.btnNativeOpengl.setOnClickListener {
+            startActivity(Intent(this, NativeOpenGLESActivity::class.java))
+        }
+
     }
+
 }
