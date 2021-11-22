@@ -8,23 +8,8 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btn_init"
-        style="@style/Button_Entrance"
-        android:text="Init" />
-
-    <Button
-        android:id="@+id/btn_opengl"
-        style="@style/Button_Entrance"
-        android:text="OpenGL" />
-
-    <Button
-        android:id="@+id/btn_camera"
+        android:id="@+id/camera_api1_back"
         style="@style/Button_Entrance"
         android:text="Camera" />
-
-    <Button
-        android:id="@+id/btn_mediaCodec"
-        style="@style/Button_Entrance"
-        android:text="Media Codec" />
 
 </LinearLayout>

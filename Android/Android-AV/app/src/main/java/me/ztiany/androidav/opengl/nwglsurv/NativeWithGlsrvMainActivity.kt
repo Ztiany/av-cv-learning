@@ -2,17 +2,16 @@ package me.ztiany.androidav.opengl.nwglsurv
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.androidav.databinding.NativeOpenglActivityMainBinding
-import me.ztiany.androidav.opengl.TemplateGLSurfaceView
+import me.ztiany.androidav.databinding.OpenglActivityNativeGlsurvMainBinding
 import me.ztiany.androidav.utils.newMMLayoutParams
 
-class NativeOpenGLESActivity : AppCompatActivity() {
+class NativeWithGlsrvMainActivity : AppCompatActivity() {
 
-    private lateinit var binding: NativeOpenglActivityMainBinding
+    private lateinit var binding: OpenglActivityNativeGlsurvMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = NativeOpenglActivityMainBinding.inflate(layoutInflater)
+        binding = OpenglActivityNativeGlsurvMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setUpView()

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.java
+package me.ztiany.androidav.opengl.javaapi
 
 import android.opengl.GLSurfaceView
 import javax.microedition.khronos.egl.EGLConfig

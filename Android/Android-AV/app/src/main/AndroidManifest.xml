@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.ztiany.androidav">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application
         android:name=".AppContext"
         android:allowBackup="false"
@@ -22,7 +28,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".opengl.nwglsurv.NativeOpenGLESActivity" />
+        <activity android:name=".opengl.nwglsurv.NativeWithGlsrvMainActivity" />
+
+        <activity android:name=".android.CameraActivity" />
+        <activity android:name=".android.MediaCodecActivity" />
+        <activity android:name=".android.camera1.Camera1BackActivity" />
+        <activity android:name=".android.h265.livescreen.sender.ScreenSenderActivity"/>
+        <activity android:name=".android.h265.livescreen.receiver.ScreenReceiverActivity"/>
 
     </application>
 

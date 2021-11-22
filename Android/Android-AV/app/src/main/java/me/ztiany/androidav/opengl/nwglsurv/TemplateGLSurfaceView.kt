@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl
+package me.ztiany.androidav.opengl.nwglsurv
 
 import android.annotation.SuppressLint
 import android.content.Context
