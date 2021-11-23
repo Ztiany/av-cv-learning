@@ -14,4 +14,11 @@
         <!-- Customize your theme here. -->
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="Theme.FullScreen" parent="Theme.AndroidAV">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>

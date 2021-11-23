@@ -3,7 +3,7 @@ package me.ztiany.androidav.opengl.nwglsurv
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.databinding.OpenglActivityNativeGlsurvMainBinding
-import me.ztiany.androidav.utils.newMMLayoutParams
+import me.ztiany.androidav.common.newMMLayoutParams
 
 class NativeWithGlsrvMainActivity : AppCompatActivity() {
 

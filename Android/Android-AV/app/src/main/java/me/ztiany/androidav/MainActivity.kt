@@ -1,18 +1,15 @@
 package me.ztiany.androidav
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import com.yanzhenjie.permission.Action
-import me.ztiany.androidav.databinding.ActivityMainBinding
-import me.ztiany.androidav.opengl.nwglsurv.NativeWithGlsrvMainActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
-import me.ztiany.androidav.android.CameraActivity
-import me.ztiany.androidav.android.MediaCodecActivity
+import me.ztiany.androidav.camera.CameraActivity
+import me.ztiany.androidav.databinding.ActivityMainBinding
+import me.ztiany.androidav.opengl.OpenGLESActivity
+import me.ztiany.androidav.video.VideoActivity
 import timber.log.Timber
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,15 +30,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpengl.setOnClickListener {
-            startActivity(Intent(this, NativeWithGlsrvMainActivity::class.java))
+            startActivity(Intent(this, OpenGLESActivity::class.java))
         }
 
         binding.btnCamera.setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))
         }
 
-        binding.btnMediaCodec.setOnClickListener {
-            startActivity(Intent(this, MediaCodecActivity::class.java))
+        binding.btnVideo.setOnClickListener {
+            startActivity(Intent(this, VideoActivity::class.java))
         }
     }
 

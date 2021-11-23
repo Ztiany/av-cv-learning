@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.ztiany.androidav">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -28,13 +27,34 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".opengl.nwglsurv.NativeWithGlsrvMainActivity" />
+        <!-- ==================================================== OpenGL ==================================================== -->
+        <activity
+            android:name=".opengl.OpenGLESActivity"
+            android:label="OpenGLES" />
+        <activity
+            android:name=".opengl.nwglsurv.NativeWithGlsrvMainActivity"
+            android:label="GLSurfaceView with Native" />
 
-        <activity android:name=".android.CameraActivity" />
-        <activity android:name=".android.MediaCodecActivity" />
-        <activity android:name=".android.camera1.Camera1BackActivity" />
-        <activity android:name=".android.h265.livescreen.sender.ScreenSenderActivity"/>
-        <activity android:name=".android.h265.livescreen.receiver.ScreenReceiverActivity"/>
+        <!-- ==================================================== Camera ==================================================== -->
+        <activity android:name=".camera.CameraActivity" />
+        <activity android:name=".camera.camera1.Camera1BackActivity" />
+
+        <!-- ==================================================== Video ==================================================== -->
+        <activity
+            android:name=".video.VideoActivity"
+            android:label="Android Video" />
+        <activity
+            android:name=".video.h265.livescreen.sender.ScreenSenderActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".video.h265.livescreen.receiver.ScreenReceiverActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".video.h265.livecamera.client.LiveCameraClientActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".video.h265.livecamera.server.LiveCameraServerActivity"
+            android:theme="@style/Theme.FullScreen" />
 
     </application>
 
