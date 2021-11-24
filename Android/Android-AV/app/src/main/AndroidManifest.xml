@@ -37,7 +37,12 @@
 
         <!-- ==================================================== Camera ==================================================== -->
         <activity android:name=".camera.CameraActivity" />
-        <activity android:name=".camera.camera1.Camera1BackActivity" />
+        <activity
+            android:name=".camera.camera1.Camera1Activity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".camera.camera2.Camera2Activity"
+            android:theme="@style/Theme.FullScreen" />
 
         <!-- ==================================================== Video ==================================================== -->
         <activity

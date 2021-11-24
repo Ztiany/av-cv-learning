@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".camera.CameraActivity">
 
     <Button
-        android:id="@+id/camera_api1_back"
         style="@style/Button_Entrance"
-        android:text="Camera" />
+        android:onClick="camera1"
+        android:text="Camera 1" />
+
+    <Button
+        style="@style/Button_Entrance"
+        android:onClick="camera2"
+        android:text="Camera 2" />
 
 </LinearLayout>

@@ -22,13 +22,13 @@ import timber.log.Timber;
 /**
  * Camera1 API，后置摄像头。
  */
-public class Camera1BackSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Camera.Size size;
     private Camera mCamera;
     private volatile boolean isCapture;
 
-    public Camera1BackSurfaceView(Context context, AttributeSet attrs) {
+    public Camera1SurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
     }
