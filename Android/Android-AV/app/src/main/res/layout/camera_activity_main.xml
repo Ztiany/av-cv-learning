@@ -16,4 +16,9 @@
         android:onClick="camera2"
         android:text="Camera 2" />
 
+    <Button
+        style="@style/Button_Entrance"
+        android:onClick="camera2Encoding"
+        android:text="Camera 2 Encoding" />
+
 </LinearLayout>

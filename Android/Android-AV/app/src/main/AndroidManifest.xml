@@ -41,7 +41,11 @@
             android:name=".camera.camera1.Camera1Activity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".camera.camera2.Camera2Activity"
+            android:name=".camera.camera2.Camera2PreviewActivity"
+            android:theme="@style/Theme.FullScreen" />
+
+        <activity
+            android:name=".camera.camera2.Camera2EncodingActivity"
             android:theme="@style/Theme.FullScreen" />
 
         <!-- ==================================================== Video ==================================================== -->

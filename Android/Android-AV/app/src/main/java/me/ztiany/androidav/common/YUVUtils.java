@@ -3,7 +3,7 @@ package me.ztiany.androidav.common;
 public class YUVUtils {
 
     /**
-     * NV21 画面旋转 90 度。参考：
+     * NV21 画面顺时针旋转 90 度。参考：
      * <p>
      * 1. https://stackoverflow.com/questions/44994510/how-to-convert-rotate-raw-nv21-array-image-android-media-image-from-front-ca
      * 2. https://stackoverflow.com/questions/6853401/camera-pixels-rotated/31425229#31425229
@@ -51,6 +51,9 @@ public class YUVUtils {
         return output;
     }
 
+    /**
+     * NV21 画面顺时针旋转 90 度。
+     */
     public static void rotateNV21CW(final byte[] yuv, final byte[] output, final int width, final int height, final int rotation) {
         if (rotation == 0) {
             return;
@@ -105,17 +108,17 @@ public class YUVUtils {
      *         </li>
      *     </ol>
      * </pre>
-     *
+     * <p>
      * 【Camera2】将 Y:U:V == 4:2:2 的数据转换为 nv21。
      *
      * @param y      Y 数据
      * @param u      U 数据
      * @param v      V 数据
-     * @param nv21   生成的 nv21，需要预先分配内存。
+     * @param nv21   生成的 nv21，需要预先分配内存
      * @param stride 步长
      * @param height 图像高度
      */
-    public static void yuv422ToYuv420sp(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+    public static void yuv422ToNV21(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
         System.arraycopy(y, 0, nv21, 0, y.length);
         // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算。
         int length = y.length + u.length / 2 + v.length / 2;
@@ -139,14 +142,28 @@ public class YUVUtils {
      * @param stride 步长
      * @param height 图像高度
      */
-    public static void yuv420ToYuv420sp(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+    public static void yuv420ToNV21(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
         System.arraycopy(y, 0, nv21, 0, y.length);
-        // 注意，若length值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算
+        // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算
         int length = y.length + u.length + v.length;
         int uIndex = 0, vIndex = 0;
         for (int i = stride * height; i < length; i++) {
             nv21[i] = v[vIndex++];
             nv21[i + 1] = u[uIndex++];
+        }
+    }
+
+    /**
+     * 【Camera2】YUV【YUV422/YUV420】 to NV21。【因为有些设备，即使要求的 YUV420 的数据，回传的还是 YUV422 的格式】
+     */
+    public static void yuvToNV21(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+        // 回传数据是YUV422
+        if (y.length / u.length == 2) {
+            YUVUtils.yuv422ToNV21(y, u, v, nv21, stride, height);
+        }
+        // 回传数据是YUV420
+        else if (y.length / u.length == 4) {
+            YUVUtils.yuv420ToNV21(y, u, v, nv21, stride, height);
         }
     }
 

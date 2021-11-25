@@ -122,7 +122,7 @@ public class Camera2Helper {
             result = (mSensorOrientation - degrees + 360) % 360;
         }
 
-        Timber.i("getCameraOri: " + rotation + " " + result + " " + mSensorOrientation);
+        Timber.i("getCameraOri: rotation = " + rotation + " result = " + result + " mSensorOrientation = " + mSensorOrientation);
         return result;
     }
 
@@ -306,8 +306,6 @@ public class Camera2Helper {
         } else {
             previewViewRatio = (float) bestSize.getWidth() / (float) bestSize.getHeight();
         }
-        Timber.d("(float) previewViewSize.x / (float) previewViewSize.y = %f", previewViewRatio);
-
         if (previewViewRatio > 1) {
             previewViewRatio = 1 / previewViewRatio;
         }
@@ -698,16 +696,13 @@ public class Camera2Helper {
         private byte[] u;
         private byte[] v;
 
-        private final ReentrantLock lock = new ReentrantLock();
-
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
+
             // Y:U:V == 4:2:2
             if (camera2Listener != null && image.getFormat() == ImageFormat.YUV_420_888) {
                 Image.Plane[] planes = image.getPlanes();
-                // 加锁确保y、u、v来源于同一个Image
-                lock.lock();
                 // 重复使用同一批byte数组，减少gc频率
                 if (y == null) {
                     ByteBuffer bufferY = planes[0].getBuffer();
@@ -716,19 +711,22 @@ public class Camera2Helper {
                     Timber.i("Y limit = %d, position = %d, capacity = %d", bufferY.limit(), bufferY.position(), bufferY.capacity());
                     Timber.i("u limit = %d, position = %d, capacity = %d", bufferU.limit(), bufferU.position(), bufferU.capacity());
                     Timber.i("v limit = %d, position = %d, capacity = %d", bufferV.limit(), bufferV.position(), bufferV.capacity());
-                    Timber.i("planes[0].getRowStride() = %d", planes[0].getRowStride());
+                    Timber.i("planesY: row-stride) = %d, pixel-stride = %d", planes[0].getRowStride(), planes[0].getPixelStride());
+                    Timber.i("planesU: row-stride) = %d, pixel-stride = %d", planes[1].getRowStride(), planes[1].getPixelStride());
+                    Timber.i("planesV: row-stride) = %d, pixel-stride = %d", planes[2].getRowStride(), planes[2].getPixelStride());
                     Timber.i("mPreviewSize = %dx%d", mPreviewSize.getWidth(), mPreviewSize.getHeight());
                     y = new byte[bufferY.limit() - bufferY.position()];
                     u = new byte[bufferU.limit() - bufferU.position()];
                     v = new byte[bufferV.limit() - bufferV.position()];
                 }
+
                 if (image.getPlanes()[0].getBuffer().remaining() == y.length) {
                     planes[0].getBuffer().get(y);
                     planes[1].getBuffer().get(u);
                     planes[2].getBuffer().get(v);
                     camera2Listener.onPreview(y, u, v, mPreviewSize, planes[0].getRowStride());
                 }
-                lock.unlock();
+
             }
             image.close();
         }

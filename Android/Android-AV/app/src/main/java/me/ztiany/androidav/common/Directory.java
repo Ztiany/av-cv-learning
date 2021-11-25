@@ -36,6 +36,9 @@ public class Directory {
     public static final String PICTURE_FORMAT_JPEG = ".jpeg";
     public static final String PICTURE_FORMAT_PNG = ".png";
     public static final String VIDEO_FORMAT_MP4 = ".mp4";
+    public static final String VIDEO_FORMAT_H264 = ".h264";
+    public static final String VIDEO_FORMAT_H265 = ".h265";
+    public static final String VIDEO_FORMAT_TXT = ".txt";
 
     ///////////////////////////////////////////////////////////////////////////
     // sd card private
