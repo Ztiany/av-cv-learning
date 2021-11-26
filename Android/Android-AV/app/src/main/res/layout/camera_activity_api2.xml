@@ -4,8 +4,14 @@
     android:layout_height="match_parent">
 
     <TextureView
-        android:id="@+id/camera_api2_texture_view"
+        android:id="@+id/texture_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <Button
+        style="@style/Button_Entrance"
+        android:layout_gravity="end|bottom"
+        android:onClick="switchCamera"
+        android:text="switchCamera" />
 
 </FrameLayout>

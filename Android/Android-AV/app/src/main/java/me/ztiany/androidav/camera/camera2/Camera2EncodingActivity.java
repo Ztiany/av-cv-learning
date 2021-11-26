@@ -16,6 +16,7 @@ import me.ztiany.androidav.R;
 import me.ztiany.androidav.common.YUVUtils;
 import timber.log.Timber;
 
+
 public class Camera2EncodingActivity extends AppCompatActivity implements ViewTreeObserver.OnGlobalLayoutListener, Camera2Listener {
 
     private Camera2Helper camera2Helper;
@@ -36,15 +37,12 @@ public class Camera2EncodingActivity extends AppCompatActivity implements ViewTr
     // 实际打开的cameraId
     private String openedCameraId;
 
-    // 当前获取的帧数
-    private int currentIndex = 0;
-
-    private final H265Encoder mH265Encoder = new H265Encoder();
+    private final H264Encoder mH264Encoder = new H264Encoder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_activity_api2_);
+        setContentView(R.layout.camera_activity_api2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         initView();
@@ -80,8 +78,8 @@ public class Camera2EncodingActivity extends AppCompatActivity implements ViewTr
         if (camera2Helper != null) {
             camera2Helper.stop();
         }
-        if (mH265Encoder != null) {
-            mH265Encoder.stop();
+        if (mH264Encoder != null) {
+            mH264Encoder.stop();
         }
         super.onPause();
     }
@@ -100,16 +98,16 @@ public class Camera2EncodingActivity extends AppCompatActivity implements ViewTr
         this.displayOrientation = displayOrientation;
         this.isMirrorPreview = isMirror;
         this.openedCameraId = cameraId;
-        mH265Encoder.initCodec(previewSize.getHeight(), previewSize.getWidth());
+        mH264Encoder.initCodec(previewSize.getHeight(), previewSize.getWidth());
     }
 
     @Override
     public void onPreview(final byte[] y, final byte[] u, final byte[] v, final Size previewSize, final int stride) {
         if (nv21 == null) {
-            nv21 = new byte[stride * previewSize.getHeight() * 3 / 2];
+            nv21 = new byte[previewSize.getWidth() * previewSize.getHeight() * 3 / 2];
         }
-        YUVUtils.yuvToNV21(y, u, v, nv21, stride, previewSize.getHeight());
-        mH265Encoder.processCamaraData(nv21, previewSize, stride, displayOrientation, isMirrorPreview, openedCameraId, currentIndex++);
+        YUVUtils.nv21FromYUVCutToWidth(y, u, v, nv21, stride, previewSize.getWidth(), previewSize.getHeight());
+        mH264Encoder.processCamaraData(nv21, previewSize, stride, displayOrientation, isMirrorPreview, openedCameraId);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class Camera2PreviewActivity extends AppCompatActivity implements ViewTre
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_activity_api2_);
+        setContentView(R.layout.camera_activity_api2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         imageProcessExecutor = Executors.newSingleThreadExecutor();
@@ -171,7 +171,7 @@ public class Camera2PreviewActivity extends AppCompatActivity implements ViewTre
                 if (nv21 == null) {
                     nv21 = new byte[stride * previewSize.getHeight() * 3 / 2];
                 }
-                YUVUtils.yuvToNV21(y, u, v, nv21, stride, previewSize.getHeight());
+                YUVUtils.nv21FromYUV(y, u, v, nv21, stride, previewSize.getHeight());
                 YUVImageDisplay.showYUVImage(
                         Camera2PreviewActivity.this,
                         nv21,

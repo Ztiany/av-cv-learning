@@ -63,8 +63,8 @@ public class EncodePushLiveH265 {
         //YUVUtils.rotateNV12CW90D(nv12, yuv, width, height);
 
         //先旋转，再转换
-        YUVUtils.rotateNV21CW(input, nv12, width, height, 90);
-        YUVUtils.nv21toNV12(nv12, yuv);
+        YUVUtils.nv21RotateCW(input, nv12, width, height, 90);
+        YUVUtils.nv12FromNV21(nv12, yuv);
 
         int inputBufferIndex = mediaCodec.dequeueInputBuffer(100000);
         if (inputBufferIndex >= 0) {

@@ -52,7 +52,9 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 Timber.d("bytes == buffer: %b", buffer == bytes);//true
                 if (isCapture) {
                     isCapture = false;
-                    capture(YUVUtils.rotateNV21CW(bytes, size.width, size.height, 90));
+                    final byte[] output = new byte[bytes.length];
+                    YUVUtils.nv21RotateCW(bytes, output, size.width, size.height, 90);
+                    capture(output);
                 }
                 mCamera.addCallbackBuffer(bytes);
             });

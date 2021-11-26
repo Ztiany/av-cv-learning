@@ -17,7 +17,7 @@ import me.ztiany.androidav.common.IOUtils;
 import me.ztiany.androidav.common.YUVUtils;
 import timber.log.Timber;
 
-class H265Encoder {
+class H264Encoder {
 
     private final LinkedBlockingDeque<byte[]> mLinkedBlockingDeque = new LinkedBlockingDeque<>();
 
@@ -27,12 +27,14 @@ class H265Encoder {
     private byte[] nv21_rotated;
     private byte[] nv12;
 
+    private int mFrameIndex;
+
     private FileOutputStream mFileOutputStream;
     private FileWriter mFileWriter;
 
     void initCodec(int width, int height) {
         try {
-            mFileOutputStream = new FileOutputStream(Directory.createDCIMPicturePath(Directory.VIDEO_FORMAT_H265));
+            mFileOutputStream = new FileOutputStream(Directory.createDCIMPicturePath(Directory.VIDEO_FORMAT_H264));
             mFileWriter = new FileWriter(Directory.createDCIMPicturePath(Directory.VIDEO_FORMAT_TXT));
         } catch (IOException e) {
             Timber.e(e);
@@ -42,10 +44,11 @@ class H265Encoder {
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
             final MediaFormat format = MediaFormat.createVideoFormat("video/avc", width, height);
-            //设置帧率
+            //COLOR_FormatYUV420SemiPlanar
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
-            format.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3);//可以为 1 3 5 等来控制质量
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
             mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mediaCodec.start();
@@ -57,14 +60,14 @@ class H265Encoder {
         startEncoder();
     }
 
-    void processCamaraData(byte[] nv21, Size previewSize, int stride, int displayOrientation, boolean isMirrorPreview, String openedCameraId, int frameIndex) {
+    void processCamaraData(byte[] nv21, Size previewSize, int stride, int displayOrientation, boolean isMirrorPreview, String openedCameraId) {
         if (nv21_rotated == null) {
-            nv21_rotated = new byte[stride * previewSize.getHeight() * 3 / 2];
-            nv12 = new byte[stride * previewSize.getHeight() * 3 / 2];
+            nv21_rotated = new byte[previewSize.getWidth() * previewSize.getHeight() * 3 / 2];
+            nv12 = new byte[previewSize.getWidth() * previewSize.getHeight() * 3 / 2];
         }
 
-        YUVUtils.rotateNV21CW(nv21, nv21_rotated, stride, previewSize.getHeight(), 90);
-        YUVUtils.nv21toNV12(nv21_rotated, nv12);
+        YUVUtils.nv21RotateCW(nv21, nv21_rotated, previewSize.getWidth(), previewSize.getHeight(), 90);
+        YUVUtils.nv12FromNV21(nv21_rotated, nv12);
 
         while (mLinkedBlockingDeque.size() > 3) {
             mLinkedBlockingDeque.removeFirst();
@@ -145,9 +148,13 @@ class H265Encoder {
             ByteBuffer byteBuffer = mediaCodec.getInputBuffer(inIndex);
             byteBuffer.clear();
             byteBuffer.put(rawData, 0, rawData.length);
-            mediaCodec.queueInputBuffer(inIndex, 0, rawData.length, 0, 0);
+            mediaCodec.queueInputBuffer(inIndex, 0, rawData.length, computePresentationTime(mFrameIndex++), 0);
         }
 
+    }
+
+    private long computePresentationTime(long frameIndex) {
+        return 240 + frameIndex * 1000000 / 15;
     }
 
 }

@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import timber.log.Timber;
 
@@ -699,7 +698,6 @@ public class Camera2Helper {
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
-
             // Y:U:V == 4:2:2
             if (camera2Listener != null && image.getFormat() == ImageFormat.YUV_420_888) {
                 Image.Plane[] planes = image.getPlanes();
@@ -714,7 +712,7 @@ public class Camera2Helper {
                     Timber.i("planesY: row-stride) = %d, pixel-stride = %d", planes[0].getRowStride(), planes[0].getPixelStride());
                     Timber.i("planesU: row-stride) = %d, pixel-stride = %d", planes[1].getRowStride(), planes[1].getPixelStride());
                     Timber.i("planesV: row-stride) = %d, pixel-stride = %d", planes[2].getRowStride(), planes[2].getPixelStride());
-                    Timber.i("mPreviewSize = %dx%d", mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                    Timber.i("preview-size = %dx%d", mPreviewSize.getWidth(), mPreviewSize.getHeight());
                     y = new byte[bufferY.limit() - bufferY.position()];
                     u = new byte[bufferU.limit() - bufferU.position()];
                     v = new byte[bufferV.limit() - bufferV.position()];
