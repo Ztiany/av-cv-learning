@@ -34,8 +34,8 @@ class H264Encoder {
 
     void initCodec(int width, int height) {
         try {
-            mFileOutputStream = new FileOutputStream(Directory.createDCIMPicturePath(Directory.VIDEO_FORMAT_H264));
-            mFileWriter = new FileWriter(Directory.createDCIMPicturePath(Directory.VIDEO_FORMAT_TXT));
+            mFileOutputStream = new FileOutputStream(Directory.createTimeNamingDCIMPath(Directory.VIDEO_FORMAT_H264));
+            mFileWriter = new FileWriter(Directory.createTimeNamingDCIMPath(Directory.VIDEO_FORMAT_TXT));
         } catch (IOException e) {
             Timber.e(e);
             return;
@@ -45,7 +45,7 @@ class H264Encoder {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
             final MediaFormat format = MediaFormat.createVideoFormat("video/avc", width, height);
             //COLOR_FormatYUV420SemiPlanar
-            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
+            //format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             format.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
             format.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3);//可以为 1 3 5 等来控制质量
@@ -133,7 +133,7 @@ class H264Encoder {
             }
             byte[] encoded = new byte[byteBuffer.remaining()];
             byteBuffer.get(encoded);
-            FileUtils.writeBytes(mFileOutputStream, encoded);
+            FileUtils.writeBytes(mFileOutputStream, encoded, true);
             FileUtils.writeContent(mFileWriter, encoded);
             mediaCodec.releaseOutputBuffer(outIndex, false);
         }

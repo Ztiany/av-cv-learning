@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
+import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
 import me.ztiany.androidav.common.printMediaCodecInfo
 import me.ztiany.androidav.databinding.ActivityMainBinding
@@ -37,6 +38,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnCamera.setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))
+        }
+
+        binding.btnAudio.setOnClickListener {
+            startActivity(Intent(this, AudioActivity::class.java))
         }
 
         binding.btnVideo.setOnClickListener {

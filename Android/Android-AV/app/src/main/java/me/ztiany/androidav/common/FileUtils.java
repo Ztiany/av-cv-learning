@@ -1,15 +1,33 @@
 package me.ztiany.androidav.common;
 
+import android.content.res.AssetFileDescriptor;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+
+import me.ztiany.androidav.AppContext;
 
 public class FileUtils {
 
-    public static void writeBytes(OutputStream outputStream, byte[] array) {
+    public static void copyAssets(String assetsName, String path) throws IOException {
+        AssetFileDescriptor assetFileDescriptor = AppContext.get().getAssets().openFd(assetsName);
+        FileChannel from = new FileInputStream(assetFileDescriptor.getFileDescriptor()).getChannel();
+        FileChannel to = new FileOutputStream(path).getChannel();
+        from.transferTo(assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength(), to);
+    }
+
+    public static void writeBytes(OutputStream outputStream, byte[] array, boolean endFlag) {
         try {
             outputStream.write(array);
-            //outputStream.write('\n');
+            if (endFlag) {
+                outputStream.write('\n');
+                outputStream.write('\n');
+                outputStream.write('\n');
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

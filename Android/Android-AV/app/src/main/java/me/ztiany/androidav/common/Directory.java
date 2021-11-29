@@ -39,6 +39,8 @@ public class Directory {
     public static final String VIDEO_FORMAT_H264 = ".h264";
     public static final String VIDEO_FORMAT_H265 = ".h265";
     public static final String VIDEO_FORMAT_TXT = ".txt";
+    public static final String AUDIO_FORMAT_PCM = ".pcm";
+    public static final String AUDIO_FORMAT_AAC = ".aac";
 
     ///////////////////////////////////////////////////////////////////////////
     // sd card private
@@ -123,9 +125,22 @@ public class Directory {
      * @return /storage/sdcard0/DCIM/APP_NAME/xxx.png
      */
     @NonNull
-    public static String createDCIMPicturePath(String format) {
+    public static String createTimeNamingDCIMPath(String format) {
         String path = getSDCardPublicDirectoryPath(Environment.DIRECTORY_DCIM).toString() + File.separator + APP_NAME + File.separator;
         File file = new File(path + createTempFileName(format));
+        makeParentPath(file, "createDCIMPictureStorePath() called mkdirs: ");
+        return file.getAbsolutePath();
+    }
+
+    /**
+     * 获取 DCIM 存储图片的路径。
+     *
+     * @return /storage/sdcard0/DCIM/APP_NAME/xxx.png
+     */
+    @NonNull
+    public static String createDCIMPath(String filename) {
+        String path = getSDCardPublicDirectoryPath(Environment.DIRECTORY_DCIM).toString() + File.separator + APP_NAME + File.separator;
+        File file = new File(path + filename);
         makeParentPath(file, "createDCIMPictureStorePath() called mkdirs: ");
         return file.getAbsolutePath();
     }

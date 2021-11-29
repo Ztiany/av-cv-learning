@@ -80,7 +80,7 @@ public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
     public void capture(byte[] temp) {
         //保存一张照片
-        File pictureFile = new File(Directory.createDCIMPicturePath(Directory.PICTURE_FORMAT_JPEG));
+        File pictureFile = new File(Directory.createTimeNamingDCIMPath(Directory.PICTURE_FORMAT_JPEG));
         if (!pictureFile.exists()) {
             try {
                 pictureFile.createNewFile();
