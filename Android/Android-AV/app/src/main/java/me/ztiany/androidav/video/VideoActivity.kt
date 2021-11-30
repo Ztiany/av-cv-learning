@@ -8,6 +8,7 @@ import me.ztiany.androidav.video.h265.livecamera.client.LiveCameraClientActivity
 import me.ztiany.androidav.video.h265.livecamera.server.LiveCameraServerActivity
 import me.ztiany.androidav.video.h265.livescreen.receiver.ScreenReceiverActivity
 import me.ztiany.androidav.video.h265.livescreen.sender.ScreenSenderActivity
+import me.ztiany.androidav.video.combine.VideoCombinationActivity
 
 class VideoActivity : AppCompatActivity() {
 
@@ -35,6 +36,11 @@ class VideoActivity : AppCompatActivity() {
         }
         binding.videoH265ShareCameraClient.setOnClickListener {
             startActivity(Intent(this, LiveCameraClientActivity::class.java))
+        }
+
+        //视频拼接
+        binding.videoMosaic.setOnClickListener {
+            startActivity(Intent(this, VideoCombinationActivity::class.java))
         }
     }
 

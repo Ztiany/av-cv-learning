@@ -43,7 +43,7 @@ public class VideoAudioMixing {
         File mixedPCM = new File(Directory.getSDCardRootPath(), "mixed.pcm");
         File mixedWAV = new File(Directory.getSDCardRootPath(), "mixed.wav");
 
-        //TODO
+        //TODO: 根据媒体时长调整时间。
         adjustStartAndEnd(videoInput, bgAudioInput, startTimeUs, endTimeUs);
 
         //extra pcm, than we has two pcm files which have the same duration.
@@ -186,6 +186,7 @@ public class VideoAudioMixing {
                 break;
             }
 
+            //TODO: 为什么加 600？
             info.presentationTimeUs = sampleTimeUs - startTimeUs + 600;
             info.flags = videoExtractor.getSampleFlags();
             info.size = videoExtractor.readSampleData(buffer, 0);
@@ -196,7 +197,6 @@ public class VideoAudioMixing {
             videoExtractor.advance();
         }
         //------------------------------------------------ 混入视频完毕 ------------------------------------------------
-
 
         try {
             wavExtractor.release();
