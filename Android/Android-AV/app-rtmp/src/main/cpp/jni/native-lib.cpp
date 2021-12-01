@@ -1,12 +1,8 @@
 #include <jni.h>
 #include <string>
-#include <malloc.h>
-#include <pthread.h>
 #include <Log.h>
 #include <RtmpPusher.h>
 
-static bool running = false;
-static pthread_t thread_id;
 JavaVM *javaVM;
 static RtmpPusher *rtmpPusher;
 
@@ -32,14 +28,14 @@ Java_me_ztiany_rtmp_livevideo_MediaPusher_initPusher(JNIEnv *env, jobject thiz, 
     env->ReleaseStringUTFChars(url, path);
 
     //start the pusher
-    rtmpPusher.start(address);
+    rtmpPusher->start(address);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_me_ztiany_rtmp_livevideo_MediaPusher_releasePusher(JNIEnv *env, jobject thiz) {
     if (rtmpPusher) {
-        rtmpPusher.stop();
+        rtmpPusher->stop();
     }
     rtmpPusher = nullptr;
 }
