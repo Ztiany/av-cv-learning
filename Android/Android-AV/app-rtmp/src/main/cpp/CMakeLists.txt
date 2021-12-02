@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.10.2)
 project("android_rtmp")
 
-#添加头文件
-include_directories(tools)
 #添加 LibRTC 子模块
 add_subdirectory(librtmp)
 
 #添加源码
 aux_source_directory(./jni JNI_MODULE)
+
 #构建共享库
 add_library(android_rtmp SHARED ${JNI_MODULE})
 

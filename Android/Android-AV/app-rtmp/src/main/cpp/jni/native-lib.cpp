@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <string>
-#include <Log.h>
-#include <RtmpPusher.h>
+#include "Log.h"
+#include "RtmpPusher.h"
 
 JavaVM *javaVM;
 static RtmpPusher *rtmpPusher;

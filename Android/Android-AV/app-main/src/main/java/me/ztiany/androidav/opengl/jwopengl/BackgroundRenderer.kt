@@ -1,0 +1,28 @@
+package me.ztiany.androidav.opengl.jwopengl
+
+import android.opengl.GLES20
+import android.opengl.GLSurfaceView
+import timber.log.Timber
+import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.opengles.GL10
+
+class BackgroundRenderer : GLSurfaceView.Renderer {
+
+    override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
+        Timber.d("onSurfaceCreated() called with: gl = $gl, config = $config")
+        //设置当前颜色状态【OpenGL 是一个状态机】
+        GLES20.glClearColor(0.6F, 0.4F, 0.1F, 1.0F)
+    }
+
+    override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
+        Timber.d("onSurfaceChanged() called with: gl = $gl, width = $width, height = $height")
+        //设置视口，Viewport 可以理解为 OpenGL 的画布。
+        GLES20.glViewport(0, 0, width, height)
+    }
+
+    override fun onDrawFrame(gl: GL10) {
+        //用 glClearColor 设置的颜色来擦除颜色缓冲区。【除了颜色缓冲区，还有 GL_DEPTH_BUFFER_BIT（深度） 和 GL_STENCIL_BUFFER_BIT（蒙版）】
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+    }
+
+}
