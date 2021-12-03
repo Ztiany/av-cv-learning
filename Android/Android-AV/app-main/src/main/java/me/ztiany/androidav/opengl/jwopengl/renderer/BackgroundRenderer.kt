@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView

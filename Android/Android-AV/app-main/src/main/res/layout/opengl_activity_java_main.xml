@@ -18,4 +18,9 @@
         android:onClick="drawTriangle"
         android:text="画三角形" />
 
+    <Button
+        style="@style/Button_Entrance"
+        android:onClick="drawRect"
+        android:text="画渐变矩形" />
+
 </LinearLayout>
