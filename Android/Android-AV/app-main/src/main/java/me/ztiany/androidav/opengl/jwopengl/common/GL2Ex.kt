@@ -15,7 +15,7 @@ import java.nio.FloatBuffer
  * 3. left-top
  * 4. right-top
  */
-fun newRectVertex4Coordination() = floatArrayOf(
+fun newVertexCoordinateFull4() = floatArrayOf(
     -1.0f, -1.0f, 0.0F, 1.0F,  //left-bottom
     1.0f, -1.0f, 0.0F, 1.0F, //right-bottom
     -1.0f, 1.0f, 0.0F, 1.0F, //left-top
@@ -29,7 +29,7 @@ fun newRectVertex4Coordination() = floatArrayOf(
  * 3. left-top
  * 4. right-top
  */
-fun newRectVertex3Coordination() = floatArrayOf(
+fun newVertexCoordinateFull3() = floatArrayOf(
     -1.0F, -1.0F, 0.0F,   //left-bottom
     1.0F, -1.0F, 0.0F,  //right-bottom
     -1.0F, 1.0F, 0.0F,  //left-top
@@ -43,7 +43,7 @@ fun newRectVertex3Coordination() = floatArrayOf(
  * 3. left-top
  * 4. right-top
  */
-fun newRectTextureCoordination() = floatArrayOf(
+fun newTextureCoordinate() = floatArrayOf(
     0.0F, 1.0F,//left-bottom
     1.0F, 1.0F,//right-bottom
     0.0F, 0.0F,//left-top

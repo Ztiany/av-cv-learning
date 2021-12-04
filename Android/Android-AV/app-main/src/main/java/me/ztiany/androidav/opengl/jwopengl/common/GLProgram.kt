@@ -1,6 +1,7 @@
 package me.ztiany.androidav.opengl.jwopengl.common
 
 import android.opengl.GLES20
+import android.opengl.Matrix
 import me.ztiany.androidav.common.FileUtils
 import java.nio.FloatBuffer
 
@@ -14,12 +15,11 @@ class GLProgram(
     private val attributeMap = mutableMapOf<String, Int>()
     private val uniformMap = mutableMapOf<String, Int>()
 
-    fun setSize(width: Int, height: Int) {
-
-    }
-
     companion object {
-        fun fromAssets(vertexPath: String, fragmentPath: String) = GLProgram(FileUtils.loadAssets(vertexPath), FileUtils.loadAssets(fragmentPath))
+        fun fromAssets(vertexPath: String, fragmentPath: String) = GLProgram(
+            FileUtils.loadAssets(vertexPath),
+            FileUtils.loadAssets(fragmentPath)
+        )
     }
 
     fun activeAttribute(attributeName: String) {
@@ -73,6 +73,10 @@ class GLProgram(
         )
     }
 
+    fun drawArraysStrip(count: Int) {
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, count)
+    }
+
     /**
      * - elementsPerVertex: 每个点几个 float。
      */
@@ -80,15 +84,25 @@ class GLProgram(
         GLES20.glVertexAttribPointer(
             attributeHandle(attribute),
             elementsPerVertex,
-            GLES20.GL_FLOAT,
+            GLES20.GL_INT,
             false,
             elementsPerVertex * 4/*每个点 4 个 float，每 float 4 byte*/,
             vbo
         )
     }
 
-    private fun attributeHandle(attribute: String) = attributeMap[attribute] ?: throw NoSuchElementException()
+    fun uniformMatrix4fv(uniformName: String, matrix: FloatArray) {
+        GLES20.glUniformMatrix4fv(
+            uniformHandle(uniformName),
+            1,
+            false,
+            matrix,
+            0
+        )
+    }
 
-    private fun uniformHandle(attribute: String) = uniformMap[attribute] ?: throw NoSuchElementException()
+    fun attributeHandle(attribute: String) = attributeMap[attribute] ?: throw NoSuchElementException()
+
+    fun uniformHandle(attribute: String) = uniformMap[attribute] ?: throw NoSuchElementException()
 
 }

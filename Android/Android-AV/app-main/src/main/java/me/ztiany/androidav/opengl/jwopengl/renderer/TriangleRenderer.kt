@@ -17,7 +17,7 @@ class TriangleRenderer : GLSurfaceView.Renderer {
 
     private lateinit var vertexBuffer: FloatBuffer
 
-    private val triangleCoordination = floatArrayOf(
+    private val triangleCoordinate = floatArrayOf(
         0.0F, 0.5F, 0.0F,  // top
         -0.5F, -0.5F, 0.0F,  // bottom left
         0.5F, -0.5F, 0.0F // bottom right
@@ -35,16 +35,16 @@ class TriangleRenderer : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         //申请 native 空间
-        vertexBuffer = ByteBuffer.allocateDirect(triangleCoordination.size * 4 /*one float has four bytes.*/)
+        vertexBuffer = ByteBuffer.allocateDirect(triangleCoordinate.size * 4 /*one float has four bytes.*/)
             .order(ByteOrder.nativeOrder())
             .asFloatBuffer()
-            .put(triangleCoordination).also {
+            .put(triangleCoordinate).also {
                 it.position(0)
             }//将坐标数据转换为 FloatBuffer
 
         //生成 Shader
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, FileUtils.loadAssets("shader/base_vert.glsl"))
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, FileUtils.loadAssets("shader/color_fragment.glsl"))
+        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, FileUtils.loadAssets("shader/vertex_base.glsl"))
+        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, FileUtils.loadAssets("shader/fragment_color.glsl"))
 
         //创建一个空的OpenGLES程序
         program = GLES20.glCreateProgram()

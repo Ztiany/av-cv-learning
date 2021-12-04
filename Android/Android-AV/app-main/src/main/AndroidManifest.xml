@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="me.ztiany.androidav">
 
@@ -8,6 +9,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <uses-feature android:name="android.hardware.camera.any" />
 
     <application
         android:name=".AppContext"
@@ -39,6 +42,10 @@
         <activity
             android:name=".opengl.jwopengl.JavaWithOpenGLCommonActivity"
             android:label="OpenGLES with Java Common" />
+        <activity
+            android:name=".opengl.jwopengl.preview.OpenGLCameraPreviewActivity"
+            android:theme="@style/Theme.FullScreen" />
+
         <!-- ==================================================== Camera ==================================================== -->
         <activity android:name=".camera.CameraActivity" />
         <activity
@@ -47,7 +54,6 @@
         <activity
             android:name=".camera.camera2.Camera2PreviewActivity"
             android:theme="@style/Theme.FullScreen" />
-
         <activity
             android:name=".camera.camera2.Camera2EncodingActivity"
             android:theme="@style/Theme.FullScreen" />

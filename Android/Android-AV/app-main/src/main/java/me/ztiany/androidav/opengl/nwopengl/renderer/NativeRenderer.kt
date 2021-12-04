@@ -1,6 +1,7 @@
-package me.ztiany.androidav.opengl.nwopengl
+package me.ztiany.androidav.opengl.nwopengl.renderer
 
 import android.opengl.GLSurfaceView
+import me.ztiany.androidav.opengl.nwopengl.OGLESInterface
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

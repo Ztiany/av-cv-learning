@@ -1,29 +1,59 @@
 package me.ztiany.androidav.opengl.jwopengl
 
+import android.app.Activity
+import android.content.Intent
 import android.opengl.GLSurfaceView
-import android.view.View
-import me.ztiany.androidav.databinding.OpenglActivityJavaMainBinding
-import me.ztiany.androidav.opengl.jwopengl.renderer.BackgroundRenderer
-import me.ztiany.androidav.opengl.jwopengl.renderer.GradualTriangleRenderer
-import me.ztiany.androidav.opengl.jwopengl.renderer.TriangleRenderer
-import me.ztiany.lib.avbase.BaseActivity
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import me.ztiany.androidav.common.IEntrance
+import me.ztiany.androidav.common.buildLayoutEntrance
+import me.ztiany.androidav.opengl.jwopengl.preview.OpenGLCameraPreviewActivity
+import me.ztiany.androidav.opengl.jwopengl.renderer.*
 
-class JavaWithOpenGLMainActivity : BaseActivity<OpenglActivityJavaMainBinding>() {
+class JavaWithOpenGLMainActivity : AppCompatActivity() {
 
-    private fun startCommon(clazz: Class<out GLSurfaceView.Renderer>) {
-        JavaWithOpenGLCommonActivity.start(this, clazz)
+    private data class CommonItem(
+        override val title: String,
+        val renderer: Class<out GLSurfaceView.Renderer>,
+        val controller: Class<out GLController>? = null,
+        val params: GLParams? = null
+    ) : IEntrance
+
+    private data class ActivityItem(
+        override val title: String,
+        val activity: Class<out Activity>,
+    ) : IEntrance
+
+    private val entrances = listOf(
+        CommonItem("绘制背景", BackgroundRenderer::class.java),
+        CommonItem("绘制三角形", TriangleRenderer::class.java),
+        CommonItem("绘制渐变矩形", GradualRectangleRenderer::class.java),
+        CommonItem("绘制纹理", TextureRenderer::class.java),
+        CommonItem("绘制纹理（修正1）", Fixed1TextureRenderer::class.java),
+        CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
+        CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
+        ActivityItem("相机预览", OpenGLCameraPreviewActivity::class.java),
+    )
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(
+            buildLayoutEntrance(
+                this,
+                entrances
+            ) { _, index ->
+                handleClicked(index)
+            }
+        )
     }
 
-    fun drawBackground(view: View) {
-        startCommon(BackgroundRenderer::class.java)
-    }
-
-    fun drawTriangle(view: View) {
-        startCommon(TriangleRenderer::class.java)
-    }
-
-    fun drawRect(view: View) {
-        startCommon(GradualTriangleRenderer::class.java)
+    private fun handleClicked(index: Int) {
+        val item = entrances[index]
+        if (item is CommonItem) {
+            JavaWithOpenGLCommonActivity.start(this, item.title, item.renderer)
+        } else if (item is ActivityItem) {
+            startActivity(Intent(this, item.activity))
+        }
     }
 
 }

@@ -4,11 +4,11 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import me.ztiany.androidav.opengl.jwopengl.common.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.common.generateVBOBuffer
-import me.ztiany.androidav.opengl.jwopengl.common.newRectVertex3Coordination
+import me.ztiany.androidav.opengl.jwopengl.common.newVertexCoordinateFull3
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class GradualTriangleRenderer : GLSurfaceView.Renderer {
+class GradualRectangleRenderer : GLSurfaceView.Renderer {
 
     private lateinit var program: GLProgram
 
@@ -22,7 +22,7 @@ class GradualTriangleRenderer : GLSurfaceView.Renderer {
 
     /*矩形的坐标*/
     private val vertexVbo = generateVBOBuffer(
-        newRectVertex3Coordination().map {
+        newVertexCoordinateFull3().map {
             it * 0.8F
         }.toFloatArray()
     )
@@ -31,7 +31,7 @@ class GradualTriangleRenderer : GLSurfaceView.Renderer {
     private val colorBuffer = generateVBOBuffer(vertexColor)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        program = GLProgram.fromAssets("shader/base_vert.glsl", "shader/coloring_fragment.glsl")
+        program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_coloring.glsl")
         program.activeAttribute("aPosition")
         program.activeAttribute("aColor")
         program.setColor(0.7F, 0.5F, 0.5F, 1.0F)
@@ -39,7 +39,6 @@ class GradualTriangleRenderer : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
-        program.setSize(width, height)
     }
 
     override fun onDrawFrame(gl: GL10?) {

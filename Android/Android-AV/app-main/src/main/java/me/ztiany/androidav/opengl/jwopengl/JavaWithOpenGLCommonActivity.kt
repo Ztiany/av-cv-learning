@@ -12,17 +12,20 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
     companion object {
 
         private const val KEY_RENDERER = "key_renderer"
+        private const val KEY_TITLE = "key_title"
         private const val KEY_CONTROLLER = "key_controller"
         private const val KEY_PARAMS = "key_params"
 
         fun start(
             context: Context,
+            title: String,
             renderer: Class<out GLSurfaceView.Renderer>,
             controller: Class<out GLController>? = null,
             params: GLParams? = null
         ) {
 
             with(Intent(context, JavaWithOpenGLCommonActivity::class.java)) {
+                putExtra(KEY_TITLE, title)
                 putExtra(KEY_RENDERER, renderer)
                 putExtra(KEY_CONTROLLER, controller)
                 putExtra(KEY_PARAMS, params)
@@ -44,6 +47,9 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
 
     private fun setUpGlSurfaceView() {
         val renderer = intent.getSerializableExtra(KEY_RENDERER) as Class<out GLSurfaceView.Renderer>
+        val title = intent.getStringExtra(KEY_TITLE)
+
+        supportActionBar?.title = title
         binding.openglGlSurfaceView.setRenderer(renderer.newInstance())
         binding.openglGlSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
     }

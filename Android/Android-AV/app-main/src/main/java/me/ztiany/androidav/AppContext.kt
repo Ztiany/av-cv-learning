@@ -2,6 +2,8 @@ package me.ztiany.androidav
 
 import android.app.Application
 import android.content.Context
+import androidx.camera.camera2.Camera2Config
+import androidx.camera.core.CameraXConfig
 import kotlin.properties.Delegates
 import timber.log.Timber
 

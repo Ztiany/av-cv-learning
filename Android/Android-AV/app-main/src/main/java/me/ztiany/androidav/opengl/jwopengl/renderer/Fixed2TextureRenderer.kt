@@ -8,26 +8,31 @@ import me.ztiany.androidav.opengl.jwopengl.common.*
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class TextureRenderer : GLSurfaceView.Renderer {
+class Fixed2TextureRenderer : GLSurfaceView.Renderer {
 
     private lateinit var program: GLProgram
     private lateinit var glTexture: GLTexture
 
+    private val mvpMatrix by lazy { GLMVPMatrix() }
+
     /**矩形的坐标*/
-    private val vertexVbo = generateVBOBuffer(
-        newVertexCoordinateFull3().map {
-            it * 0.8F
-        }.toFloatArray()
-    )
+    private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
     /**纹理坐标*/
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinate())
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_texture.glsl")
+        program = GLProgram.fromAssets(
+            "shader/vertex_mvp_separated.glsl",
+            "shader/fragment_texture.glsl"
+        )
+
         program.activeAttribute("aPosition")
         program.activeAttribute("aTextureCoordinate")
         program.activeUniform("uTexture")
+        program.activeUniform("uModelMatrix")
+        program.activeUniform("uViewMatrix")
+        program.activeUniform("uProjectionMatrix")
 
         glTexture = generateTextureFromBitmap(
             program.uniformHandle("uTexture"),
@@ -38,12 +43,20 @@ class TextureRenderer : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+
+        mvpMatrix.setWorldSize(width, height)
+        mvpMatrix.setModelSize(glTexture.width, glTexture.height)
+        mvpMatrix.lookAtNormally()
+        mvpMatrix.adjustToOrthogonal()
     }
 
     override fun onDrawFrame(gl: GL10?) {
         program.startDraw {
             clearColorBuffer()
             glTexture.activeTexture()
+            uniformMatrix4fv("uModelMatrix", mvpMatrix.modelMatrix)
+            uniformMatrix4fv("uViewMatrix", mvpMatrix.viewMatrix)
+            uniformMatrix4fv("uProjectionMatrix", mvpMatrix.projectionMatrix)
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4/*4 个点*/)
