@@ -6,9 +6,9 @@ import android.opengl.GLES11Ext
 import android.opengl.GLUtils
 import timber.log.Timber
 
-class GLTexture(
+data class GLTexture(
     val handle: Int,
-    val id: Int,
+    val name: Int,
     val width: Int,
     val height: Int,
     val index: Int,
@@ -19,10 +19,16 @@ fun GLTexture.activeTexture() {
     //激活指定纹理单元【有 32 个纹理单位，默认只有 0 号纹理单元是激活的】为了代码的统一性，不管哪个纹理，都调用一次 glActiveTexture，多次调用没有问题。
     GLES20.glActiveTexture(getTextureIdentificationByIndex(index))
     //绑定纹理 ID 到当前激活的纹理单元。
-    GLES20.glBindTexture(textureType, id)
+    GLES20.glBindTexture(textureType, name)
     //将激活的纹理单元传递到着色器里面。
     //我们使用 glUniform1i 设置 uniform 采样器的位置值，或者说纹理单元。通过 glUniform1i 的设置，我们保证每个 uniform 采样器对应着正确的纹理单元。
+    //为一个纹理变量指定纹理数值 0，表示从 GL_TEXTURE0 采样。
+    //为一个纹理变量指定纹理数值 1，表示从 GL_TEXTURE1 采样。
     GLES20.glUniform1i(handle, index)
+}
+
+fun GLTexture.deleteTexture() {
+    GLES20.glDeleteTextures(1, intArrayOf(name), 0)
 }
 
 /**
@@ -36,11 +42,13 @@ fun generateTexture(
     textureType: Int = GLES20.GL_TEXTURE_2D
 ): GLTexture {
     //申请纹理
-    val textureObjectIds = allocateTexture()
+    val textureObjectIds = allocateTextureObject()
     //设置通用属性
-    setCommonAttribute(textureType, textureObjectIds)
+    setCommonAttribute(textureType, textureObjectIds[0])
     //返回纹理封装对象
-    return GLTexture(textureHandle, textureObjectIds[0], 0, 0, textureIndex, textureType)
+    return GLTexture(textureHandle, textureObjectIds[0], 0, 0, textureIndex, textureType).apply {
+        Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
+    }
 }
 
 /**
@@ -54,11 +62,11 @@ fun generateTextureFromBitmap(
     bitmap: Bitmap
 ): GLTexture {
     //申请纹理
-    val textureObjectIds = allocateTexture()
+    val textureObjectIds = allocateTextureObject()
 
     //设置通用属性
     val textureType = GLES20.GL_TEXTURE_2D
-    setCommonAttribute(textureType, textureObjectIds)
+    setCommonAttribute(textureType, textureObjectIds[0])
 
     //通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
     GLES20.glBindTexture(textureType, textureObjectIds[0])
@@ -66,12 +74,14 @@ fun generateTextureFromBitmap(
     GLES20.glBindTexture(textureType, 0)
 
     //返回纹理封装对象
-    return GLTexture(textureHandle, textureObjectIds[0], bitmap.width, bitmap.height, textureIndex, textureType)
+    return GLTexture(textureHandle, textureObjectIds[0], bitmap.width, bitmap.height, textureIndex, textureType).apply {
+        Timber.d("new GLTexture: $this with Identification ${getTextureIdentificationByIndex(index)}")
+    }
 }
 
-private fun setCommonAttribute(textureType: Int, textureObjectIds: IntArray) {
-    //绑定到这个纹理，之后的纹理操作就是对这个纹理进行操作
-    GLES20.glBindTexture(textureType, textureObjectIds[0])
+private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
+    //绑定到这个纹理对象，之后的纹理操作就是对这个纹理对象进行操作。
+    GLES20.glBindTexture(textureType, textureObjectId)
 
     //设置纹理缩放过滤
     // GL_NEAREST: 使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
@@ -91,8 +101,13 @@ private fun setCommonAttribute(textureType: Int, textureObjectIds: IntArray) {
     GLES20.glBindTexture(textureType, 0)
 }
 
-private fun allocateTexture(): IntArray {
-    //创建纹理对象
+private fun allocateTextureObject(): IntArray {
+    /*
+    申请一个纹理对象，返回这个对象的 id，注意：
+        1. The generated textures have no dimensionality; they assume the dimensionality of the texture target to which they are first bound (see glBindTexture).
+        2. glGenTextures only allocates texture "names" (eg ids) with no "dimensionality". So you are not actually allocating texture memory as such, and the overhead here is negligible compared to actual texture memory allocation.
+        3. glTexImage will actually control the amount of texture memory used per texture.
+     */
     val textureObjectIds = IntArray(1)
     GLES20.glGenTextures(1, textureObjectIds, 0)
     if (textureObjectIds[0] == 0) {
@@ -103,7 +118,11 @@ private fun allocateTexture(): IntArray {
     return textureObjectIds
 }
 
-/**OpenGL 一共有 32 个纹理，从 0-31 号纹理都有对应的标识，定义在 [GLES20] 中。*/
+/**
+ * 1. OpenGL 一共有 32 个纹理位置（单元），从 0-31 号纹理都有对应的标识，定义在 [GLES20] 中。
+ * 2. 一个纹理的默认纹理位置是 0，它是默认的激活纹理单元。
+ * 3. 纹理单元的主要目的是让我们在着色器中可以使用多于一个的纹理。通过把纹理单元赋值给采样器，我们可以一次绑定多个纹理。
+ */
 private fun getTextureIdentificationByIndex(textureIndex: Int): Int {
     return when (textureIndex) {
         0 -> GLES20.GL_TEXTURE0
