@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.common.IEntrance
 import me.ztiany.androidav.common.buildLayoutEntrance
+import me.ztiany.androidav.opengl.jwopengl.egl.SimpleEGLPreviewWithSURVActivity
 import me.ztiany.androidav.opengl.jwopengl.preview.OpenGLCameraPreviewActivity
 import me.ztiany.androidav.opengl.jwopengl.renderer.*
 
@@ -31,8 +32,8 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         CommonItem("绘制纹理", TextureRenderer::class.java),
         CommonItem("绘制纹理（修正1）", Fixed1TextureRenderer::class.java),
         CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
-        CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
-        ActivityItem("相机预览", OpenGLCameraPreviewActivity::class.java),
+        ActivityItem("相机预览（GLSurfaceView）", OpenGLCameraPreviewActivity::class.java),
+        ActivityItem("相机预览（EGL + SurfaceView）", SimpleEGLPreviewWithSURVActivity::class.java),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
