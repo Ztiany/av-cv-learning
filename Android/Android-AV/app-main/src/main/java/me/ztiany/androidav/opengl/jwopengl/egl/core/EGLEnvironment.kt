@@ -21,38 +21,35 @@ class EGLEnvironment(
 
         private const val MSG_RENDERER_SURFACE_CREATED = 105
         private const val MSG_RENDERER_SURFACE_CHANGED = 106
-        private const val MSG_RENDERER_DRAW = 108
+        private const val MSG_RENDERER_DRAW = 107
     }
+
+    private val eglThread = HandlerThread("EGLEnvironment")
 
     private val eglCore = EGLCore()
 
+    private lateinit var renderer: Renderer
+    private lateinit var eglHandler: Handler
+
     @Volatile private var surfaceAvailable = false
 
-    private val eglThread = HandlerThread("EGLEnvironment")
-    private val eglHandler: Handler
+    @Volatile var renderMode = RenderMode.Continuously
 
-    var renderMode = RenderMode.Continuously
-
-    private var hasNotified = false
-
-    var renderer: Renderer? = null
-        set(value) {
-            if (field == value) {
-                return
-            }
-            hasNotified = false
-            field = value
-            eglHandler.sendEmptyMessage(MSG_RENDERER_SURFACE_CREATED)
+    fun start(renderer: Renderer) {
+        if (this::renderer.isInitialized) {
+            throw IllegalStateException("renderer has already been set.")
         }
 
-    init {
+        this.renderer = renderer
+
         eglThread.start()
         eglHandler = Handler(eglThread.looper, ::handleMessage)
         eglHandler.sendEmptyMessage(MSG_EGL_INIT)
-        surfaceProvider.start(newSurfaceProviderCallback())
+
+        surfaceProvider.start(surfaceProviderCallback)
     }
 
-    private fun newSurfaceProviderCallback() = object : SurfaceProviderCallback {
+    private val surfaceProviderCallback = object : SurfaceProviderCallback {
         override fun onSurfaceAvailable(surface: Surface) {
             surfaceAvailable = true
             eglHandler.sendMessage(Message.obtain().apply {
@@ -74,12 +71,15 @@ class EGLEnvironment(
             eglHandler.removeCallbacksAndMessages(null)
             eglHandler.sendEmptyMessage(MSG_EGL_SURFACE_DESTROYED)
         }
-
     }
 
     fun release() {
         surfaceProvider.stop()
         eglHandler.removeCallbacksAndMessages(null)
+        //A TextureView's onDestroy is called after an Activity's onDestroy.
+        if (surfaceAvailable) {
+            eglHandler.sendEmptyMessage(MSG_EGL_SURFACE_DESTROYED)
+        }
         eglHandler.sendEmptyMessage(MSG_EGL_SURFACE_RELEASE)
         eglThread.quitSafely()
     }
@@ -100,11 +100,13 @@ class EGLEnvironment(
                 eglCore.makeEglContext(message.obj as? EGLContext)
             }
             MSG_EGL_NEW_SURFACE -> {
+                Timber.d("handleEGLMessage MSG_EGL_NEW_SURFACE")
                 eglCore.makeEglWindowSurface(message.obj as Surface)
                 eglCore.makeCurrent()
                 eglHandler.sendEmptyMessage(MSG_RENDERER_SURFACE_CREATED)
             }
             MSG_EGL_SURFACE_REFRESH -> {
+                Timber.d("handleEGLMessage MSG_EGL_SURFACE_REFRESH")
                 //egl doesn't need to do anything.
                 //...
                 //notify renderer the surface size.
@@ -118,10 +120,12 @@ class EGLEnvironment(
                 }
             }
             MSG_EGL_SURFACE_DESTROYED -> {
-                renderer?.onSurfaceDestroy()
+                Timber.d("handleEGLMessage MSG_EGL_SURFACE_DESTROYED")
+                renderer.onSurfaceDestroy()
                 eglCore.destroySurface()
             }
             MSG_EGL_SURFACE_RELEASE -> {
+                Timber.d("handleEGLMessage MSG_EGL_SURFACE_RELEASE")
                 eglCore.release()
             }
         }
@@ -130,21 +134,20 @@ class EGLEnvironment(
     private fun handleRendererMessage(message: Message) {
         when (message.what) {
             MSG_RENDERER_SURFACE_CREATED -> {
+                Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CREATED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    if (!hasNotified) {
-                        renderer?.onSurfaceCreated()
-                        hasNotified = true
-                    }
+                    renderer.onSurfaceCreated()
                 }
             }
             MSG_RENDERER_SURFACE_CHANGED -> {
+                Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CHANGED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    renderer?.onSurfaceChanged(message.arg1, message.arg2)
+                    renderer.onSurfaceChanged(message.arg1, message.arg2)
                 }
             }
             MSG_RENDERER_DRAW -> {
                 if (eglCore.isActive() && surfaceAvailable) {
-                    renderer?.onDrawFrame()
+                    renderer.onDrawFrame()
                     eglCore.swapBuffers()
                 }
                 checkIfDrawContinuously()
@@ -152,6 +155,7 @@ class EGLEnvironment(
         }
     }
 
+    /*TODO: optimize the delay time.*/
     private fun checkIfDrawContinuously() {
         if (renderMode == RenderMode.Continuously) {
             eglHandler.sendEmptyMessageDelayed(MSG_RENDERER_DRAW, 16)

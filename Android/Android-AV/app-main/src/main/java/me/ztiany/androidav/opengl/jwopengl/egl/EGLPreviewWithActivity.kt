@@ -1,18 +1,23 @@
 package me.ztiany.androidav.opengl.jwopengl.egl
 
 import android.graphics.Point
+import android.os.Bundle
 import android.util.Size
-import me.ztiany.androidav.databinding.OpenglActivityEglSimpleSurvPreviewBinding
-import me.ztiany.androidav.opengl.jwopengl.egl.core.EGLAttribute
-import me.ztiany.androidav.opengl.jwopengl.egl.core.EGLEnvironment
-import me.ztiany.androidav.opengl.jwopengl.egl.core.SurfaceViewProvider
+import androidx.appcompat.app.AppCompatActivity
+import me.ztiany.androidav.R
+import me.ztiany.androidav.opengl.jwopengl.egl.core.*
 import me.ztiany.androidav.opengl.jwopengl.egl.renderer.CameraRenderer
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
-import me.ztiany.lib.avbase.BaseActivity
 
-class SimpleEGLPreviewWithSURVActivity : BaseActivity<OpenglActivityEglSimpleSurvPreviewBinding>() {
+class EGLPreviewWithActivity : AppCompatActivity() {
+
+    companion object {
+        const val WITH_SURFACE_VIEW = 1
+        const val WITH_TEXTURE_VIEW = 2
+        const val RENDER_TYPE = "RENDER_TYPE"
+    }
 
     private lateinit var eglEnvironment: EGLEnvironment
     private lateinit var cameraOperator: CameraOperator
@@ -29,18 +34,27 @@ class SimpleEGLPreviewWithSURVActivity : BaseActivity<OpenglActivityEglSimpleSur
         }
     }
 
-    override fun setUpView() {
-        setUpGlSurfaceView()
-        setUpCamera()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (intent.getIntExtra(RENDER_TYPE, WITH_SURFACE_VIEW) == WITH_SURFACE_VIEW) {
+            setContentView(R.layout.opengl_activity_egl_surv_preview)
+            setUpGlSurfaceView(SurfaceViewProvider(findViewById(R.id.opengl_egl_surface_view)))
+            setUpCamera(Point(0, 0))
+        } else {
+            setContentView(R.layout.opengl_activity_egl_texv_preview)
+            setUpGlSurfaceView(TextureViewProvider(findViewById(R.id.opengl_egl_texture_view)))
+            setUpCamera(Point(0, 0))
+        }
     }
 
-    private fun setUpGlSurfaceView() {
-        eglEnvironment = EGLEnvironment(SurfaceViewProvider(binding.openglSurfaceView), EGLAttribute())
+    private fun setUpGlSurfaceView(surfaceProvider: SurfaceProvider) {
+        eglEnvironment = EGLEnvironment(surfaceProvider, EGLAttribute())
         cameraRenderer = CameraRenderer(this, eglEnvironment)
-        eglEnvironment.renderer = cameraRenderer
+        eglEnvironment.renderMode = RenderMode.WhenReady
+        eglEnvironment.start(cameraRenderer)
     }
 
-    private fun setUpCamera() {
+    private fun setUpCamera(point: Point) {
         val cameraListener = CameraListener { _, _, previewSize, displayOrientation, _ ->
             onCameraAvailable(previewSize, displayOrientation)
         }
@@ -51,12 +65,7 @@ class SimpleEGLPreviewWithSURVActivity : BaseActivity<OpenglActivityEglSimpleSur
             .minPreviewSize(Point(100, 100))
             .specificCameraId(CameraOperator.CAMERA_ID_BACK)
             .context(applicationContext)
-            .previewViewSize(
-                Point(
-                    binding.openglSurfaceView.width,
-                    binding.openglSurfaceView.height
-                )
-            )
+            .previewViewSize(point)
             .targetPreviewSize(Point(800, 480))
             .rotation(windowManager.defaultDisplay.rotation)
             .build("2")

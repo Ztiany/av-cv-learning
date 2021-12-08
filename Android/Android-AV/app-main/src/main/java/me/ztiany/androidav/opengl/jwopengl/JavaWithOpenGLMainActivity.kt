@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.common.IEntrance
 import me.ztiany.androidav.common.buildLayoutEntrance
-import me.ztiany.androidav.opengl.jwopengl.egl.SimpleEGLPreviewWithSURVActivity
+import me.ztiany.androidav.opengl.jwopengl.egl.EGLPreviewWithActivity
 import me.ztiany.androidav.opengl.jwopengl.preview.OpenGLCameraPreviewActivity
 import me.ztiany.androidav.opengl.jwopengl.renderer.*
 
@@ -23,6 +23,7 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
     private data class ActivityItem(
         override val title: String,
         val activity: Class<out Activity>,
+        val onIntent: ((Intent) -> Unit)? = null,
     ) : IEntrance
 
     private val entrances = listOf(
@@ -33,7 +34,12 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         CommonItem("绘制纹理（修正1）", Fixed1TextureRenderer::class.java),
         CommonItem("绘制纹理（修正2）", Fixed2TextureRenderer::class.java),
         ActivityItem("相机预览（GLSurfaceView）", OpenGLCameraPreviewActivity::class.java),
-        ActivityItem("相机预览（EGL + SurfaceView）", SimpleEGLPreviewWithSURVActivity::class.java),
+        ActivityItem("相机预览（EGL + SurfaceView）", EGLPreviewWithActivity::class.java) {
+            it.putExtra(EGLPreviewWithActivity.RENDER_TYPE, EGLPreviewWithActivity.WITH_SURFACE_VIEW)
+        },
+        ActivityItem("相机预览（EGL + TextureView）", EGLPreviewWithActivity::class.java) {
+            it.putExtra(EGLPreviewWithActivity.RENDER_TYPE, EGLPreviewWithActivity.WITH_TEXTURE_VIEW)
+        },
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +59,9 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         if (item is CommonItem) {
             JavaWithOpenGLCommonActivity.start(this, item.title, item.renderer)
         } else if (item is ActivityItem) {
-            startActivity(Intent(this, item.activity))
+            startActivity(Intent(this, item.activity).apply {
+                item.onIntent?.invoke(this)
+            })
         }
     }
 

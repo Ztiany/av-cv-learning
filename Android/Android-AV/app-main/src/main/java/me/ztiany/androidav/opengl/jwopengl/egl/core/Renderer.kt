@@ -1,5 +1,6 @@
 package me.ztiany.androidav.opengl.jwopengl.egl.core
 
+/**All the methods in this class will be called in a OpenGL Marked Thread.*/
 interface Renderer {
 
     /**

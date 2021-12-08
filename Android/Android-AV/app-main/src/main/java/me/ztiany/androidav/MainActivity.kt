@@ -3,8 +3,10 @@ package me.ztiany.androidav
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
+import kotlinx.coroutines.*
 import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
 import me.ztiany.androidav.common.printMediaCodecInfo
@@ -13,6 +15,8 @@ import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
 import me.ztiany.androidav.video.VideoActivity
 import timber.log.Timber
+import java.lang.NullPointerException
+import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity() {
 
