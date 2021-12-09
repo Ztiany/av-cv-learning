@@ -4,7 +4,7 @@
 #include "pusher/RtmpPusher.h"
 
 JavaVM *javaVM;
-static RtmpPusher *rtmpPusher
+static RtmpPusher *rtmpPusher;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;

@@ -3,7 +3,6 @@ project("android_rtmp")
 
 #添加 LibRTC 子模块
 add_subdirectory(librtmp)
-include_directories(librtmp)
 
 #构建共享库
 add_library(
