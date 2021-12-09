@@ -3,12 +3,24 @@ project("android_rtmp")
 
 #添加 LibRTC 子模块
 add_subdirectory(librtmp)
-
-#添加源码
-aux_source_directory(./jni JNI_MODULE)
+include_directories(librtmp)
 
 #构建共享库
-add_library(android_rtmp SHARED ${JNI_MODULE})
+add_library(
+        ###库名
+        android_rtmp
+
+        ###共享库
+        SHARED
+
+        ###源码
+        native-lib.cpp
+        codec/X264Codec.cpp
+        pusher/RtmpPusher.h
+        utils/JavaCaller.h
+        utils/SafeQueue.h
+        utils/SafeQueueCPP11.h
+)
 
 #找到依赖库
 find_library(log-lib log)

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.egl.core
+package me.ztiany.androidav.opengl.jwopengl.egl
 
 import android.view.SurfaceHolder
 import android.view.SurfaceView

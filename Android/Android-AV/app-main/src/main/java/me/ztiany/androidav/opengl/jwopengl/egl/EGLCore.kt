@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.egl.core
+package me.ztiany.androidav.opengl.jwopengl.egl
 
 import android.opengl.EGL14
 import android.opengl.EGLConfig

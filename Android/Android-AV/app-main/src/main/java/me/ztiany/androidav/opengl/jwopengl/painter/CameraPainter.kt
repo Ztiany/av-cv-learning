@@ -1,21 +1,18 @@
-package me.ztiany.androidav.opengl.jwopengl.preview
+package me.ztiany.androidav.opengl.jwopengl.painter
 
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
-import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
 import me.ztiany.androidav.opengl.jwopengl.common.*
 import timber.log.Timber
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
-class CameraRenderer(
+class CameraPainter(
     private val context: Context,
-    private val glSurfaceView: GLSurfaceView
-) : GLSurfaceView.Renderer {
+    private val eglBridger: EGLBridger
+) : GLPainter {
 
     private val glMVPMatrix = GLMVPMatrix()
     private lateinit var glProgram: GLProgram
@@ -43,7 +40,7 @@ class CameraRenderer(
         }
     }
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+    override fun onSurfaceCreated() {
         glProgram = GLProgram.fromAssets(
             "shader/vertex_mvp.glsl",
             "shader/fragment_camera.glsl"
@@ -69,14 +66,14 @@ class CameraRenderer(
         }
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onSurfaceChanged(width: Int, height: Int) {
         Timber.d("onSurfaceChanged")
         GLES20.glViewport(0, 0, width, height)
         glMVPMatrix.setWorldSize(width, height)
         adjustMatrix()
     }
 
-    override fun onDrawFrame(gl: GL10?) {
+    override fun onDrawFrame() {
         glProgram.startDraw {
             clearColorBuffer()
             glTexture.activeTexture()
@@ -88,8 +85,11 @@ class CameraRenderer(
         }
     }
 
+    override fun onSurfaceDestroy() {
+    }
+
     private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
-        glSurfaceView.requestRender()
+        eglBridger.requestRender()
     }
 
     fun setVideoAttribute(width: Int, height: Int, displayOrientation: Int) {

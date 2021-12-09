@@ -1,5 +1,5 @@
 package me.ztiany.androidav.opengl.jwopengl.egl
 
-class SimpleEGL {
+class EGLAttribute {
 
 }

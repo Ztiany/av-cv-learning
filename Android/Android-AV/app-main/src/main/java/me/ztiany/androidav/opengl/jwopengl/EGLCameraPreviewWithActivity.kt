@@ -1,17 +1,18 @@
-package me.ztiany.androidav.opengl.jwopengl.egl
+package me.ztiany.androidav.opengl.jwopengl
 
 import android.graphics.Point
 import android.os.Bundle
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.R
-import me.ztiany.androidav.opengl.jwopengl.egl.core.*
-import me.ztiany.androidav.opengl.jwopengl.egl.renderer.CameraRenderer
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.egl.*
+import me.ztiany.androidav.opengl.jwopengl.painter.CameraPainter
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
 
-class EGLPreviewWithActivity : AppCompatActivity() {
+class EGLCameraPreviewWithActivity : AppCompatActivity() {
 
     companion object {
         const val WITH_SURFACE_VIEW = 1
@@ -21,15 +22,15 @@ class EGLPreviewWithActivity : AppCompatActivity() {
 
     private lateinit var eglEnvironment: EGLEnvironment
     private lateinit var cameraOperator: CameraOperator
-    private lateinit var cameraRenderer: CameraRenderer
+    private lateinit var cameraPainter: CameraPainter
 
     private fun onCameraAvailable(previewSize: Size, displayOrientation: Int) {
         if ((displayOrientation / 90).mod(2) == 1) {
-            cameraRenderer.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation)
+            cameraPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation)
         } else {
-            cameraRenderer.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation)
+            cameraPainter.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation)
         }
-        cameraRenderer.getSurfaceTexture {
+        cameraPainter.getSurfaceTexture {
             cameraOperator.startPreview(it)
         }
     }
@@ -49,9 +50,13 @@ class EGLPreviewWithActivity : AppCompatActivity() {
 
     private fun setUpGlSurfaceView(surfaceProvider: SurfaceProvider) {
         eglEnvironment = EGLEnvironment(surfaceProvider, EGLAttribute())
-        cameraRenderer = CameraRenderer(this, eglEnvironment)
         eglEnvironment.renderMode = RenderMode.WhenReady
-        eglEnvironment.start(cameraRenderer)
+        cameraPainter = CameraPainter(this, object : EGLBridger {
+            override fun requestRender() {
+                eglEnvironment.requestRender()
+            }
+        })
+        eglEnvironment.start(CompoundRenderer(cameraPainter))
     }
 
     private fun setUpCamera(point: Point) {

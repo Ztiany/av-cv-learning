@@ -1,7 +1,7 @@
-package me.ztiany.androidav.opengl.jwopengl.egl.core
+package me.ztiany.androidav.opengl.jwopengl.common
 
 /**All the methods in this class will be called in a OpenGL Marked Thread.*/
-interface Renderer {
+interface GLPainter {
 
     /**
      * Called when the surface is created or recreated.
@@ -19,7 +19,7 @@ interface Renderer {
     fun onDrawFrame()
 
     /**
-     * Called when egl context release.
+     * Called when egl context release.【It is not guaranteed that this method will be called at the end of drawing.】
      */
     fun onSurfaceDestroy()
 

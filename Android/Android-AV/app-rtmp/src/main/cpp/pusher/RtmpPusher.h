@@ -1,13 +1,13 @@
 #ifndef ANDROID_AV_LIBRTMP_HPP
 #define ANDROID_AV_LIBRTMP_HPP
 
-#include "SafeQueue.h"
 #include <pthread.h>
-#include "JavaCaller.h"
-#include "Log.h"
+#include "../utils/SafeQueue.h"
+#include "../utils/JavaCaller.h"
+#include "../utils/Log.h"
 
 extern "C" {
-#include "../librtmp/rtmp.h"
+#include <rtmp.h>
 }
 
 class RtmpPusher {

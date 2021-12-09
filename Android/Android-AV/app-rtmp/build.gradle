@@ -15,7 +15,7 @@ android {
         versionName "1.0"
         externalNativeBuild {
             cmake {
-                cppFlags ''
+                cppFlags "-std=c++11 -frtti -fexceptions"
             }
         }
     }
@@ -39,7 +39,6 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.10.2'
         }
     }
 

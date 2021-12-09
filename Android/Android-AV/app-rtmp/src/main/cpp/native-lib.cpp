@@ -1,10 +1,10 @@
 #include <jni.h>
 #include <string>
-#include "Log.h"
-#include "RtmpPusher.h"
+#include "utils/Log.h"
+#include "pusher/RtmpPusher.h"
 
 JavaVM *javaVM;
-static RtmpPusher *rtmpPusher;
+static RtmpPusher *rtmpPusher
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;

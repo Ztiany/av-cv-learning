@@ -1,14 +1,12 @@
-package me.ztiany.androidav.opengl.jwopengl.renderer
+package me.ztiany.androidav.opengl.jwopengl.painter
 
 import android.opengl.GLES20
-import android.opengl.GLSurfaceView
+import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
 import me.ztiany.androidav.opengl.jwopengl.common.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.common.generateVBOBuffer
 import me.ztiany.androidav.opengl.jwopengl.common.newVertexCoordinateFull3
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
-class GradualRectangleRenderer : GLSurfaceView.Renderer {
+class GradualRectanglePainter : GLPainter {
 
     private lateinit var program: GLProgram
 
@@ -30,24 +28,27 @@ class GradualRectangleRenderer : GLSurfaceView.Renderer {
     /*矩形的坐标颜色*/
     private val colorBuffer = generateVBOBuffer(vertexColor)
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+    override fun onSurfaceCreated() {
         program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_coloring.glsl")
         program.activeAttribute("aPosition")
         program.activeAttribute("aColor")
         program.setColor(0.7F, 0.5F, 0.5F, 1.0F)
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onSurfaceChanged(width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame(gl: GL10?) {
+    override fun onDrawFrame() {
         program.startDraw {
             clearColorBuffer()
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aColor", 4, colorBuffer)
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4/*4 个点*/)
         }
+    }
+
+    override fun onSurfaceDestroy() {
     }
 
 }

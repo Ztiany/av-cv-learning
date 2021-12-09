@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.egl.core
+package me.ztiany.androidav.opengl.jwopengl.egl
 
 import android.graphics.SurfaceTexture
 import android.view.Surface

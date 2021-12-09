@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.egl.core
+package me.ztiany.androidav.opengl.jwopengl.egl
 
 import android.opengl.EGLContext
 import android.os.Handler
@@ -28,19 +28,19 @@ class EGLEnvironment(
 
     private val eglCore = EGLCore()
 
-    private lateinit var renderer: Renderer
+    private lateinit var GLRenderer: GLRenderer
     private lateinit var eglHandler: Handler
 
     @Volatile private var surfaceAvailable = false
 
     @Volatile var renderMode = RenderMode.Continuously
 
-    fun start(renderer: Renderer) {
-        if (this::renderer.isInitialized) {
+    fun start(GLRenderer: GLRenderer) {
+        if (this::GLRenderer.isInitialized) {
             throw IllegalStateException("renderer has already been set.")
         }
 
-        this.renderer = renderer
+        this.GLRenderer = GLRenderer
 
         eglThread.start()
         eglHandler = Handler(eglThread.looper, ::handleMessage)
@@ -121,7 +121,7 @@ class EGLEnvironment(
             }
             MSG_EGL_SURFACE_DESTROYED -> {
                 Timber.d("handleEGLMessage MSG_EGL_SURFACE_DESTROYED")
-                renderer.onSurfaceDestroy()
+                GLRenderer.onSurfaceDestroy()
                 eglCore.destroySurface()
             }
             MSG_EGL_SURFACE_RELEASE -> {
@@ -136,18 +136,18 @@ class EGLEnvironment(
             MSG_RENDERER_SURFACE_CREATED -> {
                 Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CREATED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    renderer.onSurfaceCreated()
+                    GLRenderer.onSurfaceCreated()
                 }
             }
             MSG_RENDERER_SURFACE_CHANGED -> {
                 Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CHANGED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    renderer.onSurfaceChanged(message.arg1, message.arg2)
+                    GLRenderer.onSurfaceChanged(message.arg1, message.arg2)
                 }
             }
             MSG_RENDERER_DRAW -> {
                 if (eglCore.isActive() && surfaceAvailable) {
-                    renderer.onDrawFrame()
+                    GLRenderer.onDrawFrame()
                     eglCore.swapBuffers()
                 }
                 checkIfDrawContinuously()

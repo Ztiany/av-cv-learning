@@ -1,15 +1,13 @@
-package me.ztiany.androidav.opengl.jwopengl.renderer
+package me.ztiany.androidav.opengl.jwopengl.painter
 
 import android.opengl.GLES20
-import android.opengl.GLSurfaceView
 import me.ztiany.androidav.common.FileUtils
+import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
-class TriangleRenderer : GLSurfaceView.Renderer {
+class TrianglePainter : GLPainter {
 
     private var program = 0
     private var aPositionHandle = 0
@@ -33,7 +31,7 @@ class TriangleRenderer : GLSurfaceView.Renderer {
         return shader
     }
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+    override fun onSurfaceCreated() {
         //申请 native 空间
         vertexBuffer = ByteBuffer.allocateDirect(triangleCoordinate.size * 4 /*one float has four bytes.*/)
             .order(ByteOrder.nativeOrder())
@@ -61,10 +59,11 @@ class TriangleRenderer : GLSurfaceView.Renderer {
         uColorHandle = GLES20.glGetUniformLocation(program, "aColor")
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onSurfaceChanged(width: Int, height: Int) {
+        GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame(gl: GL10?) {
+    override fun onDrawFrame() {
         //清理
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -84,6 +83,9 @@ class TriangleRenderer : GLSurfaceView.Renderer {
         //禁止顶点数组的句柄
         GLES20.glDisableVertexAttribArray(aPositionHandle)
         GLES20.glUseProgram(0)
+    }
+
+    override fun onSurfaceDestroy() {
     }
 
 }

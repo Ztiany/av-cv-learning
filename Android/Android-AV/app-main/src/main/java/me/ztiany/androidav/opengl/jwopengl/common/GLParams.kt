@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl
+package me.ztiany.androidav.opengl.jwopengl.common
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

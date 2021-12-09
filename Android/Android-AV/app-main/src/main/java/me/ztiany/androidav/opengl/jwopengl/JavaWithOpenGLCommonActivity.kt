@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.opengl.GLSurfaceView
 import me.ztiany.androidav.databinding.OpenglActivityCommonBinding
+import me.ztiany.androidav.opengl.jwopengl.common.CompoundRenderer
+import me.ztiany.androidav.opengl.jwopengl.common.GLController
+import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
+import me.ztiany.androidav.opengl.jwopengl.common.GLParams
 import me.ztiany.lib.avbase.BaseActivity
 import timber.log.Timber
 
@@ -11,7 +15,7 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
 
     companion object {
 
-        private const val KEY_RENDERER = "key_renderer"
+        private const val KEY_DEFAULT_PAINTER = "key_default_painter"
         private const val KEY_TITLE = "key_title"
         private const val KEY_CONTROLLER = "key_controller"
         private const val KEY_PARAMS = "key_params"
@@ -19,14 +23,14 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
         fun start(
             context: Context,
             title: String,
-            renderer: Class<out GLSurfaceView.Renderer>,
+            defaultPainter: Class<out GLPainter>,
             controller: Class<out GLController>? = null,
             params: GLParams? = null
         ) {
 
             with(Intent(context, JavaWithOpenGLCommonActivity::class.java)) {
                 putExtra(KEY_TITLE, title)
-                putExtra(KEY_RENDERER, renderer)
+                putExtra(KEY_DEFAULT_PAINTER, defaultPainter)
                 putExtra(KEY_CONTROLLER, controller)
                 putExtra(KEY_PARAMS, params)
                 context.startActivity(this)
@@ -46,11 +50,15 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
     }
 
     private fun setUpGlSurfaceView() {
-        val renderer = intent.getSerializableExtra(KEY_RENDERER) as Class<out GLSurfaceView.Renderer>
+        val defaultPainter = intent.getSerializableExtra(KEY_DEFAULT_PAINTER) as Class<*>
         val title = intent.getStringExtra(KEY_TITLE)
 
+        //title
         supportActionBar?.title = title
-        binding.openglGlSurfaceView.setRenderer(renderer.newInstance())
+
+        //renderer
+        val renderer = CompoundRenderer(defaultPainter.newInstance() as GLPainter)
+        binding.openglGlSurfaceView.setRenderer(renderer)
         binding.openglGlSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
     }
 
