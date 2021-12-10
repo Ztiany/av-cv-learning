@@ -35,7 +35,6 @@ public class Camera2Operator implements CameraOperator {
     private final int rotation;
     private final Point previewViewSize;
     private final Point specificPreviewSize;
-    private final boolean isMirror;
 
     private String mCameraId;
 
@@ -64,7 +63,6 @@ public class Camera2Operator implements CameraOperator {
         specificPreviewSize = builder.previewSize;
         maxPreviewSize = builder.maxPreviewSize;
         minPreviewSize = builder.minPreviewSize;
-        isMirror = builder.isMirror;
         context = builder.context;
 
         Timber.d("camera builder %s", builder.toString());
@@ -123,7 +121,7 @@ public class Camera2Operator implements CameraOperator {
 
             if (mCameraListener != null) {
                 ContextCompat.getMainExecutor(context).execute(() ->
-                        mCameraListener.onCameraOpened(new Camera2(mCameraDevice), mCameraId, mPreviewSize, getCameraOri(rotation, mCameraId), isMirror)
+                        mCameraListener.onCameraOpened(new Camera2(mCameraDevice), mCameraId, mPreviewSize, getCameraOri(rotation, mCameraId))
                 );
             }
         }

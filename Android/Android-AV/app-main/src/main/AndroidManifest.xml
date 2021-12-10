@@ -47,6 +47,9 @@
         <activity
             android:name=".opengl.jwopengl.EGLCameraPreviewWithActivity"
             android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".opengl.jwopengl.OpenGLRecorderActivity"
+            android:theme="@style/Theme.FullScreen" />
         <!-- ==================================================== Camera ==================================================== -->
         <activity android:name=".camera.CameraActivity" />
         <activity

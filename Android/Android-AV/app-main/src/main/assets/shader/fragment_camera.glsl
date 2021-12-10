@@ -2,11 +2,13 @@
 precision mediump float;
 #endif
 
-//直接承载 YUV 的纹理
+//使用 samplerExternalOES 需要添加下面标识
 #extension GL_OES_EGL_image_external : require
 
+//纹理坐标
 varying vec2 vTextureCoordinate;
 
+//直接承载 YUV 的纹理
 uniform samplerExternalOES uTexture;
 
 void main(){

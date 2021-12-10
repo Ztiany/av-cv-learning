@@ -24,11 +24,11 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
     private lateinit var cameraOperator: CameraOperator
     private lateinit var cameraPainter: CameraPainter
 
-    private fun onCameraAvailable(previewSize: Size, displayOrientation: Int) {
+    private fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isMirror: Boolean) {
         if ((displayOrientation / 90).mod(2) == 1) {
-            cameraPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation)
+            cameraPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation, isMirror)
         } else {
-            cameraPainter.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation)
+            cameraPainter.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation, isMirror)
         }
         cameraPainter.getSurfaceTexture {
             cameraOperator.startPreview(it)
@@ -60,8 +60,8 @@ class EGLCameraPreviewWithActivity : AppCompatActivity() {
     }
 
     private fun setUpCamera(point: Point) {
-        val cameraListener = CameraListener { _, _, previewSize, displayOrientation, _ ->
-            onCameraAvailable(previewSize, displayOrientation)
+        val cameraListener = CameraListener { _, cameraID, previewSize, displayOrientation ->
+            onCameraAvailable(previewSize, displayOrientation, CameraOperator.CAMERA_ID_FRONT == cameraID)
         }
 
         cameraOperator = CameraBuilder()

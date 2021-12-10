@@ -50,6 +50,11 @@ class GLMVPMatrix {
         modelHeight = height
     }
 
+    fun getWorldWidth() = worldWidth
+    fun getWorldHeight() = worldHeight
+    fun getModelWidth() = modelWidth
+    fun getModelHeight() = modelHeight
+
     /**一般的相机摆放位置*/
     fun lookAtNormally() {
         lookAt(

@@ -20,6 +20,7 @@ class CameraPainter(
 
     /**用于修正相机的方向*/
     private var displayOrientation = 0
+    private var isMirror = false
 
     /**承载视频的纹理*/
     private lateinit var surfaceTexture: SurfaceTexture
@@ -28,7 +29,7 @@ class CameraPainter(
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
     /**纹理坐标*/
-    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinate())
+    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
 
@@ -54,7 +55,8 @@ class CameraPainter(
         glTexture = generateTexture(
             glProgram.uniformHandle("uTexture"),
             0,
-            GLES11Ext.GL_TEXTURE_EXTERNAL_OES)
+            GLES11Ext.GL_TEXTURE_EXTERNAL_OES
+        )
 
         surfaceTexture = SurfaceTexture(glTexture.name)
         ContextCompat.getMainExecutor(context).execute {
@@ -92,9 +94,10 @@ class CameraPainter(
         eglBridger.requestRender()
     }
 
-    fun setVideoAttribute(width: Int, height: Int, displayOrientation: Int) {
+    fun setVideoAttribute(width: Int, height: Int, displayOrientation: Int, isMirror: Boolean) {
         Timber.d("setVideoAttribute")
         this.displayOrientation = displayOrientation
+        this.isMirror = isMirror
         glMVPMatrix.setModelSize(width, height)
         adjustMatrix()
     }
@@ -104,7 +107,12 @@ class CameraPainter(
         glMVPMatrix.adjustToOrthogonal()
         glMVPMatrix.combineMVP()
         //绕着 Z 轴旋转
-        Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, -this.displayOrientation.toFloat(), 0F, 0F, 1F)
+        if (!isMirror) {
+            Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, -this.displayOrientation.toFloat(), 0F, 0F, 1F)
+        } else {
+            Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, this.displayOrientation.toFloat(), 0F, 0F, 1F)
+            Matrix.scaleM(glMVPMatrix.mvpMatrix, 0, 1F, -1F, 1F)
+        }
     }
 
 }

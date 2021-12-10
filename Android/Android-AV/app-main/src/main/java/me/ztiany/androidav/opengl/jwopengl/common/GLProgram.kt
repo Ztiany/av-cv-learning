@@ -1,7 +1,6 @@
 package me.ztiany.androidav.opengl.jwopengl.common
 
 import android.opengl.GLES20
-import android.opengl.Matrix
 import me.ztiany.androidav.common.FileUtils
 import java.nio.FloatBuffer
 
@@ -99,6 +98,10 @@ class GLProgram(
             matrix,
             0
         )
+    }
+
+    fun uniform1f(uniformName: String, value: Float) {
+        GLES20.glUniform1f(uniformHandle(uniformName), value)
     }
 
     fun attributeHandle(attribute: String) = attributeMap[attribute] ?: throw NoSuchElementException()

@@ -40,6 +40,7 @@ class JavaWithOpenGLMainActivity : AppCompatActivity() {
         ActivityItem("相机预览（EGL + TextureView）", EGLCameraPreviewWithActivity::class.java) {
             it.putExtra(EGLCameraPreviewWithActivity.RENDER_TYPE, EGLCameraPreviewWithActivity.WITH_TEXTURE_VIEW)
         },
+        ActivityItem("相机预览+特效+录频", OpenGLRecorderActivity::class.java),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

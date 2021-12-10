@@ -16,7 +16,7 @@ class Fixed2TexturePainter : GLPainter {
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
     /**纹理坐标*/
-    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinate())
+    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onSurfaceCreated() {
         program = GLProgram.fromAssets(

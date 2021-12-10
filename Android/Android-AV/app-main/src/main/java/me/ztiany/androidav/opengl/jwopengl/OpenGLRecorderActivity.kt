@@ -3,27 +3,27 @@ package me.ztiany.androidav.opengl.jwopengl
 import android.graphics.Point
 import android.opengl.GLSurfaceView
 import android.util.Size
-import me.ztiany.androidav.databinding.OpenglActivityCameraPreviewBinding
+import me.ztiany.androidav.databinding.OpenglActivityRecorderBinding
 import me.ztiany.androidav.opengl.jwopengl.common.CompoundRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
-import me.ztiany.androidav.opengl.jwopengl.painter.CameraPainter
+import me.ztiany.androidav.opengl.jwopengl.painter.RecorderShowPainter
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
 import me.ztiany.lib.avbase.BaseActivity
 
-class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBinding>() {
+class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
     private lateinit var cameraOperator: CameraOperator
-    private lateinit var cameraPainter: CameraPainter
+    private lateinit var recorderShowPainter: RecorderShowPainter
 
     private fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isMirror: Boolean) {
         if ((displayOrientation / 90).mod(2) == 1) {
-            cameraPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation, isMirror)
+            recorderShowPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation)
         } else {
-            cameraPainter.setVideoAttribute(previewSize.height, previewSize.width, displayOrientation, isMirror)
+            recorderShowPainter.setVideoAttribute(previewSize.width, previewSize.height, displayOrientation)
         }
-        cameraPainter.getSurfaceTexture {
+        recorderShowPainter.getSurfaceTexture {
             cameraOperator.startPreview(it)
         }
     }
@@ -35,12 +35,12 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
 
     private fun setUpGlSurfaceView() {
         binding.openglCameraView.setEGLContextClientVersion(2)
-        cameraPainter = CameraPainter(this, object : EGLBridger {
+        recorderShowPainter = RecorderShowPainter(this, object : EGLBridger {
             override fun requestRender() {
                 binding.openglCameraView.requestRender()
             }
         })
-        binding.openglCameraView.setRenderer(CompoundRenderer(cameraPainter))
+        binding.openglCameraView.setRenderer(CompoundRenderer(recorderShowPainter))
         binding.openglCameraView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
     }
 
@@ -55,8 +55,7 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
             .cameraListener(cameraListener)
             .maxPreviewSize(Point(1920, 1080))
             .minPreviewSize(Point(100, 100))
-            .specificCameraId(CameraOperator.CAMERA_ID_FRONT)
-            .isMirror(true)
+            .specificCameraId(CameraOperator.CAMERA_ID_BACK)
             .context(applicationContext)
             .previewViewSize(Point(openglCameraView.width, openglCameraView.height))
             .targetPreviewSize(Point(800, 480))

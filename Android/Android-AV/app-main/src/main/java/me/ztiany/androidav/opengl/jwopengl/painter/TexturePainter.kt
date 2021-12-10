@@ -18,7 +18,7 @@ class TexturePainter : GLPainter {
     )
 
     /**纹理坐标*/
-    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinate())
+    private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
     override fun onSurfaceCreated() {
         program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_texture.glsl")
