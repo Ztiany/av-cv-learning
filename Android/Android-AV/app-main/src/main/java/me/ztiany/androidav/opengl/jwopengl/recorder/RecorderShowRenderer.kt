@@ -19,32 +19,35 @@ class RecorderShowRenderer(
     private val eglBridger: EGLBridger
 ) : GLRenderer {
 
-    var onFrame: ((GLTexture, Long) -> Unit)? = null
-
     /**承载视频的纹理*/
     private lateinit var cameraSurfaceTexture: SurfaceTexture
     private lateinit var cameraTexture: GLTexture
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
 
-    private lateinit var eglContext: EGLContext
-    private var onEGLContext: ((EGLContext) -> Unit)? = null
-
     private val soulFilter = SoulFilter()
     private val screenFilter = ScreenFilter()
+
+    @Volatile private var recorder: Recorder? = null
+
+    private lateinit var eglContext: EGLContext
+
+    fun startRecording(recorder: Recorder) {
+        this.recorder?.onStop()
+        this.recorder = recorder
+        this.recorder?.onStart(eglContext)
+    }
+
+    fun stopRecording() {
+        val stoppingRecorder = this.recorder
+        this.recorder = null
+        stoppingRecorder?.onStop()
+    }
 
     fun getSurfaceTexture(onSurfaceText: (SurfaceTexture) -> Unit) {
         if (::cameraSurfaceTexture.isInitialized) {
             onSurfaceText(cameraSurfaceTexture)
         } else {
             this.onSurfaceText = onSurfaceText
-        }
-    }
-
-    fun getEGLContext(onEGLContext: (EGLContext) -> Unit) {
-        if (::eglContext.isInitialized) {
-            onEGLContext(eglContext)
-        } else {
-            this.onEGLContext = onEGLContext
         }
     }
 
@@ -82,7 +85,10 @@ class RecorderShowRenderer(
         cameraSurfaceTexture.updateTexImage()
         var glTexture = soulFilter.onDrawFrame(cameraTexture)
         glTexture = screenFilter.onDrawFrame(glTexture)
-        onFrame?.invoke(glTexture, cameraSurfaceTexture.timestamp)
+
+        recorder?.run {
+            onFrame(TextureWithTime(glTexture, cameraSurfaceTexture.timestamp))
+        }
     }
 
     override fun onSurfaceDestroy() {

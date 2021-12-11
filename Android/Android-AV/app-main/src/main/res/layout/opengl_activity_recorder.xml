@@ -14,10 +14,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/opengl_bt_start"
-        style="@style/Button_Default"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:text="开始" />
+        android:layout_marginBottom="30dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/opengl_btn_speed"
+            style="@style/Button_Default"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:width="0dp"
+            android:text="1.0 倍数" />
+
+        <Button
+            android:id="@+id/opengl_btn_start"
+            style="@style/Button_Default"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:width="0dp"
+            android:text="开始" />
+
+        <Button
+            android:id="@+id/opengl_btn_switch"
+            style="@style/Button_Default"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:width="0dp"
+            android:text="切换" />
+
+    </LinearLayout>
 
 </FrameLayout>

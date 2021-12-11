@@ -5,8 +5,6 @@ import android.opengl.EGLContext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import android.view.Surface
-import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.androidav.common.Directory
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.RenderMode
 import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProvider
@@ -14,14 +12,14 @@ import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProviderCallback
 import me.ztiany.androidav.opengl.jwopengl.egl14.*
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
-import java.io.File
-import kotlin.concurrent.thread
 
 /**渲染的是 FBO 中的纹理，使用标准的坐标系*/
-class RecorderEncodeRenderer(private val context: AppCompatActivity) : GLRenderer {
+class RecorderEncodeRenderer : GLRenderer {
 
+    /**CPU 着色器程序*/
     private lateinit var glProgram: GLProgram
 
+    /**用于修正坐标位置*/
     private val glMVPMatrix = GLMVPMatrix()
 
     /**矩形的坐标*/
@@ -30,14 +28,12 @@ class RecorderEncodeRenderer(private val context: AppCompatActivity) : GLRendere
     /**纹理坐标*/
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
+    /**自定义的 EGL 环境*/
     private var eglEnvironment: EGLEnvironment? = null
-    private var mediaCodec: MediaCodec? = null
-    private var mediaMuxer: MediaMuxer? = null
     private var mediaCodecSurfaceProvider: MediaCodecSurfaceProvider? = null
 
-    private var lastTimeStamp: Long = 0
-    private var track = 0
-    private val speed = 1F
+    /**编码器*/
+    private var encoder: Encoder? = null
 
     override fun onSurfaceCreated() {
         glProgram = GLProgram.fromAssets(
@@ -77,7 +73,7 @@ class RecorderEncodeRenderer(private val context: AppCompatActivity) : GLRendere
     }
 
     override fun onSurfaceDestroy() {
-
+        Timber.d("onSurfaceDestroy")
     }
 
     fun setVideoAttribute(attribute: TextureAttribute) {
@@ -104,141 +100,62 @@ class RecorderEncodeRenderer(private val context: AppCompatActivity) : GLRendere
         }
     }
 
-
-    fun start(sharedEGLContext: EGLContext) {
-        endOfStream = false
-        val surface = initMediaCodec()
-        val mediaCodecSurfaceProvider = MediaCodecSurfaceProvider(surface)
-        this.mediaCodecSurfaceProvider = mediaCodecSurfaceProvider
-
-        thread {
-            codec()
+    fun start(sharedEGLContext: EGLContext, encoder: Encoder) {
+        if (this.encoder != null) {
+            throw UnsupportedOperationException("Already started..")
         }
 
-        eglEnvironment = EGLEnvironment(mediaCodecSurfaceProvider, EGLAttribute(sharedEGLContext)).apply {
+        this.encoder = encoder
+        encoder.init(glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
+
+        if (encoder.mode == EncoderMode.Hard) {
+            startWithHardEncoder(sharedEGLContext, encoder)
+        } else {
+            throw UnsupportedOperationException("Not supported.")
+        }
+    }
+
+    private fun startWithHardEncoder(sharedEGLContext: EGLContext, encoder: Encoder) {
+        encoder.start()
+        val surfaceProvider = MediaCodecSurfaceProvider(encoder.getInputSurfaceView())
+        eglEnvironment = EGLEnvironment(
+            surfaceProvider,
+            EGLAttribute(sharedEGLContext)
+        ).apply {
             renderMode = RenderMode.WhenDirty
             start(this@RecorderEncodeRenderer)
         }
-    }
-
-    private fun initMediaCodec(): Surface {
-        val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
-        //从 surface 当中获得
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-        //码率
-        format.setInteger(MediaFormat.KEY_BIT_RATE, glMVPMatrix.getModelWidth() * glMVPMatrix.getModelHeight() * 3)
-        //帧率
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, 25)
-        //关键帧间隔
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10)
-        //创建编码器
-        val mediaCodec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
-        //配置编码器
-        mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        //输入数据
-        val surface = mediaCodec.createInputSurface()
-        this.mediaCodec = mediaCodec
-        //开始编码
-        mediaCodec.start()
-
-        //混合器 (复用器) 将编码的 h.264 封装为 mp4
-        val output = File(Directory.getSDCardRootPath(), Directory.createTempFileName(Directory.VIDEO_FORMAT_MP4)).absolutePath
-        Timber.d("output = $output")
-        mediaMuxer = MediaMuxer(output, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        return surface
+        this.mediaCodecSurfaceProvider = surfaceProvider
     }
 
     fun stop() {
-        endOfStream = true
+        mediaCodecSurfaceProvider?.stop()
         eglEnvironment?.release()
+        encoder?.stop()
+        eglEnvironment = null
+        mediaCodecSurfaceProvider = null
+        encoder = null
     }
 
-    fun onFrame(glTexture: GLTexture, timestamp: Long) {
-        eglEnvironment?.requestRender(TextureWithTime(glTexture, timestamp))
+    fun onFrame(frame: TextureWithTime) {
+        eglEnvironment?.requestRender(frame)
     }
 
     private inner class MediaCodecSurfaceProvider(private val surface: Surface) : SurfaceProvider {
 
+        private lateinit var surfaceProviderCallback: SurfaceProviderCallback
+
         override fun start(surfaceProviderCallback: SurfaceProviderCallback) {
+            if (this::surfaceProviderCallback.isInitialized) {
+                throw UnsupportedOperationException("call this only once.")
+            }
+            this.surfaceProviderCallback = surfaceProviderCallback
             surfaceProviderCallback.onSurfaceAvailable(surface)
             surfaceProviderCallback.onSurfaceChanged(surface, glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
         }
 
-        override fun stop() = Unit
-    }
-
-    class TextureWithTime(
-        val glTexture: GLTexture,
-        val timestamp: Long
-    )
-
-    @Volatile var endOfStream = false
-
-    private fun codec() {
-        val mediaCodec = this.mediaCodec ?: return
-        val mediaMuxer = this.mediaMuxer ?: return
-
-        while (true) {
-            if (endOfStream) {
-                mediaCodec.signalEndOfInputStream()
-                mediaCodec.stop()
-                mediaCodec.release()
-                mediaMuxer.stop()
-                mediaMuxer.release()
-                Timber.d("stop recording 1.")
-            }
-
-            val bufferInfo = MediaCodec.BufferInfo()
-            val index: Int = mediaCodec.dequeueOutputBuffer(bufferInfo, 10000)
-            if (index == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                if (!endOfStream) {
-                    continue
-                } else {
-                    mediaCodec.signalEndOfInputStream()
-                    mediaCodec.stop()
-                    mediaCodec.release()
-                    mediaMuxer.stop()
-                    mediaMuxer.release()
-                    Timber.d("stop recording 2.")
-                    break
-                }
-            } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                //输出格式发生改变 ，第一次总会调用所以在这里开启混合器
-                val newFormat: MediaFormat = mediaCodec.outputFormat
-                track = mediaMuxer.addTrack(newFormat)
-                mediaMuxer.start()
-            } else if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                //可以忽略
-            } else {
-                //调整时间戳
-                bufferInfo.presentationTimeUs = (bufferInfo.presentationTimeUs / speed).toLong()
-                //有时候会出现异常 ： timestampUs xxx < lastTimestampUs yyy for Video track
-                if (bufferInfo.presentationTimeUs <= lastTimeStamp) {
-                    bufferInfo.presentationTimeUs = (lastTimeStamp + 1000000 / 25 / speed).toLong()
-                }
-                lastTimeStamp = bufferInfo.presentationTimeUs
-
-                //正常则 index 获得缓冲区下标
-                val encodedData = mediaCodec.getOutputBuffer(index)!!
-                //如果当前的 buffer是配置信息，不管它
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                    bufferInfo.size = 0
-                }
-                if (bufferInfo.size != 0) {
-                    //设置从哪里开始读数据(读出来就是编码后的数据)
-                    encodedData.position(bufferInfo.offset)
-                    //设置能读数据的总长度
-                    encodedData.limit(bufferInfo.offset + bufferInfo.size)
-                    //写出为mp4
-                    mediaMuxer.writeSampleData(track, encodedData, bufferInfo)
-                }
-                // 释放这个缓冲区，后续可以存放新的编码后的数据啦
-                mediaCodec.releaseOutputBuffer(index, false)
-                // 如果给了结束信号 signalEndOfInputStream
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                    break
-                }
-            }
+        override fun stop() {
+            surfaceProviderCallback.onSurfaceDestroyed()
         }
     }
 

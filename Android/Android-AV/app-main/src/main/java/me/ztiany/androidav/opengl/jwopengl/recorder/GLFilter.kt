@@ -1,4 +1,8 @@
-package me.ztiany.androidav.opengl.jwopengl.gles2
+package me.ztiany.androidav.opengl.jwopengl.recorder
+
+import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
+import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
+import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 
 interface GLFilter {
 
@@ -32,11 +36,3 @@ abstract class BaseGLFilter : GLFilter {
     }
 
 }
-
-data class TextureAttribute(
-    val width: Int,
-    val height: Int,
-    val orientation: Int = 0,
-    val isFront: Boolean = false,
-    val isCamera: Boolean = false
-)
