@@ -1,11 +1,12 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
 import me.ztiany.androidav.R
 import me.ztiany.androidav.common.loadBitmap
-import me.ztiany.androidav.opengl.jwopengl.common.*
+import me.ztiany.androidav.opengl.jwopengl.gles2.*
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 
-class Fixed1TexturePainter : GLPainter {
+class Fixed1TextureRenderer : GLRenderer {
 
     private lateinit var glProgram: GLProgram
     private lateinit var glTexture: GLTexture
@@ -49,7 +50,7 @@ class Fixed1TexturePainter : GLPainter {
         glMVPMatrix.combineMVP()
     }
 
-    override fun onDrawFrame() {
+    override fun onDrawFrame(attachment: Any? ) {
         glProgram.startDraw {
             clearColorBuffer()
             glTexture.activeTexture()

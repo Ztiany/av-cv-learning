@@ -1,10 +1,10 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
-import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import timber.log.Timber
 
-class BackgroundPainter : GLPainter {
+class BackgroundRenderer : GLRenderer {
 
     override fun onSurfaceCreated() {
         Timber.d("onSurfaceCreated() called")
@@ -18,7 +18,7 @@ class BackgroundPainter : GLPainter {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame() {
+    override fun onDrawFrame(attachment: Any? ) {
         //用 glClearColor 设置的颜色来擦除颜色缓冲区。【除了颜色缓冲区，还有 GL_DEPTH_BUFFER_BIT（深度） 和 GL_STENCIL_BUFFER_BIT（蒙版）】
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
     }

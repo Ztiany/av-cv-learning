@@ -226,7 +226,7 @@ public class Directory {
     /**
      * 根据日期生成一个临时文件名，格式由 format 制定。
      */
-    private static String createTempFileName(String format) {
+    public static String createTempFileName(String format) {
         String tempFileName = Objects.requireNonNull(SDF_HOLDER.get()).format(new Date()) + "_" + UUID.randomUUID().toString();
         return tempFileName + format;
     }

@@ -1,7 +1,7 @@
 package me.ztiany.androidav.opengl.jwopengl.common
 
 /**All the methods in this class will be called in a OpenGL Marked Thread.*/
-interface GLPainter {
+interface GLRenderer {
 
     /**
      * Called when the surface is created or recreated.
@@ -16,7 +16,7 @@ interface GLPainter {
     /**
      * Called to draw the current frame.
      */
-    fun onDrawFrame()
+    fun onDrawFrame(attachment: Any? = null)
 
     /**
      * Called when egl context release.【It is not guaranteed that this method will be called at the end of drawing.】

@@ -20,7 +20,7 @@ import me.ztiany.androidav.common.YUVUtils;
 import timber.log.Timber;
 
 /**
- * Camera1 API，后置摄像头。
+ * Camera1 API，后置摄像头【测试代码，只支持后置摄像头垂直拍摄】。
  */
 public class Camera1SurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 

@@ -1,13 +1,13 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
 import me.ztiany.androidav.common.FileUtils
-import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-class TrianglePainter : GLPainter {
+class TriangleRenderer : GLRenderer {
 
     private var program = 0
     private var aPositionHandle = 0
@@ -63,7 +63,7 @@ class TrianglePainter : GLPainter {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame() {
+    override fun onDrawFrame(attachment: Any? ) {
         //清理
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 

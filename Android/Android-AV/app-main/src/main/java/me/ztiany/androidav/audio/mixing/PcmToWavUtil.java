@@ -45,7 +45,7 @@ public class PcmToWavUtil {
         long totalDataLen;
         long longSampleRate = mSampleRate;
         int channels = mChannelCount;
-        long byteRate = 16 * mSampleRate * channels / 8;
+        long byteRate = 16L * mSampleRate * channels / 8;
         byte[] data = new byte[mBufferSize];
         try {
             in = new FileInputStream(inFilename);

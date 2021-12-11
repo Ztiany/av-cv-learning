@@ -1,7 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
-
-import me.ztiany.androidav.opengl.jwopengl.common.GLProgram
-import me.ztiany.androidav.opengl.jwopengl.common.GLTexture
+package me.ztiany.androidav.opengl.jwopengl.gles2
 
 interface GLFilter {
 
@@ -9,7 +6,7 @@ interface GLFilter {
 
     fun setWorldSize(width: Int, height: Int)
 
-    fun setTextureAttribute(width: Int, height: Int, orientation: Int)
+    fun setTextureAttribute(attribute: TextureAttribute)
 
     fun onDrawFrame(sharedTexture: GLTexture): GLTexture
 
@@ -31,7 +28,15 @@ abstract class BaseGLFilter : GLFilter {
     override fun setWorldSize(width: Int, height: Int) {
     }
 
-    override fun setTextureAttribute(width: Int, height: Int, orientation: Int) {
+    override fun setTextureAttribute(attribute: TextureAttribute) {
     }
 
 }
+
+data class TextureAttribute(
+    val width: Int,
+    val height: Int,
+    val orientation: Int = 0,
+    val isFront: Boolean = false,
+    val isCamera: Boolean = false
+)

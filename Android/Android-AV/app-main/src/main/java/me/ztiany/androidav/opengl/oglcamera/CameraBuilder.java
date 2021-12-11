@@ -35,7 +35,7 @@ public final class CameraBuilder {
     /**
      * 指定的预览宽高，若系统支持则会以这个预览宽高进行预览
      */
-    Point previewSize;
+    Point targetPreviewSize;
 
     /**
      * 最大分辨率
@@ -61,7 +61,7 @@ public final class CameraBuilder {
     }
 
     public CameraBuilder targetPreviewSize(Point val) {
-        previewSize = val;
+        targetPreviewSize = val;
         return this;
     }
 
@@ -134,7 +134,7 @@ public final class CameraBuilder {
                 ", camera2Listener=" + mCameraListener +
                 ", previewViewSize=" + previewViewSize +
                 ", rotation=" + rotation +
-                ", previewSize=" + previewSize +
+                ", previewSize=" + targetPreviewSize +
                 ", maxPreviewSize=" + maxPreviewSize +
                 ", minPreviewSize=" + minPreviewSize +
                 ", context=" + context +

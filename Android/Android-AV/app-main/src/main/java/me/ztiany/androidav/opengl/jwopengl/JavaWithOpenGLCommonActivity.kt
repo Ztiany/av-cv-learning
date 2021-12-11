@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.opengl.GLSurfaceView
 import me.ztiany.androidav.databinding.OpenglActivityCommonBinding
-import me.ztiany.androidav.opengl.jwopengl.common.CompoundRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.GLController
-import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
 import me.ztiany.androidav.opengl.jwopengl.common.GLParams
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.lib.avbase.BaseActivity
 import timber.log.Timber
 
@@ -23,7 +23,7 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
         fun start(
             context: Context,
             title: String,
-            defaultPainter: Class<out GLPainter>,
+            defaultPainter: Class<out GLRenderer>,
             controller: Class<out GLController>? = null,
             params: GLParams? = null
         ) {
@@ -57,8 +57,8 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
         supportActionBar?.title = title
 
         //renderer
-        val renderer = CompoundRenderer(defaultPainter.newInstance() as GLPainter)
-        binding.openglGlSurfaceView.setRenderer(renderer)
+        val renderer = defaultPainter.newInstance() as GLRenderer
+        binding.openglGlSurfaceView.setGLRenderer(renderer)
         binding.openglGlSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
     }
 

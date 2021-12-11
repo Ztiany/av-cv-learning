@@ -1,6 +1,6 @@
 @file:JvmName("GL2Ex")
 
-package me.ztiany.androidav.opengl.jwopengl.common
+package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
 import me.ztiany.androidav.common.FileUtils
@@ -38,16 +38,16 @@ fun newVertexCoordinateFull3() = floatArrayOf(
 
 /**
  * 返回一个矩形的纹理坐标数组，每个点 2 个元素。顺序为：
- * 1. left-up
- * 2. right-up
- * 3. left-bottom
- * 4. right-bottom
+ * 1. left-bottom
+ * 2. right-bottom
+ * 3. left-top
+ * 4. right-top
  */
 fun newTextureCoordinateStandard() = floatArrayOf(
-    0.0F, 1.0F,//left-up
-    1.0F, 1.0F,//right-up
     0.0F, 0.0F,//left-bottom
     1.0F, 0.0F,//right-bottom
+    0.0F, 1.0F,//left-top
+    1.0F, 1.0F,//right-top
 )
 
 /**
@@ -63,7 +63,6 @@ fun newTextureCoordinateAndroid() = floatArrayOf(
     0.0F, 0.0F,//left-top
     1.0F, 0.0F//right-top
 )
-
 
 fun loadShader(type: Int, shaderCode: String): Int {
     val shader = GLES20.glCreateShader(type)

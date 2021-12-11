@@ -1,12 +1,12 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
-import me.ztiany.androidav.opengl.jwopengl.common.GLPainter
-import me.ztiany.androidav.opengl.jwopengl.common.GLProgram
-import me.ztiany.androidav.opengl.jwopengl.common.generateVBOBuffer
-import me.ztiany.androidav.opengl.jwopengl.common.newVertexCoordinateFull3
+import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
+import me.ztiany.androidav.opengl.jwopengl.gles2.generateVBOBuffer
+import me.ztiany.androidav.opengl.jwopengl.gles2.newVertexCoordinateFull3
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 
-class GradualRectanglePainter : GLPainter {
+class GradualRectangleRenderer : GLRenderer {
 
     private lateinit var program: GLProgram
 
@@ -39,7 +39,7 @@ class GradualRectanglePainter : GLPainter {
         GLES20.glViewport(0, 0, width, height)
     }
 
-    override fun onDrawFrame() {
+    override fun onDrawFrame(attachment: Any? ) {
         program.startDraw {
             clearColorBuffer()
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)

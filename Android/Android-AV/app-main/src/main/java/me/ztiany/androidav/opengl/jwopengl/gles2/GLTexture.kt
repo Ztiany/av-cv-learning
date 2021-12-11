@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.common
+package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.graphics.Bitmap
 import android.opengl.GLES11Ext

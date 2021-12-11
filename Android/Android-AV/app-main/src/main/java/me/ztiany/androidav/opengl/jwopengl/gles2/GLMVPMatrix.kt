@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.common
+package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.Matrix
 import timber.log.Timber
@@ -18,7 +18,8 @@ class GLMVPMatrix {
     /**用于接收 mvp 的计算结果*/
     val mvpMatrix = FloatArray(16)
 
-    private val identity = floatArrayOf(
+    /**默认为单位矩阵*/
+    val modelMatrix = floatArrayOf(
         1.0F, 0F, 0F, 0F,
         0.0F, 1.0F, 0F, 0F,
         0.0F, 0F, 1.0F, 0F,
@@ -26,13 +27,20 @@ class GLMVPMatrix {
     )
 
     /**默认为单位矩阵*/
-    val modelMatrix = identity
+    val viewMatrix = floatArrayOf(
+        1.0F, 0F, 0F, 0F,
+        0.0F, 1.0F, 0F, 0F,
+        0.0F, 0F, 1.0F, 0F,
+        0.0F, 0F, 0F, 1.0F,
+    )
 
     /**默认为单位矩阵*/
-    val viewMatrix = identity
-
-    /**默认为单位矩阵*/
-    val projectionMatrix = identity
+    val projectionMatrix = floatArrayOf(
+        1.0F, 0F, 0F, 0F,
+        0.0F, 1.0F, 0F, 0F,
+        0.0F, 0F, 1.0F, 0F,
+        0.0F, 0F, 0F, 1.0F,
+    )
 
     private var worldWidth = 0
     private var worldHeight = 0
@@ -147,9 +155,7 @@ class GLMVPMatrix {
     }
 
     fun resetToIdentity(floatArray: FloatArray) {
-        identity.forEachIndexed { index, value ->
-            floatArray[index] = value
-        }
+        Matrix.setIdentityM(floatArray, 0)
     }
 
 }

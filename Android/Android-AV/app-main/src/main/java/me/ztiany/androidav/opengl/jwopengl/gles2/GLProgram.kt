@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.common
+package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
 import me.ztiany.androidav.common.FileUtils

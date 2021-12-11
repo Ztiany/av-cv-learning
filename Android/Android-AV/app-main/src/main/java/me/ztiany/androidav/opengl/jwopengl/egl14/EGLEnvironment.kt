@@ -1,10 +1,13 @@
-package me.ztiany.androidav.opengl.jwopengl.egl
+package me.ztiany.androidav.opengl.jwopengl.egl14
 
-import android.opengl.EGLContext
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.view.Surface
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.jwopengl.common.RenderMode
+import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProvider
+import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProviderCallback
 import timber.log.Timber
 
 class EGLEnvironment(
@@ -28,7 +31,7 @@ class EGLEnvironment(
 
     private val eglCore = EGLCore()
 
-    private lateinit var GLRenderer: GLRenderer
+    private lateinit var glRenderer: GLRenderer
     private lateinit var eglHandler: Handler
 
     @Volatile private var surfaceAvailable = false
@@ -36,11 +39,11 @@ class EGLEnvironment(
     @Volatile var renderMode = RenderMode.Continuously
 
     fun start(GLRenderer: GLRenderer) {
-        if (this::GLRenderer.isInitialized) {
+        if (this::glRenderer.isInitialized) {
             throw IllegalStateException("renderer has already been set.")
         }
 
-        this.GLRenderer = GLRenderer
+        this.glRenderer = GLRenderer
 
         eglThread.start()
         eglHandler = Handler(eglThread.looper, ::handleMessage)
@@ -97,7 +100,7 @@ class EGLEnvironment(
         when (message.what) {
             MSG_EGL_INIT -> {
                 Timber.d("handleEGLMessage MSG_EGL_INIT")
-                eglCore.makeEglContext(message.obj as? EGLContext)
+                eglCore.makeEglContext(eglAttribute.sharedContext)
             }
             MSG_EGL_NEW_SURFACE -> {
                 Timber.d("handleEGLMessage MSG_EGL_NEW_SURFACE")
@@ -121,7 +124,7 @@ class EGLEnvironment(
             }
             MSG_EGL_SURFACE_DESTROYED -> {
                 Timber.d("handleEGLMessage MSG_EGL_SURFACE_DESTROYED")
-                GLRenderer.onSurfaceDestroy()
+                glRenderer.onSurfaceDestroy()
                 eglCore.destroySurface()
             }
             MSG_EGL_SURFACE_RELEASE -> {
@@ -136,18 +139,18 @@ class EGLEnvironment(
             MSG_RENDERER_SURFACE_CREATED -> {
                 Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CREATED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    GLRenderer.onSurfaceCreated()
+                    glRenderer.onSurfaceCreated()
                 }
             }
             MSG_RENDERER_SURFACE_CHANGED -> {
                 Timber.d("handleEGLMessage MSG_RENDERER_SURFACE_CHANGED")
                 if (eglCore.isActive() && surfaceAvailable) {
-                    GLRenderer.onSurfaceChanged(message.arg1, message.arg2)
+                    glRenderer.onSurfaceChanged(message.arg1, message.arg2)
                 }
             }
             MSG_RENDERER_DRAW -> {
                 if (eglCore.isActive() && surfaceAvailable) {
-                    GLRenderer.onDrawFrame()
+                    glRenderer.onDrawFrame(message.obj)
                     eglCore.swapBuffers()
                 }
                 checkIfDrawContinuously()
@@ -162,10 +165,17 @@ class EGLEnvironment(
         }
     }
 
-    fun requestRender() {
-        if (surfaceAvailable) {
-            eglHandler.sendEmptyMessage(MSG_RENDERER_DRAW)
+    fun requestRender(attach: Any? = null) {
+        if (surfaceAvailable && eglCore.isActive()) {
+            eglHandler.sendMessage(Message.obtain().apply {
+                what = MSG_RENDERER_DRAW
+                obj = attach
+            })
         }
+    }
+
+    fun setPresentationTime(nanoseconds: Long) {
+        eglCore.setPresentationTime(nanoseconds)
     }
 
 }

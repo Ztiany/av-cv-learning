@@ -14,4 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <Button
+        android:id="@+id/opengl_bt_start"
+        style="@style/Button_Default"
+        android:layout_gravity="bottom"
+        android:text="开始" />
+
 </FrameLayout>

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.painter
+package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.content.Context
 import android.graphics.SurfaceTexture
@@ -6,13 +6,15 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
 import androidx.core.content.ContextCompat
-import me.ztiany.androidav.opengl.jwopengl.common.*
+import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
+import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
+import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
-class CameraPainter(
+class CameraRenderer(
     private val context: Context,
     private val eglBridger: EGLBridger
-) : GLPainter {
+) : GLRenderer {
 
     private val glMVPMatrix = GLMVPMatrix()
     private lateinit var glProgram: GLProgram
@@ -42,6 +44,8 @@ class CameraPainter(
     }
 
     override fun onSurfaceCreated() {
+        Timber.d("onSurfaceCreated")
+
         glProgram = GLProgram.fromAssets(
             "shader/vertex_mvp.glsl",
             "shader/fragment_camera.glsl"
@@ -75,7 +79,7 @@ class CameraPainter(
         adjustMatrix()
     }
 
-    override fun onDrawFrame() {
+    override fun onDrawFrame(attachment: Any?) {
         glProgram.startDraw {
             clearColorBuffer()
             glTexture.activeTexture()
@@ -88,6 +92,7 @@ class CameraPainter(
     }
 
     override fun onSurfaceDestroy() {
+        Timber.d("onSurfaceDestroy")
     }
 
     private fun onFrameAvailable(surfaceTexture: SurfaceTexture) {
@@ -108,10 +113,12 @@ class CameraPainter(
         glMVPMatrix.combineMVP()
         //绕着 Z 轴旋转
         if (!isMirror) {
+            //后摄，一般情况下相机的画面被逆时针转了 90 度，这是这里也将顶点坐标转同样的角度，再去纹理采样
+            //注意【顶点是先插值，然后我们利用矩阵再将顶点修正到正确的采样进行位置】。
             Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, -this.displayOrientation.toFloat(), 0F, 0F, 1F)
         } else {
+            Matrix.scaleM(glMVPMatrix.mvpMatrix, 0, -1F, 1F, 1F)
             Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, this.displayOrientation.toFloat(), 0F, 0F, 1F)
-            Matrix.scaleM(glMVPMatrix.mvpMatrix, 0, 1F, -1F, 1F)
         }
     }
 

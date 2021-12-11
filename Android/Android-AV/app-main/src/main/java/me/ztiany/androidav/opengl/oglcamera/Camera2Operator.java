@@ -60,7 +60,7 @@ public class Camera2Operator implements CameraOperator {
         mCameraListener = builder.mCameraListener;
         rotation = builder.rotation;
         previewViewSize = builder.previewViewSize;
-        specificPreviewSize = builder.previewSize;
+        specificPreviewSize = builder.targetPreviewSize;
         maxPreviewSize = builder.maxPreviewSize;
         minPreviewSize = builder.minPreviewSize;
         context = builder.context;
@@ -250,9 +250,9 @@ public class Camera2Operator implements CameraOperator {
 
         Size bestSize = sizes.get(0);
         float previewViewRatio;
-        if (previewViewSize != null) {
+        if (previewViewSize != null) {//如果设置了预览 View 的宽高，就用它来做对比
             previewViewRatio = (float) previewViewSize.x / (float) previewViewSize.y;
-        } else {
+        } else {//否则就用最佳预览来做对比
             previewViewRatio = (float) bestSize.getWidth() / (float) bestSize.getHeight();
         }
         if (previewViewRatio > 1) {
@@ -261,11 +261,13 @@ public class Camera2Operator implements CameraOperator {
         Timber.d("getBestSupportedSize: previewViewRatio = 1 / previewViewRatio = %f", previewViewRatio);
 
         for (Size s : sizes) {
+            //如果有符合目标尺寸的，就用目标尺寸。
             if (specificPreviewSize != null && specificPreviewSize.x == s.getWidth() && specificPreviewSize.y == s.getHeight()) {
                 Timber.d("getBestSupportedSize: returning %dx%d", s.getWidth(), s.getHeight());
                 return s;
             }
             /*
+            否则就找到最小比例误差的那个尺寸。
             get the minimal deviation size.
                 best:
                    2160 / 1080 = 1.996...
