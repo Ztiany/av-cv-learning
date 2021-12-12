@@ -36,6 +36,7 @@ class RecorderEncodeRenderer : GLRenderer {
     private var encoder: Encoder? = null
 
     override fun onSurfaceCreated() {
+        Timber.d("onSurfaceCreated() called")
         glProgram = GLProgram.fromAssets(
             "shader/vertex_mvp.glsl",
             "shader/fragment_texture.glsl"
@@ -51,6 +52,7 @@ class RecorderEncodeRenderer : GLRenderer {
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
+        Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
         GLES20.glViewport(0, 0, width, height)
     }
 
@@ -77,6 +79,7 @@ class RecorderEncodeRenderer : GLRenderer {
     }
 
     fun setVideoAttribute(attribute: TextureAttribute) {
+        Timber.d("setVideoAttribute() called with: attribute = $attribute")
         if ((attribute.orientation / 90).mod(2) == 1) {//竖屏
             glMVPMatrix.setWorldSize(attribute.height, attribute.width)
             glMVPMatrix.setModelSize(attribute.height, attribute.width)

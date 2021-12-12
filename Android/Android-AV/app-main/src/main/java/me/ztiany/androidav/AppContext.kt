@@ -2,10 +2,9 @@ package me.ztiany.androidav
 
 import android.app.Application
 import android.content.Context
-import androidx.camera.camera2.Camera2Config
-import androidx.camera.core.CameraXConfig
-import kotlin.properties.Delegates
+import me.ztiany.androidav.common.CrashHandler
 import timber.log.Timber
+import kotlin.properties.Delegates
 
 
 class AppContext : Application() {
@@ -14,6 +13,7 @@ class AppContext : Application() {
         super.onCreate()
         appContext = this
         Timber.plant(Timber.DebugTree())
+        CrashHandler.register(this)
     }
 
     companion object {

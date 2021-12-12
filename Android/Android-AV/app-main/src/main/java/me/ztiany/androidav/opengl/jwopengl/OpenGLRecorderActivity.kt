@@ -100,6 +100,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
     override fun onResume() {
         super.onResume()
+        binding.openglCameraView.onResume()
         cameraOperator?.start()
     }
 
@@ -107,6 +108,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
         super.onPause()
         cameraOperator?.stop()
         recorderManager.stopRecording()
+        binding.openglCameraView.onPause()
     }
 
     override fun onDestroy() {

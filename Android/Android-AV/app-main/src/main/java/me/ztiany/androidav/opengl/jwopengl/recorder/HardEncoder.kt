@@ -78,6 +78,7 @@ class HardEncoder(
         while (true) {
             if (ended) {
                 endStream()
+                break
             }
 
             val bufferInfo = MediaCodec.BufferInfo()

@@ -28,6 +28,7 @@ class RecorderShowRenderer(
     private val screenFilter = ScreenFilter()
 
     @Volatile private var recorder: Recorder? = null
+    @Volatile private var textureSizeReceived = false
 
     private lateinit var eglContext: EGLContext
 
@@ -52,6 +53,8 @@ class RecorderShowRenderer(
     }
 
     override fun onSurfaceCreated() {
+        Timber.d("onSurfaceCreated() called")
+
         eglContext = EGL14.eglGetCurrentContext()
 
         cameraTexture = generateTexture(
@@ -76,12 +79,16 @@ class RecorderShowRenderer(
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
-        Timber.d("onSurfaceChanged")
+        Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
         soulFilter.setWorldSize(width, height)
         screenFilter.setWorldSize(width, height)
     }
 
     override fun onDrawFrame(attachment: Any?) {
+        if (!textureSizeReceived) {
+            return
+        }
+
         cameraSurfaceTexture.updateTexImage()
         var glTexture = soulFilter.onDrawFrame(cameraTexture)
         glTexture = screenFilter.onDrawFrame(glTexture)
@@ -101,6 +108,7 @@ class RecorderShowRenderer(
 
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
+        textureSizeReceived = true
         soulFilter.setTextureAttribute(attribute)
         screenFilter.setTextureAttribute(attribute)
     }

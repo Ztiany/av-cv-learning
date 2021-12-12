@@ -6,7 +6,7 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.*
 /**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
 class SoulFilter : BaseGLFilter() {
 
-    private lateinit var glFBO: GLFBOWithTexture
+    private var glFBO: GLFBOWithTexture? = null
 
     /**矩形的坐标*/
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
@@ -39,14 +39,7 @@ class SoulFilter : BaseGLFilter() {
     }
 
     override fun setWorldSize(width: Int, height: Int) {
-        val glTexture = generateFBOTexture(
-            glProgram.uniformHandle("uTexture"),
-            1,
-            textureWidth,
-            textureHeight
-        )
 
-        glFBO = generateFBOWithTexture(glTexture)
     }
 
     override fun setTextureAttribute(attribute: TextureAttribute) {
@@ -55,11 +48,37 @@ class SoulFilter : BaseGLFilter() {
     }
 
     override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
-        glFBO.use {
+        val fbo = getFBO()
+
+        fbo.use {
             GLES20.glViewport(0, 0, textureWidth, textureHeight)
             doDraw(sharedTexture)
         }
-        return glFBO.texture
+
+        return fbo.texture
+    }
+
+    private fun getFBO(): GLFBOWithTexture {
+        var fbo = glFBO
+
+        if (fbo != null && (fbo.texture.width != textureWidth || fbo.texture.height != textureHeight)) {
+            fbo.delete()
+            fbo = null
+        }
+
+        if (fbo == null) {
+            val glTexture = generateFBOTexture(
+                glProgram.uniformHandle("uTexture"),
+                0,
+                //use the real texture size.
+                textureWidth,
+                textureHeight
+            )
+            fbo = generateFBOWithTexture(glTexture)
+            glFBO = fbo
+        }
+
+        return fbo
     }
 
     private fun doDraw(sharedTexture: GLTexture) {

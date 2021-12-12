@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".opengl.jwopengl.OpenGLCameraPreviewActivity"
+    tools:context=".opengl.jwopengl.OpenGLRecorderActivity"
     tools:ignore="HardcodedText">
 
     <android.opengl.GLSurfaceView
