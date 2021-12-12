@@ -11,9 +11,9 @@ import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.gles2.generateTexture
-import me.ztiany.androidav.opengl.jwopengl.recorder.filter.FoundationScreenFilter
 import me.ztiany.androidav.opengl.jwopengl.recorder.filter.GLFilter
 import me.ztiany.androidav.opengl.jwopengl.recorder.filter.NoneEffectFBOFilter
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.ScreenFilter
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -29,7 +29,7 @@ class RecorderShowRenderer(
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
 
     private val foundationFBOFilter = NoneEffectFBOFilter()
-    private val foundationScreenFilter = FoundationScreenFilter()
+    private val foundationScreenFilter = ScreenFilter()
 
     private val effectFilters = CopyOnWriteArrayList<GLFilter>()
 

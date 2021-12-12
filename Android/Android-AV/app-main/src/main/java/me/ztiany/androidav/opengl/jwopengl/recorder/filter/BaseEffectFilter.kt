@@ -6,7 +6,7 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.activeTexture
 
 /**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
-abstract class BaseEffectFilter : FoundationBaseEffectFilter() {
+abstract class BaseEffectFilter : BaseEffectFBOFilter() {
 
     override fun createAndInitProgram(): GLProgram {
         val glProgram = createGLProgram()

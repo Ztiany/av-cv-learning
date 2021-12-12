@@ -4,7 +4,7 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import timber.log.Timber
 
 /**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
-abstract class FoundationBaseEffectFilter : BaseGLFilter() {
+abstract class BaseEffectFBOFilter : BaseGLFilter() {
 
     private var glFBO: GLFBOWithTexture? = null
 

@@ -3,7 +3,6 @@ package me.ztiany.androidav.opengl.jwopengl.recorder
 import android.media.*
 import android.opengl.EGLContext
 import android.opengl.GLES20
-import android.opengl.Matrix
 import android.view.Surface
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.RenderMode
@@ -21,9 +20,6 @@ class RecorderEncodeRenderer : GLRenderer {
     /**CPU 着色器程序*/
     private lateinit var glProgram: GLProgram
 
-    /**用于修正坐标位置*/
-    private val glMVPMatrix = GLMVPMatrix()
-
     /**矩形的坐标*/
     private val vertexVbo = generateVBOBuffer(newVertexCoordinateFull3())
 
@@ -40,14 +36,13 @@ class RecorderEncodeRenderer : GLRenderer {
     override fun onSurfaceCreated() {
         Timber.d("onSurfaceCreated() called")
         glProgram = GLProgram.fromAssets(
-            "shader/vertex_mvp.glsl",
+            "shader/vertex_base.glsl",
             "shader/fragment_texture.glsl"
         )
 
         //vertex
         glProgram.activeAttribute("aPosition")
         glProgram.activeAttribute("aTextureCoordinate")
-        glProgram.activeUniform("uMVPModelMatrix")
 
         //fragment
         glProgram.activeUniform("uTexture")
@@ -64,9 +59,7 @@ class RecorderEncodeRenderer : GLRenderer {
             //vertex
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            uniformMatrix4fv("uMVPModelMatrix", glMVPMatrix.mvpMatrix)
             //fragment
-            //texture【将分享过来的纹理绘制到 FBO 的纹理上】
             textureWithTime.glTexture.activeTexture(uniformHandle("uTexture"))
             //draw
             drawArraysStrip(4/*4 个顶点*/)
@@ -79,28 +72,17 @@ class RecorderEncodeRenderer : GLRenderer {
         Timber.d("onSurfaceDestroy")
     }
 
+    private var textureWidth = 0
+    private var textureHeight = 0
+
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
         if ((attribute.orientation / 90).mod(2) == 1) {//竖屏
-            glMVPMatrix.setWorldSize(attribute.height, attribute.width)
-            glMVPMatrix.setModelSize(attribute.height, attribute.width)
+            textureWidth = attribute.height
+            textureHeight = attribute.width
         } else {//横屏
-            glMVPMatrix.setWorldSize(attribute.height, attribute.width)
-            glMVPMatrix.setModelSize(attribute.width, attribute.height)
-        }
-
-        glMVPMatrix.resetToIdentity(glMVPMatrix.mvpMatrix)
-        glMVPMatrix.lookAtNormally()
-        glMVPMatrix.adjustToOrthogonal()
-        glMVPMatrix.combineMVP()
-        //绕着 Z 轴旋转
-        if (!attribute.isFront) {
-            //后摄，一般情况下相机的画面被逆时针转了 90 度，这是这里也将顶点坐标转同样的角度。
-            //注意【顶点是先插值，然后我们利用矩阵再将顶点修正到正确的采样进行位置】。
-            Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, -attribute.orientation.toFloat(), 0F, 0F, 1F)
-        } else {
-            Matrix.scaleM(glMVPMatrix.mvpMatrix, 0, -1F, 1F, 1F)
-            Matrix.rotateM(glMVPMatrix.mvpMatrix, 0, attribute.orientation.toFloat(), 0F, 0F, 1F)
+            textureWidth = attribute.width
+            textureHeight = attribute.height
         }
     }
 
@@ -110,7 +92,7 @@ class RecorderEncodeRenderer : GLRenderer {
         }
 
         this.encoder = encoder
-        encoder.init(glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
+        encoder.init(textureWidth, textureHeight)
 
         if (encoder.mode == EncoderMode.Hard) {
             startWithHardEncoder(sharedEGLContext, encoder)
@@ -155,7 +137,7 @@ class RecorderEncodeRenderer : GLRenderer {
             }
             this.surfaceProviderCallback = surfaceProviderCallback
             surfaceProviderCallback.onSurfaceAvailable(surface)
-            surfaceProviderCallback.onSurfaceChanged(surface, glMVPMatrix.getModelWidth(), glMVPMatrix.getModelHeight())
+            surfaceProviderCallback.onSurfaceChanged(surface, textureWidth, textureHeight)
         }
 
         override fun stop() {

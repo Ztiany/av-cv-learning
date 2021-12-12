@@ -5,5 +5,5 @@ data class TextureAttribute(
     val height: Int,
     val orientation: Int = 0,
     val isFront: Boolean = false,
-    val isCamera: Boolean = false
+    val isCamera: Boolean = true
 )

@@ -6,7 +6,7 @@ import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.activeTexture
 
 /**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
-class EffectSoulFilter : FoundationBaseEffectFilter() {
+class EffectSoulFilter : BaseEffectFBOFilter() {
 
     private var mixPercent = 0F
     private var scalePercent = 0F
