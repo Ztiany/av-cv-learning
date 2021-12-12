@@ -8,6 +8,7 @@ import me.ztiany.androidav.common.Directory
 import me.ztiany.androidav.databinding.OpenglActivityRecorderBinding
 import me.ztiany.androidav.opengl.jwopengl.recorder.RecorderManager
 import me.ztiany.androidav.opengl.jwopengl.recorder.Speed
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.*
 import me.ztiany.androidav.opengl.jwopengl.recorder.getSpeedName
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
@@ -15,17 +16,32 @@ import me.ztiany.androidav.opengl.oglcamera.CameraOperator
 import me.ztiany.lib.avbase.BaseActivity
 import java.io.File
 
-/**
- * TODO:
- * 1. 解决偶尔黑屏的 Bug。
- * 2. 抽离出 FBO，封装出更多的 Shader。
- */
+/**RENDERMODE_WHEN_DIRTY 不需要调用 surface 的 onResume/onPause */
 class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
     private var cameraOperator: CameraOperator? = null
-    private val recorderManager = RecorderManager(this)
+    private val recorderManager = RecorderManager()
     private var storePath: String = ""
     private var currentSpeed = Speed.MODE_NORMAL
+
+    private val allEffect = listOf(
+        "灵魂出窍" to EffectSoulFilter(),
+        "屏幕二分" to EffectSplit2Filter(),
+        "屏幕三分" to EffectSplit3Filter(),
+        "美颜 1" to BeautifyFilter(1),
+        "美颜 2" to BeautifyFilter(2),
+        "无特效" to null
+    )
+
+    private var currentIndex = -1
+
+    private fun nextEffect(): Pair<String, GLFilter?> {
+        currentIndex++
+        if (currentIndex >= allEffect.size) {
+            currentIndex = 0
+        }
+        return allEffect[currentIndex]
+    }
 
     private fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isFront: Boolean) {
         recorderManager.onCameraAvailable(previewSize, displayOrientation, isFront) {
@@ -37,11 +53,23 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
         recorderManager.init(binding.openglCameraView)
         setUpRecordBtnLogic()
         setUpSpeedBtnLogic()
+        setUpEffectBtnLogic()
         binding.openglBtnSwitch.setOnClickListener {
             cameraOperator?.switchCamera()
         }
         window.decorView.doOnLayout {
             setUpCamera()
+        }
+    }
+
+    private fun setUpEffectBtnLogic() {
+        binding.openglBtnEffect.setOnClickListener {
+            val (name, filter) = nextEffect()
+            binding.openglBtnEffect.text = name
+            recorderManager.removeAllEffect()
+            if (filter != null) {
+                recorderManager.addEffect(filter)
+            }
         }
     }
 
@@ -73,6 +101,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
             binding.openglBtnSwitch.isEnabled = !recorderManager.isRecording
             binding.openglBtnSpeed.isEnabled = !recorderManager.isRecording
+            binding.openglBtnEffect.isEnabled = !recorderManager.isRecording
         }
     }
 
@@ -100,7 +129,6 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
 
     override fun onResume() {
         super.onResume()
-        binding.openglCameraView.onResume()
         cameraOperator?.start()
     }
 
@@ -108,7 +136,6 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
         super.onPause()
         cameraOperator?.stop()
         recorderManager.stopRecording()
-        binding.openglCameraView.onPause()
     }
 
     override fun onDestroy() {

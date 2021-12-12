@@ -1,11 +1,12 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder
+package me.ztiany.androidav.opengl.jwopengl.recorder.filter
 
 import android.opengl.GLES20
 import android.opengl.Matrix
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
+import timber.log.Timber
 
 /**渲染的是 FBO 中的纹理，使用标准的坐标系*/
-class ScreenFilter : BaseGLFilter() {
+class FoundationScreenFilter : BaseGLFilter() {
 
     private val glMVPMatrix = GLMVPMatrix()
 
@@ -22,6 +23,8 @@ class ScreenFilter : BaseGLFilter() {
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateStandard())
 
     override fun createAndInitProgram(): GLProgram {
+        Timber.d("createAndInitProgram() called")
+
         val glProgram = GLProgram.fromAssets(
             "shader/vertex_mvp.glsl",
             "shader/fragment_texture.glsl"
@@ -55,6 +58,7 @@ class ScreenFilter : BaseGLFilter() {
     }
 
     private fun adjustMatrix() {
+        glMVPMatrix.resetToIdentity(glMVPMatrix.mvpMatrix)
         glMVPMatrix.lookAtNormally()
         glMVPMatrix.adjustToOrthogonal()
         glMVPMatrix.combineMVP()
@@ -69,14 +73,11 @@ class ScreenFilter : BaseGLFilter() {
         }
     }
 
-    override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
+    override fun doDraw(sharedTexture: GLTexture): GLTexture {
         GLES20.glViewport(0, 0, glMVPMatrix.getWorldWidth(), glMVPMatrix.getWorldHeight())
-        doDraw(sharedTexture)
-        return sharedTexture
-    }
-
-    private fun doDraw(sharedTexture: GLTexture) {
         glProgram.startDraw {
+            //clear
+            clearColorBuffer()
             //vertex
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
@@ -86,6 +87,7 @@ class ScreenFilter : BaseGLFilter() {
             //draw
             drawArraysStrip(4/*4 个顶点*/)
         }
+        return sharedTexture
     }
 
 }

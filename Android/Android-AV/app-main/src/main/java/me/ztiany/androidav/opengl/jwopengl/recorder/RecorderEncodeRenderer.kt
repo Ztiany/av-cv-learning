@@ -11,6 +11,8 @@ import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProvider
 import me.ztiany.androidav.opengl.jwopengl.common.SurfaceProviderCallback
 import me.ztiany.androidav.opengl.jwopengl.egl14.*
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
+import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.Encoder
+import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.EncoderMode
 import timber.log.Timber
 
 /**渲染的是 FBO 中的纹理，使用标准的坐标系*/
@@ -59,7 +61,6 @@ class RecorderEncodeRenderer : GLRenderer {
     override fun onDrawFrame(attachment: Any?) {
         val textureWithTime = attachment as? TextureWithTime ?: return
         glProgram.startDraw {
-            clearColorBuffer()
             //vertex
             vertexAttribPointerFloat("aPosition", 3, vertexVbo)
             vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)

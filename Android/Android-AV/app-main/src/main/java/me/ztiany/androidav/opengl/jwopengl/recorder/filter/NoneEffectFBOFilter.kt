@@ -1,10 +1,10 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder
+package me.ztiany.androidav.opengl.jwopengl.recorder.filter
 
 import android.opengl.GLES20
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
+import timber.log.Timber
 
-/**灵魂出鞘效果，注意：其接收来自相机的纹理。*/
-class SoulFilter : BaseGLFilter() {
+class NoneEffectFBOFilter : BaseGLFilter() {
 
     private var glFBO: GLFBOWithTexture? = null
 
@@ -14,16 +14,15 @@ class SoulFilter : BaseGLFilter() {
     /**纹理坐标*/
     private val textureCoordinateBuffer = generateVBOBuffer(newTextureCoordinateAndroid())
 
-    private var mixPercent = 0F
-    private var scalePercent = 0F
-
     private var textureWidth = 0
     private var textureHeight = 0
 
     override fun createAndInitProgram(): GLProgram {
+        Timber.d("createAndInitProgram() called")
+
         val glProgram = GLProgram.fromAssets(
             "shader/vertex_base.glsl",
-            "shader/fragment_soul_OES.glsl"
+            "shader/fragment_camera.glsl"
         )
 
         //vertex
@@ -31,8 +30,6 @@ class SoulFilter : BaseGLFilter() {
         glProgram.activeAttribute("aTextureCoordinate")
 
         //fragment
-        glProgram.activeUniform("scalePercent")
-        glProgram.activeUniform("mixPercent")
         glProgram.activeUniform("uTexture")
 
         return glProgram
@@ -47,14 +44,21 @@ class SoulFilter : BaseGLFilter() {
         this.textureHeight = attribute.height
     }
 
-    override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
+    override fun doDraw(sharedTexture: GLTexture): GLTexture {
         val fbo = getFBO()
-
         fbo.use {
-            GLES20.glViewport(0, 0, textureWidth, textureHeight)
-            doDraw(sharedTexture)
+            glProgram.startDraw {
+                clearColorBuffer()
+                GLES20.glViewport(0, 0, textureWidth, textureHeight)
+                //vertex
+                vertexAttribPointerFloat("aPosition", 3, vertexVbo)
+                vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
+                //texture【将分享过来的视频纹理绘制到 FBO 的纹理上】
+                sharedTexture.activeTexture(uniformHandle("uTexture"))
+                //draw
+                drawArraysStrip(4/*4 个顶点*/)
+            }
         }
-
         return fbo.texture
     }
 
@@ -67,6 +71,7 @@ class SoulFilter : BaseGLFilter() {
         }
 
         if (fbo == null) {
+            Timber.d("create new fbo $textureWidth x $textureHeight.")
             val glTexture = generateFBOTexture(
                 glProgram.uniformHandle("uTexture"),
                 0,
@@ -79,34 +84,6 @@ class SoulFilter : BaseGLFilter() {
         }
 
         return fbo
-    }
-
-    private fun doDraw(sharedTexture: GLTexture) {
-        glProgram.startDraw {
-            clearColorBuffer()
-            //vertex
-            vertexAttribPointerFloat("aPosition", 3, vertexVbo)
-            vertexAttribPointerFloat("aTextureCoordinate", 2, textureCoordinateBuffer)
-            //fragment
-            uniform1f("scalePercent", 1.0F + scalePercent)//[1, 2]
-            uniform1f("mixPercent", 1.0F - mixPercent)//[1,0]
-            updatePercent()
-            //texture【将分享过来的纹理绘制到 FBO 的纹理上】
-            sharedTexture.activeTexture(uniformHandle("uTexture"))
-            //draw
-            drawArraysStrip(4/*4 个顶点*/)
-        }
-    }
-
-    private fun updatePercent() {
-        scalePercent += 0.08F
-        mixPercent += 0.08F
-        if (scalePercent >= 1.0) {
-            scalePercent = 0.0F
-        }
-        if (mixPercent >= 1.0) {
-            mixPercent = 0.0F
-        }
     }
 
 }

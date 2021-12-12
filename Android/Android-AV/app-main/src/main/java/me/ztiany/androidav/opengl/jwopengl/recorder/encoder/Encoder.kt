@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder
+package me.ztiany.androidav.opengl.jwopengl.recorder.encoder
 
 import android.view.Surface
 

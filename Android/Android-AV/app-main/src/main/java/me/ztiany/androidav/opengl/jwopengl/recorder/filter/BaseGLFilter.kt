@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl.recorder
+package me.ztiany.androidav.opengl.jwopengl.recorder.filter
 
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLProgram
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
@@ -24,7 +24,9 @@ abstract class BaseGLFilter : GLFilter {
         get() = _glProgram
 
     override fun initProgram() {
-        _glProgram = createAndInitProgram()
+        if (!this::_glProgram.isInitialized) {
+            _glProgram = createAndInitProgram()
+        }
     }
 
     protected abstract fun createAndInitProgram(): GLProgram
@@ -34,5 +36,12 @@ abstract class BaseGLFilter : GLFilter {
 
     override fun setTextureAttribute(attribute: TextureAttribute) {
     }
+
+    override fun onDrawFrame(sharedTexture: GLTexture): GLTexture {
+        initProgram()
+        return doDraw(sharedTexture)
+    }
+
+    protected abstract fun doDraw(sharedTexture: GLTexture): GLTexture
 
 }

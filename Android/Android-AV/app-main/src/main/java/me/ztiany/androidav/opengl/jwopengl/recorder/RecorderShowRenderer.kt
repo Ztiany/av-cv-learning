@@ -11,7 +11,11 @@ import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.GLTexture
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
 import me.ztiany.androidav.opengl.jwopengl.gles2.generateTexture
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.FoundationScreenFilter
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.GLFilter
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.NoneEffectFBOFilter
 import timber.log.Timber
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**录像特效 + 展示*/
 class RecorderShowRenderer(
@@ -24,13 +28,17 @@ class RecorderShowRenderer(
     private lateinit var cameraTexture: GLTexture
     private var onSurfaceText: ((SurfaceTexture) -> Unit)? = null
 
-    private val soulFilter = SoulFilter()
-    private val screenFilter = ScreenFilter()
+    private val foundationFBOFilter = NoneEffectFBOFilter()
+    private val foundationScreenFilter = FoundationScreenFilter()
+
+    private val effectFilters = CopyOnWriteArrayList<GLFilter>()
 
     @Volatile private var recorder: Recorder? = null
     @Volatile private var textureSizeReceived = false
 
     private lateinit var eglContext: EGLContext
+
+    private var attribute: TextureAttribute? = null
 
     fun startRecording(recorder: Recorder) {
         this.recorder?.onStop()
@@ -74,14 +82,17 @@ class RecorderShowRenderer(
             onFrameAvailable(it)
         }
 
-        soulFilter.initProgram()
-        screenFilter.initProgram()
+        foundationFBOFilter.initProgram()
+        foundationScreenFilter.initProgram()
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         Timber.d("onSurfaceChanged() called with: width = $width, height = $height")
-        soulFilter.setWorldSize(width, height)
-        screenFilter.setWorldSize(width, height)
+        foundationFBOFilter.setWorldSize(width, height)
+        foundationScreenFilter.setWorldSize(width, height)
+        effectFilters.forEach {
+            it.setWorldSize(width, height)
+        }
     }
 
     override fun onDrawFrame(attachment: Any?) {
@@ -90,9 +101,19 @@ class RecorderShowRenderer(
         }
 
         cameraSurfaceTexture.updateTexImage()
-        var glTexture = soulFilter.onDrawFrame(cameraTexture)
-        glTexture = screenFilter.onDrawFrame(glTexture)
 
+        //draw raw video on fbo
+        var glTexture = foundationFBOFilter.onDrawFrame(cameraTexture)
+
+        //do effect on fbo
+        effectFilters.forEach {
+            glTexture = it.onDrawFrame(glTexture)
+        }
+
+        //draw fbo on screen.
+        glTexture = foundationScreenFilter.onDrawFrame(glTexture)
+
+        //send effect to recorder if need.
         recorder?.run {
             onFrame(TextureWithTime(glTexture, cameraSurfaceTexture.timestamp))
         }
@@ -108,9 +129,35 @@ class RecorderShowRenderer(
 
     fun setVideoAttribute(attribute: TextureAttribute) {
         Timber.d("setVideoAttribute() called with: attribute = $attribute")
+        this.attribute = attribute
         textureSizeReceived = true
-        soulFilter.setTextureAttribute(attribute)
-        screenFilter.setTextureAttribute(attribute)
+        foundationFBOFilter.setTextureAttribute(attribute)
+        foundationScreenFilter.setTextureAttribute(attribute)
+        effectFilters.forEach {
+            it.setTextureAttribute(attribute)
+        }
+    }
+
+    fun addEffect(glFilter: GLFilter) {
+        attribute?.let {
+            glFilter.setTextureAttribute(it)
+        }
+        effectFilters.add(glFilter)
+    }
+
+    fun removeEffect(glFilter: GLFilter) {
+        effectFilters.remove(glFilter)
+    }
+
+    fun removeAllEffect() {
+        effectFilters.clear()
     }
 
 }
+
+class TextureWithTime(
+    /**存储了当前帧的纹理*/
+    val glTexture: GLTexture,
+    /**单位：nanoseconds*/
+    val timestamp: Long
+)

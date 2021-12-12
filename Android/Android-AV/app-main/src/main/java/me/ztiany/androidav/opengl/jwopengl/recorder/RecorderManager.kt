@@ -4,16 +4,20 @@ import android.graphics.SurfaceTexture
 import android.opengl.EGLContext
 import android.opengl.GLSurfaceView
 import android.util.Size
-import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.TextureAttribute
+import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.Encoder
+import me.ztiany.androidav.opengl.jwopengl.recorder.encoder.HardEncoder
+import me.ztiany.androidav.opengl.jwopengl.recorder.filter.GLFilter
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
-class RecorderManager(
-    private val context: AppCompatActivity
-) {
+class RecorderManager {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Base
+    ///////////////////////////////////////////////////////////////////////////
 
     private lateinit var showRenderer: RecorderShowRenderer
     private lateinit var encodeRenderer: RecorderEncodeRenderer
@@ -24,8 +28,6 @@ class RecorderManager(
     @Volatile private var isOperating = false
 
     private val hasInitialized = AtomicBoolean(false)
-
-    var speed = Speed.MODE_NORMAL
 
     fun init(glSurfaceView: GLSurfaceView) {
         if (!hasInitialized.compareAndSet(false, true)) {
@@ -47,8 +49,15 @@ class RecorderManager(
         }
     }
 
+    private fun checkIfInitialized() {
+        if (!hasInitialized.get()) {
+            throw IllegalStateException("call init first.")
+        }
+    }
+
     fun onCameraAvailable(previewSize: Size, displayOrientation: Int, isFront: Boolean, startPreview: (SurfaceTexture) -> Unit) {
         Timber.d("onCameraAvailable() called with: previewSize = $previewSize, displayOrientation = $displayOrientation, isFront = $isFront")
+        checkIfInitialized()
         //provide the renderers texture the video size.
         val textureAttribute = TextureAttribute(previewSize.width, previewSize.height, displayOrientation, isFront, false)
         showRenderer.setVideoAttribute(textureAttribute)
@@ -61,6 +70,7 @@ class RecorderManager(
 
     fun startRecording(path: String) {
         Timber.d("startRecording() called isRecording = $isRecording, isOperating = $isOperating")
+        checkIfInitialized()
 
         if (isRecording || isOperating) {
             return
@@ -97,6 +107,27 @@ class RecorderManager(
 
     private fun newEncoder(path: String): Encoder {
         return HardEncoder(path, speed.getSpeedValue())
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //config
+    ///////////////////////////////////////////////////////////////////////////
+
+    var speed = Speed.MODE_NORMAL
+
+    fun addEffect(glFilter: GLFilter) {
+        checkIfInitialized()
+        showRenderer.addEffect(glFilter)
+    }
+
+    fun removeEffect(glFilter: GLFilter) {
+        checkIfInitialized()
+        showRenderer.removeEffect(glFilter)
+    }
+
+    fun removeAllEffect() {
+        checkIfInitialized()
+        showRenderer.removeAllEffect()
     }
 
 }
