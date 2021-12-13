@@ -128,9 +128,16 @@ class EGLCore {
     }
 
     /**
-     * 设置当前帧的时间，单位：纳秒
+     * 设置当前帧的时间，单位：纳秒。<br/>
+     *
+     *函数说明：specifies the time at which the current color buffer of <surface> should be presented to the viewer.The <time> parameter should be a time in
+     * nanoseconds, but the exact meaning of the time depends on the native window system's use of the presentation time.  In situations where an absolute time
+     * is needed such as displaying the color buffer on a display device, the time should correspond to the system monotonic up-time clock.  For situations in which
+     * an absolute time is not needed such as using the color buffer for video encoding, the presentation time of the first frame may be arbitrarily chosen and
+     * those of subsequent frames chosen relative to that of the first frame. 具体参考 [官方文档](https://www.khronos.org/registry/EGL/extensions/ANDROID/EGL_ANDROID_presentation_time.txt)。
      */
     fun setPresentationTime(nanoseconds: Long) {
+        Timber.d("nanoseconds = $nanoseconds")
         EGLExt.eglPresentationTimeANDROID(eglDisplay, eglSurface, nanoseconds)
     }
 

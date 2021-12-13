@@ -66,7 +66,7 @@ class RecorderShowRenderer(
         eglContext = EGL14.eglGetCurrentContext()
 
         cameraTexture = generateTexture(
-            0,
+            GLTexture.NONE,
             0,
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
         )

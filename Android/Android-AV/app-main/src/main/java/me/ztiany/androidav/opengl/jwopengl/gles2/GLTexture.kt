@@ -18,13 +18,18 @@ class GLTexture(
     /**Not necessary, May be 0.*/
     val height: Int,
 ) {
+
+    companion object {
+        const val NONE = -1
+    }
+
     override fun toString(): String {
         return "GLTexture(name=$name, textureType=$textureType, handle=$handle, width=$width, height=$height, index=$index)"
     }
 }
 
 fun GLTexture.activeTexture() {
-    if (handle == 0) {
+    if (handle == GLTexture.NONE) {
         throw IllegalStateException("The GLTexture was not bound with a handle. Call an alternative one instead.")
     }
     //激活指定纹理单元【有 32 个纹理单位，默认只有 0 号纹理单元是激活的】为了代码的统一性，不管哪个纹理，都调用一次 glActiveTexture，多次调用没有问题。
@@ -56,12 +61,12 @@ fun GLTexture.deleteTexture() {
 }
 
 /**
- * - [textureHandle]：纹理句柄【非必须】
+ * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
  * - [textureType]: 比如 [GLES20.GL_TEXTURE_2D]，或者 [GLES11Ext.GL_TEXTURE_EXTERNAL_OES] 等。
  * - [textureIndex]：0-31 闭区间
  */
 fun generateTexture(
-    textureHandle: Int = 0,
+    textureHandle: Int,
     textureIndex: Int,
     textureType: Int = GLES20.GL_TEXTURE_2D
 ): GLTexture {
@@ -76,12 +81,12 @@ fun generateTexture(
 }
 
 /**
- * - [textureHandle]：纹理句柄【非必须】
+ * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
  * - [bitmap]：纹理图片
  * - [textureIndex]：0-31 闭区间
  */
 fun generateTextureFromBitmap(
-    textureHandle: Int = 0,
+    textureHandle: Int,
     textureIndex: Int,
     bitmap: Bitmap
 ): GLTexture {
@@ -104,7 +109,7 @@ fun generateTextureFromBitmap(
 }
 
 /**
- * - [textureHandle]：纹理句柄【非必须】
+ * - [textureHandle]：纹理句柄【非必须时传 [GLTexture.NONE]】
  * - [textureIndex]：0-31 闭区间
  * - [width]：纹理宽度
  * - [height]：纹理高度

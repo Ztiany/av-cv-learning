@@ -63,7 +63,7 @@ class RecorderEncodeRenderer : GLRenderer {
             textureWithTime.glTexture.activeTexture(uniformHandle("uTexture"))
             //draw
             drawArraysStrip(4/*4 个顶点*/)
-            //setTime
+            //setTime【按照文档来说，这里其实没有必要设置】
             eglEnvironment?.setPresentationTime(textureWithTime.timestamp)
         }
     }
