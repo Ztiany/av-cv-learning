@@ -1,10 +1,17 @@
 #include <jni.h>
 #include <string>
+#include "common/log.h"
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_me_ztiany_androidav_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
+extern "C" {
+#include "libavutil/avutil.h"
+}
+
+JavaVM *javaVM;
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    javaVM = vm;
+    XLOGE("Native -------------------------------开始加载");
+    XLOGE("FFmpeg configuration: %s", avutil_configuration());
+    XLOGE("Native -------------------------------加载完成");
+    return JNI_VERSION_1_4;
 }

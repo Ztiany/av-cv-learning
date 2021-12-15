@@ -6,19 +6,19 @@ add_subdirectory(librtmp)
 
 #构建共享库
 add_library(
-        ###库名
-        android_rtmp
+    ###库名
+    android_rtmp
 
-        ###共享库
-        SHARED
+    ###共享库
+    SHARED
 
-        ###源码
-        native-lib.cpp
-        codec/X264Codec.cpp
-        pusher/RtmpPusher.h
-        utils/JavaCaller.h
-        utils/SafeQueue.h
-        utils/SafeQueueCPP11.h
+    ###源码
+    native-lib.cpp
+    codec/X264Codec.cpp
+    pusher/RtmpPusher.h
+    utils/JavaCaller.h
+    utils/SafeQueue.h
+    utils/SafeQueueCPP11.h
 )
 
 #找到依赖库
