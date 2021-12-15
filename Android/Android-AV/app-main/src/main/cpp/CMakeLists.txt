@@ -20,6 +20,8 @@ include_directories(include/Glm/virtrev)
 include_directories(include/Glm)
 include_directories(include/ffmpeg)
 include_directories(include/openssl)
+include_directories(include/fdk-aac)
+include_directories(include/x2h64)
 
 #引入预编译库
 set(JNI_LIBS ${CMAKE_SOURCE_DIR}/library/)
@@ -40,7 +42,7 @@ set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${JNI_LIBS}/${ANDROID_ABI
 add_library(crypto SHARED IMPORTED)
 set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${JNI_LIBS}/${ANDROID_ABI}/libcrypto.so)
 
-#查找指定目录下的所有源文件，并将名称保存到 DIR_SRCS 变量
+#查找指定目录下的所有源文件，并将名称保存到指定的变量
 aux_source_directory(module DIR_MODULE)
 aux_source_directory(module/common DIR_COMMON)
 aux_source_directory(module/opengl DIR_OPENGL)

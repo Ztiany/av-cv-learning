@@ -9,11 +9,6 @@
     tools:ignore="HardcodedText">
 
     <Button
-        android:id="@+id/btn_init"
-        style="@style/Button_Entrance"
-        android:text="Init" />
-
-    <Button
         android:id="@+id/btn_opengl_java"
         style="@style/Button_Entrance"
         android:text="OpenGL with Java" />

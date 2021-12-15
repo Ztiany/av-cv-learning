@@ -1,0 +1,9 @@
+#ifndef ANDROID_AV_JAVACALLER_H
+#define ANDROID_AV_JAVACALLER_H
+
+
+class JavaCaller {
+
+};
+
+#endif //ANDROID_AV_JAVACALLER_H

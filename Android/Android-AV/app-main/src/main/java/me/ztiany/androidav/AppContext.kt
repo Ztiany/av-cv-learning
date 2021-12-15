@@ -12,6 +12,11 @@ class AppContext : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = this
+
+        //加载 native
+        System.loadLibrary("androidav")
+
+        //配置调试工具
         Timber.plant(Timber.DebugTree())
         CrashHandler.register(this)
     }
