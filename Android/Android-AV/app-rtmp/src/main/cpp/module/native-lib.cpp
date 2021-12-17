@@ -14,12 +14,49 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_initPusher(JNIEnv *env, jobject thiz, jstring url) {
+Java_me_ztiany_rtmp_livevideo_MediaPusher_init(JNIEnv *env, jobject thiz) {
     //check if already started.
     if (rtmpPusher) {
         return;
     }
     rtmpPusher = new RtmpPusher();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_release(JNIEnv *env, jobject thiz) {
+    if (rtmpPusher) {
+        rtmpPusher->stop();
+    }
+    rtmpPusher = nullptr;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_initVideoCodec(JNIEnv *env, jobject thiz, jint width,
+                                                         jint height, jint fps, jint bitrate) {
+    // TODO: implement initVideoCodec()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_initAudioCodec(JNIEnv *env, jobject thiz,
+                                                         jint sample_rate, jint channels) {
+    // TODO: implement initAudioCodec()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_sendVideoPacket(JNIEnv *env, jobject thiz,
+                                                          jbyteArray data, jint video_type) {
+    // TODO: implement sendVideoPacket()
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_start(JNIEnv *env, jobject thiz, jstring url) {
+    if (!rtmpPusher) {
+        return;
+    }
+    /*if(rtmpPusher->isPushing()){
+        return;
+    }*/
 
     //convert the url
     const char *path = env->GetStringUTFChars(url, nullptr);
@@ -33,9 +70,17 @@ Java_me_ztiany_rtmp_livevideo_MediaPusher_initPusher(JNIEnv *env, jobject thiz, 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_releasePusher(JNIEnv *env, jobject thiz) {
-    if (rtmpPusher) {
-        rtmpPusher->stop();
-    }
-    rtmpPusher = nullptr;
+Java_me_ztiany_rtmp_livevideo_MediaPusher_sendAudioPacket(
+        JNIEnv *env,
+        jobject thiz,
+        jbyteArray data,
+        jint audio_type
+) {
+
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_livevideo_MediaPusher_stop(JNIEnv *env, jobject thiz) {
+    // TODO: implement stop()
 }

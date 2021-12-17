@@ -10,14 +10,15 @@
 class RtmpPusher {
 
 private:
-    SafeQueue<RTMPPacket *> queue;
-    pthread_t thread_id = 0;
     RTMP *rtmp = nullptr;
     char *_url = nullptr;
     uint32_t start_time = 0;
+    bool stopped = true;
+
+    SafeQueue<RTMPPacket *> queue;
+    pthread_t thread_id = 0;
+
     JavaCaller *javaCaller = nullptr;
-    bool ready_pushing = false;
-    bool stopped = false;
 
 public:
     RtmpPusher() = default;
@@ -32,7 +33,7 @@ public:
 
     void start(const char *url) {
         this->_url = (char *) url;
-        //start a thread to connect
+        //start a thread to connect and send packets.
         pthread_create(&thread_id, nullptr, &RtmpPusher::start_internal, this);
     }
 
@@ -51,10 +52,13 @@ private:
     }
 
     void startSender() {
+        //record the start time.
         start_time = RTMP_GetTime();
-        ready_pushing = true;
-        start_time = RTMP_GetTime();
+        //allow the queue to accept packet.
         queue.setWork(1);
+        //change the flag.
+        stopped = false;
+
         int ret;
         RTMPPacket *packet = nullptr;
         //循环从队列取包，然后发送。
@@ -70,6 +74,7 @@ private:
             packet->m_nInfoField2 = rtmp->m_stream_id;
             //发送包 1:加入队列发送
             ret = RTMP_SendPacket(rtmp, packet, 1);
+            //用完就释放
             releasePackets(packet);
             if (!ret) {
                 LOGE("发送数据失败");
@@ -84,7 +89,7 @@ private:
 
         libRtmp->rtmp = RTMP_Alloc();
         if (!libRtmp->rtmp) {
-            LOGE("rtmp创建失败");
+            LOGE("rtmp 创建失败");
             return nullptr;
         }
         RTMP_Init(libRtmp->rtmp);
@@ -93,7 +98,7 @@ private:
         libRtmp->rtmp->Link.timeout = 5;
         int ret = RTMP_SetupURL(libRtmp->rtmp, libRtmp->_url);
         if (!ret) {
-            LOGE("rtmp设置地址失败:%s", libRtmp->_url);
+            LOGE("rtmp 设置地址失败:%s", libRtmp->_url);
             return nullptr;
         }
 
@@ -102,16 +107,17 @@ private:
 
         ret = RTMP_Connect(libRtmp->rtmp, nullptr);
         if (!ret) {
-            LOGE("rtmp连接地址失败:%s", libRtmp->_url);
+            LOGE("rtmp 连接地址失败:%s", libRtmp->_url);
             return nullptr;
         }
 
         ret = RTMP_ConnectStream(libRtmp->rtmp, 0);
-        LOGE("rtmp连接成功----------->:%s", libRtmp->_url);
+        LOGE("rtmp 连接成功----------->:%s", libRtmp->_url);
         if (!ret) {
-            LOGE("rtmp连接流失败:%s", libRtmp->_url);
+            LOGE("rtmp 连接流失败:%s", libRtmp->_url);
             return nullptr;
         }
+
         libRtmp->startSender();
         return nullptr;
     }
