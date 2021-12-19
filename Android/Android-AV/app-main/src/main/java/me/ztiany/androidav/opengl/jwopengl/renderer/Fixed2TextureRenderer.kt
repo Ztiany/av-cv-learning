@@ -2,7 +2,7 @@ package me.ztiany.androidav.opengl.jwopengl.renderer
 
 import android.opengl.GLES20
 import me.ztiany.androidav.R
-import me.ztiany.androidav.common.loadBitmap
+import me.ztiany.lib.avbase.utils.loadBitmap
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 

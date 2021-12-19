@@ -15,8 +15,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import me.ztiany.androidav.common.Directory;
-import me.ztiany.androidav.common.YUVUtils;
+import me.ztiany.lib.avbase.utils.Directory;
+import me.ztiany.lib.avbase.utils.YUVUtils;
 import timber.log.Timber;
 
 /**

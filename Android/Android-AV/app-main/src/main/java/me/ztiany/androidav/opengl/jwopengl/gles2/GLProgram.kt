@@ -1,7 +1,7 @@
 package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
-import me.ztiany.androidav.common.FileUtils
+import me.ztiany.lib.avbase.utils.FileUtils
 import java.nio.FloatBuffer
 
 class GLProgram(

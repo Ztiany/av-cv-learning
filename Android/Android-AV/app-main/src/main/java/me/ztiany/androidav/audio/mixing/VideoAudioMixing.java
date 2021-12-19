@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import me.ztiany.androidav.common.Directory;
+import me.ztiany.lib.avbase.utils.Directory;
 import timber.log.Timber;
 
 public class VideoAudioMixing {

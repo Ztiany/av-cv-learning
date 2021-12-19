@@ -10,9 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import me.ztiany.androidav.common.Directory;
-import me.ztiany.androidav.common.FileUtils;
-import me.ztiany.androidav.common.IOUtils;
+import me.ztiany.lib.avbase.utils.Directory;
+import me.ztiany.lib.avbase.utils.FileUtils;
+import me.ztiany.lib.avbase.utils.IOUtils;
 
 /**
  * 视频拼接

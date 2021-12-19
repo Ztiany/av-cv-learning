@@ -3,7 +3,7 @@
 package me.ztiany.androidav.opengl.jwopengl.gles2
 
 import android.opengl.GLES20
-import me.ztiany.androidav.common.FileUtils
+import me.ztiany.lib.avbase.utils.FileUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer

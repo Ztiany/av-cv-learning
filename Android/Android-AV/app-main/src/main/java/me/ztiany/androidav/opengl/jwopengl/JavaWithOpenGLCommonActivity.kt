@@ -8,7 +8,7 @@ import me.ztiany.androidav.opengl.jwopengl.common.GLController
 import me.ztiany.androidav.opengl.jwopengl.common.GLParams
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
-import me.ztiany.lib.avbase.BaseActivity
+import me.ztiany.lib.avbase.app.BaseActivity
 import timber.log.Timber
 
 class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>() {

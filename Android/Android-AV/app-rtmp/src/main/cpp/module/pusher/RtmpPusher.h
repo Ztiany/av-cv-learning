@@ -6,39 +6,68 @@
 #include "../utils/SafeQueue.h"
 #include "../utils/JavaCaller.h"
 #include "../utils/Log.h"
+#include "../utils/Config.h"
+#include "../codec/X264Parser.h"
+#include "../codec/AACParser.h"
+#include "../codec/X264Codec.h"
+#include "../codec/AACCodec.h"
 
 class RtmpPusher {
 
 private:
-    RTMP *rtmp = nullptr;
+    RTMP *_rtmp = nullptr;
     char *_url = nullptr;
-    uint32_t start_time = 0;
-    bool stopped = true;
 
-    SafeQueue<RTMPPacket *> queue;
-    pthread_t thread_id = 0;
+    uint32_t _start_time = 0;
 
-    JavaCaller *javaCaller = nullptr;
+    bool _stopped = true;
+
+    SafeQueue<RTMPPacket *> _queue;
+    pthread_t _thread_id = 0;
+
+    X264Parser x264Parser;
+    AACParser aacParser;
+
+    JavaCaller *_javaCaller = nullptr;
 
 public:
     RtmpPusher() = default;
 
     ~RtmpPusher() {
         delete _url;
+        delete _javaCaller;
     }
 
-    void addPacket(RTMPPacket *packet) {
-        queue.push(packet);
+    void processData(int8_t *buf, int len, long tms, int type) {
+        if (type == X264) {
+            x264Parser.parsePacket(buf, len, tms, &_queue);
+        } else if (type == AAC_INFO || type == AAC_DATA) {
+            aacParser.parsePacket(buf, len, type, tms, &_queue);
+        }
     }
 
     void start(const char *url) {
+        if (isPushing()) {
+            LOGE("不要重复调用 start(const char*)");
+            return;
+        }
+
         this->_url = (char *) url;
         //start a thread to connect and send packets.
-        pthread_create(&thread_id, nullptr, &RtmpPusher::start_internal, this);
+        pthread_create(&_thread_id, nullptr, &RtmpPusher::start_internal, this);
     }
 
     void stop() {
+        _stopped = true;
+        _queue.setWork(0)
+    }
 
+    bool isPushing() {
+        return !_stopped;
+    }
+
+    void initJavaCaller(JavaCaller *javaCaller) {
+        this->_javaCaller = javaCaller;
     }
 
 private:
@@ -53,70 +82,84 @@ private:
 
     void startSender() {
         //record the start time.
-        start_time = RTMP_GetTime();
+        _start_time = RTMP_GetTime();
         //allow the queue to accept packet.
-        queue.setWork(1);
+        _queue.setWork(1);
         //change the flag.
-        stopped = false;
+        _stopped = false;
 
         int ret;
         RTMPPacket *packet = nullptr;
         //循环从队列取包，然后发送。
-        while (!stopped) {
-            queue.pop(packet);
-            if (stopped) {
+        while (!_stopped) {
+            _queue.pop(packet);
+            if (_stopped) {
                 break;
             }
             if (!packet) {
+                LOGE("packet = null");
                 continue;
             }
+
             // 给rtmp的流id
-            packet->m_nInfoField2 = rtmp->m_stream_id;
+            packet->m_nInfoField2 = _rtmp->m_stream_id;
             //发送包 1:加入队列发送
-            ret = RTMP_SendPacket(rtmp, packet, 1);
-            //用完就释放
-            releasePackets(packet);
+            ret = RTMP_SendPacket(_rtmp, packet, 1);
             if (!ret) {
                 LOGE("发送数据失败");
+                stop();
                 break;
             }
+            //用完就释放
+            releasePackets(packet);
         }
+
+        //end of loop
         releasePackets(packet);
     }
 
     static void *start_internal(void *args) {
         auto *libRtmp = static_cast<RtmpPusher *>(args);
 
-        libRtmp->rtmp = RTMP_Alloc();
-        if (!libRtmp->rtmp) {
+        libRtmp->_rtmp = RTMP_Alloc();
+        if (!libRtmp->_rtmp) {
             LOGE("rtmp 创建失败");
+            libRtmp->stop();
+            libRtmp->_javaCaller->notifyInitResult(false, Child);
             return nullptr;
         }
-        RTMP_Init(libRtmp->rtmp);
+        RTMP_Init(libRtmp->_rtmp);
 
         //设置超时时间 5s
-        libRtmp->rtmp->Link.timeout = 5;
-        int ret = RTMP_SetupURL(libRtmp->rtmp, libRtmp->_url);
+        libRtmp->_rtmp->Link.timeout = 5;
+        int ret = RTMP_SetupURL(libRtmp->_rtmp, libRtmp->_url);
         if (!ret) {
             LOGE("rtmp 设置地址失败:%s", libRtmp->_url);
+            libRtmp->stop();
+            libRtmp->_javaCaller->notifyInitResult(false, Child);
             return nullptr;
         }
 
         //开启输出模式
-        RTMP_EnableWrite(libRtmp->rtmp);
+        RTMP_EnableWrite(libRtmp->_rtmp);
 
-        ret = RTMP_Connect(libRtmp->rtmp, nullptr);
+        ret = RTMP_Connect(libRtmp->_rtmp, nullptr);
         if (!ret) {
             LOGE("rtmp 连接地址失败:%s", libRtmp->_url);
+            libRtmp->stop();
+            libRtmp->_javaCaller->notifyInitResult(false, Child);
             return nullptr;
         }
 
-        ret = RTMP_ConnectStream(libRtmp->rtmp, 0);
-        LOGE("rtmp 连接成功----------->:%s", libRtmp->_url);
+        ret = RTMP_ConnectStream(libRtmp->_rtmp, 0);
         if (!ret) {
             LOGE("rtmp 连接流失败:%s", libRtmp->_url);
+            libRtmp->stop();
+            libRtmp->_javaCaller->notifyInitResult(false, Child);
             return nullptr;
         }
+        LOGE("rtmp 连接成功----------->:%s", libRtmp->_url);
+        libRtmp->_javaCaller->notifyInitResult(true, Child);
 
         libRtmp->startSender();
         return nullptr;

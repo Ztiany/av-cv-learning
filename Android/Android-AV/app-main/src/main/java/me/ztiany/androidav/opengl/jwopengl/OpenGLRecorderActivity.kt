@@ -4,7 +4,7 @@ import android.graphics.Point
 import android.util.Size
 import android.widget.Toast
 import androidx.core.view.doOnLayout
-import me.ztiany.androidav.common.Directory
+import me.ztiany.lib.avbase.utils.Directory
 import me.ztiany.androidav.databinding.OpenglActivityRecorderBinding
 import me.ztiany.androidav.opengl.jwopengl.recorder.RecorderManager
 import me.ztiany.androidav.opengl.jwopengl.recorder.Speed
@@ -13,7 +13,7 @@ import me.ztiany.androidav.opengl.jwopengl.recorder.getSpeedName
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
-import me.ztiany.lib.avbase.BaseActivity
+import me.ztiany.lib.avbase.app.BaseActivity
 import java.io.File
 
 /**RENDERMODE_WHEN_DIRTY 不需要调用 surface 的 onResume/onPause */

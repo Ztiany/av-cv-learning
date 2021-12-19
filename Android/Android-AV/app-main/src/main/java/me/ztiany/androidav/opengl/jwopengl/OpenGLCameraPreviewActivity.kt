@@ -11,7 +11,7 @@ import me.ztiany.androidav.opengl.jwopengl.renderer.CameraRenderer
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
-import me.ztiany.lib.avbase.BaseActivity
+import me.ztiany.lib.avbase.app.BaseActivity
 
 class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBinding>() {
 

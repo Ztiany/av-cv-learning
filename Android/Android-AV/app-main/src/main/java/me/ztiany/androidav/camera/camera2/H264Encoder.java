@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import me.ztiany.androidav.common.Directory;
-import me.ztiany.androidav.common.FileUtils;
-import me.ztiany.androidav.common.IOUtils;
-import me.ztiany.androidav.common.YUVUtils;
+import me.ztiany.lib.avbase.utils.Directory;
+import me.ztiany.lib.avbase.utils.FileUtils;
+import me.ztiany.lib.avbase.utils.IOUtils;
+import me.ztiany.lib.avbase.utils.YUVUtils;
 import timber.log.Timber;
 
 class H264Encoder {
@@ -154,6 +154,7 @@ class H264Encoder {
     }
 
     private long computePresentationTime(long frameIndex) {
+        /*240 是为了给播放器一定的时间来初始化，否则可能第一帧无法展示。*/
         return 240 + frameIndex * 1000000 / 15;
     }
 

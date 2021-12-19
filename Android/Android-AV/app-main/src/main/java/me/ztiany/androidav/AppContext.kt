@@ -2,10 +2,9 @@ package me.ztiany.androidav
 
 import android.app.Application
 import android.content.Context
-import me.ztiany.androidav.common.CrashHandler
+import me.ztiany.lib.avbase.utils.CrashHandler
 import timber.log.Timber
 import kotlin.properties.Delegates
-
 
 class AppContext : Application() {
 

@@ -1,30 +1,46 @@
 package me.ztiany.rtmp
 
-import android.content.Context
 import android.content.Intent
-import android.media.projection.MediaProjection
-import android.media.projection.MediaProjectionManager
-import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import com.blankj.utilcode.util.ToastUtils
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
-import me.ztiany.rtmp.encoder.ScreenH264Encoder
-import me.ztiany.rtmp.livevideo.MediaPusher
-import me.ztiany.rtmp.source.VideoConfig
-import me.ztiany.rtmp.source.screen.ScreenVideoSource
+import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.rtmp.common.Pusher
+import me.ztiany.rtmp.databinding.ActivityMainBinding
+import me.ztiany.rtmp.practice.screen.ScreenPusher
 
+private const val URL_SELF = "rtmp://139.198.183.182/live/livestream"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-    private var mediaProjectionManager: MediaProjectionManager? = null
+    private var pusher: Pusher? = null
 
-    private var liveManager: LiveManager? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun setUpView() {
+        super.setUpView()
         askPermissions()
+        binding.rtmpBtnScreenHard.setOnClickListener {
+            liveScreenHard()
+        }
+        binding.rtmpBtnScreenSoft.setOnClickListener {
+            ToastUtils.showLong("不支持")
+        }
+        binding.rtmpBtnStop.setOnClickListener {
+            pusher?.stop()
+            showFunctions()
+        }
+    }
+
+    private fun showFunctions() {
+        binding.rtmpLlController.visibility = View.GONE
+        binding.rtmpLlScreen.visibility = View.VISIBLE
+        binding.rtmpLlCamera.visibility = View.VISIBLE
+    }
+
+    private fun showController() {
+        binding.rtmpLlController.visibility = View.VISIBLE
+        binding.rtmpLlScreen.visibility = View.GONE
+        binding.rtmpLlCamera.visibility = View.GONE
     }
 
     private fun askPermissions() {
@@ -41,35 +57,24 @@ class MainActivity : AppCompatActivity() {
             .start()
     }
 
-    fun liveScreen(view: View) {
-        MediaPusher()
-
-        this.mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-        mediaProjectionManager?.run {
-            startActivityForResult(createScreenCaptureIntent(), 100)
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
-            mediaProjectionManager?.run {
-                val mediaProjection = getMediaProjection(resultCode, data)
-                startScreenLive(mediaProjection)
-            }
-        }
+        pusher?.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun startScreenLive(mediaProjection: MediaProjection) {
-        val liveManager = LiveManager(
-            VideoConfig(720, 1280),
-            ScreenVideoSource(mediaProjection),
-            ScreenH264Encoder()
-        )
+    private fun liveScreenHard() {
+        //开始直播
+        ScreenPusher(this).also {
+            this.pusher = it
+            it.start(URL_SELF)
+        }
+        //切换 UI
+        showController()
+    }
 
-        liveManager.start()
-
-        this.liveManager = liveManager
+    override fun onDestroy() {
+        super.onDestroy()
+        pusher?.stop()
     }
 
 }

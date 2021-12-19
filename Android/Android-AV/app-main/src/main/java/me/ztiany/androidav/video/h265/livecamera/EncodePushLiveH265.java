@@ -7,7 +7,7 @@ import android.media.MediaFormat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import me.ztiany.androidav.common.YUVUtils;
+import me.ztiany.lib.avbase.utils.YUVUtils;
 import me.ztiany.androidav.video.SocketLive;
 
 public class EncodePushLiveH265 {

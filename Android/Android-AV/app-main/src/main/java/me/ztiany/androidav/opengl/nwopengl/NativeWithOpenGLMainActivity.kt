@@ -3,7 +3,7 @@ package me.ztiany.androidav.opengl.nwopengl
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.databinding.OpenglActivityNativeGlsurvMainBinding
-import me.ztiany.androidav.common.newMMLayoutParams
+import me.ztiany.lib.avbase.utils.newMMLayoutParams
 import me.ztiany.androidav.opengl.nwopengl.renderer.NativeRenderer
 
 class NativeWithOpenGLMainActivity : AppCompatActivity() {

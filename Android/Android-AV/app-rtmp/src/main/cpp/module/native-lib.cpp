@@ -14,49 +14,48 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_init(JNIEnv *env, jobject thiz) {
+Java_me_ztiany_rtmp_common_RtmpPusher_init(JNIEnv *env, jobject thiz) {
     //check if already started.
     if (rtmpPusher) {
         return;
     }
     rtmpPusher = new RtmpPusher();
+    rtmpPusher->initJavaCaller(new JavaCaller(javaVM, env, &thiz));
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_release(JNIEnv *env, jobject thiz) {
-    if (rtmpPusher) {
-        rtmpPusher->stop();
-    }
-    rtmpPusher = nullptr;
+Java_me_ztiany_rtmp_common_RtmpPusher_initVideoCodec(
+        JNIEnv *env,
+        jobject thiz,
+        jint width,
+        jint height,
+        jint fps,
+        jint bitrate
+) {
+    //todo：直接软编
 }
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_initVideoCodec(JNIEnv *env, jobject thiz, jint width,
-                                                         jint height, jint fps, jint bitrate) {
-    // TODO: implement initVideoCodec()
+Java_me_ztiany_rtmp_common_RtmpPusher_initAudioCodec(
+        JNIEnv *env,
+        jobject thiz,
+        jint sample_rate,
+        jint channels
+) {
+    //todo：直接软编
 }
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_initAudioCodec(JNIEnv *env, jobject thiz,
-                                                         jint sample_rate, jint channels) {
-    // TODO: implement initAudioCodec()
-}
-extern "C"
-JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_sendVideoPacket(JNIEnv *env, jobject thiz,
-                                                          jbyteArray data, jint video_type) {
-    // TODO: implement sendVideoPacket()
-}
-extern "C"
-JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_start(JNIEnv *env, jobject thiz, jstring url) {
+Java_me_ztiany_rtmp_common_RtmpPusher_start(JNIEnv *env, jobject thiz, jstring url) {
     if (!rtmpPusher) {
         return;
     }
-    /*if(rtmpPusher->isPushing()){
+    if (rtmpPusher->isPushing()) {
         return;
-    }*/
+    }
 
     //convert the url
     const char *path = env->GetStringUTFChars(url, nullptr);
@@ -70,17 +69,53 @@ Java_me_ztiany_rtmp_livevideo_MediaPusher_start(JNIEnv *env, jobject thiz, jstri
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_sendAudioPacket(
+Java_me_ztiany_rtmp_common_RtmpPusher_sendVideoPacket(
         JNIEnv *env,
         jobject thiz,
         jbyteArray data,
-        jint audio_type
+        jint video_type,
+        jlong tms
 ) {
-
+    if (!rtmpPusher || !rtmpPusher->isPushing()) {
+        LOGE("RTMP 已经停止运行");
+        return;
+    }
+    jbyte *buf = env->GetByteArrayElements(data, nullptr);
+    int length = env->GetArrayLength(data);
+    rtmpPusher->processData((int8_t *) buf, length, tms, video_type);
+    env->ReleaseByteArrayElements(data, buf, 0);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_me_ztiany_rtmp_livevideo_MediaPusher_stop(JNIEnv *env, jobject thiz) {
-    // TODO: implement stop()
+Java_me_ztiany_rtmp_common_RtmpPusher_sendAudioPacket(
+        JNIEnv *env,
+        jobject thiz,
+        jbyteArray data,
+        jint audio_type,
+        jlong tms
+) {
+    if (!rtmpPusher || !rtmpPusher->isPushing()) {
+        LOGE("RTMP 已经停止运行");
+        return;
+    }
+    jbyte *buf = env->GetByteArrayElements(data, nullptr);
+    int length = env->GetArrayLength(data);
+    rtmpPusher->processData((int8_t *) buf, length, tms, audio_type);
+    env->ReleaseByteArrayElements(data, buf, 0);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_common_RtmpPusher_stop(JNIEnv *env, jobject thiz) {
+    if (!rtmpPusher) {
+        return;
+    }
+    rtmpPusher->stop();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_me_ztiany_rtmp_common_RtmpPusher_release(JNIEnv *env, jobject thiz) {
+    rtmpPusher = nullptr;
 }
