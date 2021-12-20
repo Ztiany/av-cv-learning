@@ -1,20 +1,19 @@
-package me.ztiany.rtmp.practice.softcamera
+package me.ztiany.rtmp.practice.camera
 
 import android.hardware.camera2.CameraDevice
 import android.util.Size
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.lib.avbase.utils.YUVUtils
-import me.ztiany.rtmp.common.Camera2Helper
-import me.ztiany.rtmp.common.Camera2Listener
-import me.ztiany.rtmp.common.Camera2VideoSource
+import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.common.RtmpPusher
 import me.ztiany.rtmp.common.RtmpPusher.VIDEO_TYPE_NV21
 
 class CameraSoftPusher(
+    private val cameraId: String,
     context: AppCompatActivity,
     textureView: TextureView
-) {
+) : Pusher {
 
     private val camera2VideoSource = Camera2VideoSource(context, textureView)
 
@@ -66,11 +65,15 @@ class CameraSoftPusher(
 
     }
 
-    fun start(url: String) {
-        camera2VideoSource.start(480, 800, Camera2Helper.CAMERA_ID_BACK, camera2Listener)
+    override fun start(url: String) {
+        camera2VideoSource.start(480, 800, cameraId, camera2Listener)
         rtmpPusher.init()
         rtmpPusher.setCallback(rtmpCallback)
         rtmpPusher.start(url)
+    }
+
+    override fun stop() {
+
     }
 
 }

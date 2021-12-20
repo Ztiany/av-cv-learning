@@ -59,7 +59,7 @@ public:
 
     void stop() {
         _stopped = true;
-        _queue.setWork(0)
+        _queue.setWork(0);
     }
 
     bool isPushing() {

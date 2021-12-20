@@ -2,12 +2,13 @@ package me.ztiany.rtmp
 
 import android.content.Intent
 import android.view.View
-import com.blankj.utilcode.util.ToastUtils
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.rtmp.practice.camera.Camera2Helper
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.databinding.ActivityMainBinding
+import me.ztiany.rtmp.practice.camera.CameraSoftPusher
 import me.ztiany.rtmp.practice.screen.ScreenPusher
 
 private const val URL_SELF = "rtmp://139.198.183.182/live/livestream"
@@ -22,11 +23,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         binding.rtmpBtnScreenHard.setOnClickListener {
             liveScreenHard()
         }
-        binding.rtmpBtnScreenSoft.setOnClickListener {
-            ToastUtils.showLong("不支持")
+        binding.rtmpBtnCameraBack.setOnClickListener {
+            liveCameraSoft(Camera2Helper.CAMERA_ID_BACK)
         }
-        binding.rtmpBtnCameraSoft.setOnClickListener {
-            liveCameraSoft()
+        binding.rtmpBtnCameraFront.setOnClickListener {
+            liveCameraSoft(Camera2Helper.CAMERA_ID_FRONT)
         }
         binding.rtmpBtnStop.setOnClickListener {
             pusher?.stop()
@@ -35,15 +36,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun showFunctions() {
-        binding.rtmpLlController.visibility = View.GONE
-        binding.rtmpLlScreen.visibility = View.VISIBLE
-        binding.rtmpLlCamera.visibility = View.VISIBLE
+        binding.rtmpBtnStop.visibility = View.GONE
+        binding.rtmpBtnScreenHard.visibility = View.VISIBLE
+        binding.rtmpBtnCameraFront.visibility = View.VISIBLE
+        binding.rtmpBtnCameraBack.visibility = View.VISIBLE
     }
 
     private fun showController() {
-        binding.rtmpLlController.visibility = View.VISIBLE
-        binding.rtmpLlScreen.visibility = View.GONE
-        binding.rtmpLlCamera.visibility = View.GONE
+        binding.rtmpBtnStop.visibility = View.VISIBLE
+        binding.rtmpBtnScreenHard.visibility = View.GONE
+        binding.rtmpBtnCameraFront.visibility = View.GONE
+        binding.rtmpBtnCameraBack.visibility = View.GONE
     }
 
     private fun askPermissions() {
@@ -75,8 +78,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         showController()
     }
 
-    private fun liveCameraSoft() {
-
+    private fun liveCameraSoft(cameraId: String) {
+        //TODO
+        //开始直播
+        CameraSoftPusher(
+            cameraId,
+            this,
+            binding.textureView
+        ).also {
+            this.pusher = it
+            it.start(URL_SELF)
+        }
         //切换 UI
         showController()
     }

@@ -17,70 +17,34 @@
         android:layout_gravity="bottom"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/rtmp_ll_screen"
+        <Button
+            android:id="@+id/rtmp_btn_screen_hard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_margin="5dp"
+            android:text="硬编直播投屏" />
 
-            <Button
-                android:id="@+id/rtmp_btn_screen_hard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:text="直播投屏（硬编）" />
-
-            <Button
-                android:id="@+id/rtmp_btn_screen_soft"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:text="直播投屏（软编）" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/rtmp_ll_camera"
+        <Button
+            android:id="@+id/rtmp_btn_camera_back"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_margin="5dp"
+            android:text="软编直播摄像头（后）" />
 
-            <Button
-                android:id="@+id/rtmp_btn_camera_hard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:text="直播摄像头（硬编）" />
-
-            <Button
-                android:id="@+id/rtmp_btn_camera_soft"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:text="直播摄像头（软编）" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/rtmp_ll_controller"
+        <Button
+            android:id="@+id/rtmp_btn_camera_front"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_margin="5dp"
+            android:text="软编直播摄像头（前）" />
 
-            <Button
-                android:id="@+id/rtmp_btn_stop"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:text="停止" />
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/rtmp_btn_stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="停止"
+            android:visibility="gone" />
 
     </LinearLayout>
 

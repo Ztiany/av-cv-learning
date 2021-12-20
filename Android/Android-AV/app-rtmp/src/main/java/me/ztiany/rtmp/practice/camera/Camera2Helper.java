@@ -1,4 +1,4 @@
-package me.ztiany.rtmp.common;
+package me.ztiany.rtmp.practice.camera;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
