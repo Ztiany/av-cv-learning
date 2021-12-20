@@ -1,5 +1,6 @@
 package me.ztiany.androidav.camera.camera2;
 
+import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
@@ -44,9 +45,24 @@ class H264Encoder {
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
             final MediaFormat format = MediaFormat.createVideoFormat("video/avc", width, height);
-            //COLOR_FormatYUV420SemiPlanar
+
+            /*
+             * 使用 MediaCodec 将 YUV 编码为 H264 等格式时，如果指定格式为 `COLOR_FormatYUV420SemiPlanar`，在部分机型上，
+             * MediaCodec 自己会对输入的 YUV 图像的 u/v 进行交换，这就可能会导致格式不匹配的问题（结果就是编码出来的数据颜色不对）
+             * 解决方案有以下几种：
+             *      1. 在把 NV21 图像传给 MediaCodec 之前，先把 NV21 转成 NV12（毕竟这俩货仅仅只是 u/v 相反而已），但只是少数设备会有这种情况，适配起来估计有够呛的。不推荐
+             *      2. 使用 Surface 模式，可以完美避免这种情况，但同时会丧失对原 YUV 图像的处理能力，不过可以使用 OpenGL 方式来处理图像。推荐
+             *      3. 使用 COLOR_FormatYUV420Flexible 配合 MediaCodec.getInputImage()。推荐，但是如果填充 Image 官方并没有给示例，可以参考的代码是
+             *          https://github.com/aosp/cts/blob/master/tests/tests/media/src/android/media/cts/CodecUtils.java
+             */
+            //NV12
             //format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
+            //I420
+            //format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar);
+
+            //Should works with mediaCodec.getInputImage().
             format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
+
             format.setInteger(MediaFormat.KEY_FRAME_RATE, 15);
             format.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 3);//可以为 1 3 5 等来控制质量
             format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
@@ -150,7 +166,6 @@ class H264Encoder {
             byteBuffer.put(rawData, 0, rawData.length);
             mediaCodec.queueInputBuffer(inIndex, 0, rawData.length, computePresentationTime(mFrameIndex++), 0);
         }
-
     }
 
     private long computePresentationTime(long frameIndex) {

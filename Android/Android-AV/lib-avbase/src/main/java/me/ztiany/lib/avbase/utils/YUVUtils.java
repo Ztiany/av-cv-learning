@@ -1,5 +1,7 @@
 package me.ztiany.lib.avbase.utils;
 
+import timber.log.Timber;
+
 public class YUVUtils {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -53,6 +55,20 @@ public class YUVUtils {
     }
 
     /**
+     * 【Camera2】，注意：如果 stride = width，会有绿边。
+     * <pre>
+     *     <ol>
+     *         <li>
+     *             图像格式问题：经过在多台设备上测试，明明设置的预览数据格式是 ImageFormat.YUV_420_888（4 个 Y对应一组 UV，即平均 1 个像素占 1.5 个 byte，12 位），但是拿到的数据却都是 YUV_422 格式（2 个 Y 对应一组 UV，即平均 1 个像素占 2 个 byte，16 位），且 U 和 V 的长度都少了一些（在 Oneplus 5 和 Samsung Tab s3 上长度都少了 1 ），也就是  (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length); 而 YUV_420_888 数据的 Y、U、V 关系应该是： y.length / 4 == u.length == v.length;
+     *         </li>
+     *         <li>
+     *             图像宽度不一定为 stride（步长）：在有些设备上，回传的图像的 rowStride 不一定为 previewSize.getWidth()，比如在 OPPO K3 手机上，选择的分辨率为 1520x760，但是回传的图像数据的 rowStride 却是 1536，且总数据少了 16 个像素（Y 少了 16，U 和 V 分别少了 8）。
+     *         </li>
+     *         <li>
+     *             数组越界：Camera2 设置的预览数据格式是 ImageFormat.YUV_420_888 时，回传的 Y,U,V 的关系一般是 (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length)；U 和 V 是有部分缺失的，因此我们在进行数组操作时需要注意越界问题。
+     *         </li>
+     *     </ol>
+     * </pre>
      * 【Camera2】YUV【YUV422/YUV420】 to NV21。【有些设备，即使要求的 YUV420 的数据，回传的还是 YUV422 的格式】
      */
     public static void nv21FromYUV(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
@@ -67,7 +83,21 @@ public class YUVUtils {
     }
 
     /**
-     * 【Camera2】回传的图像的 rowStride 不一定为 previewSize.getWidth()，但至少满足 rowStride >= previewSize.getWidth()，有些情况需要将 rowStride 裁剪到 width。
+     * Camera API2 注意事项：
+     * <pre>
+     *     <ol>
+     *         <li>
+     *             图像格式问题：经过在多台设备上测试，明明设置的预览数据格式是 ImageFormat.YUV_420_888（4 个 Y对应一组 UV，即平均 1 个像素占 1.5 个 byte，12 位），但是拿到的数据却都是 YUV_422 格式（2 个 Y 对应一组 UV，即平均 1 个像素占 2 个 byte，16 位），且 U 和 V 的长度都少了一些（在 Oneplus 5 和 Samsung Tab s3 上长度都少了 1 ），也就是  (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length); 而 YUV_420_888 数据的 Y、U、V 关系应该是： y.length / 4 == u.length == v.length;
+     *         </li>
+     *         <li>
+     *             图像宽度不一定为 stride（步长）：在有些设备上，回传的图像的 rowStride 不一定为 previewSize.getWidth()，比如在 OPPO K3 手机上，选择的分辨率为 1520x760，但是回传的图像数据的 rowStride 却是 1536，且总数据少了 16 个像素（Y 少了 16，U 和 V 分别少了 8）。
+     *         </li>
+     *         <li>
+     *             数组越界：Camera2 设置的预览数据格式是 ImageFormat.YUV_420_888 时，回传的 Y,U,V 的关系一般是 (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length)；U 和 V 是有部分缺失的，因此我们在进行数组操作时需要注意越界问题。
+     *         </li>
+     *     </ol>
+     * </pre>
+     * 【Camera2】回传的图像的 rowStride 不一定为 previewSize.getWidth()，但至少满足 rowStride >= previewSize.getWidth()，将 rowStride 裁剪到 width，防止在 rowStride >= previewSize.getWidth() 的情况下产生的绿边。
      */
     public static void nv21FromYUVCutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
         // 回传数据是YUV422
@@ -89,21 +119,6 @@ public class YUVUtils {
     }
 
     /**
-     * Camera API2 注意事项：
-     * <pre>
-     *     <ol>
-     *         <li>
-     *             图像格式问题：经过在多台设备上测试，明明设置的预览数据格式是 ImageFormat.YUV_420_888（4 个 Y对应一组 UV，即平均 1 个像素占 1.5 个 byte，12 位），但是拿到的数据却都是 YUV_422 格式（2 个 Y 对应一组 UV，即平均 1 个像素占 2 个 byte，16 位），且 U 和 V 的长度都少了一些（在 Oneplus 5 和 Samsung Tab s3 上长度都少了 1 ），也就是  (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length); 而 YUV_420_888 数据的 Y、U、V 关系应该是： y.length / 4 == u.length == v.length;
-     *         </li>
-     *         <li>
-     *             图像宽度不一定为 stride（步长）：在有些设备上，回传的图像的 rowStride 不一定为 previewSize.getWidth()，比如在 OPPO K3 手机上，选择的分辨率为 1520x760，但是回传的图像数据的 rowStride 却是 1536，且总数据少了 16 个像素（Y 少了 16，U 和 V 分别少了 8）。
-     *         </li>
-     *         <li>
-     *             数组越界：Camera2 设置的预览数据格式是 ImageFormat.YUV_420_888 时，回传的 Y,U,V 的关系一般是 (u.length == v.length) && (y.length / 2 > u.length) && (y.length / 2 ≈ u.length)；U 和 V 是有部分缺失的，因此我们在进行数组操作时需要注意越界问题。
-     *         </li>
-     *     </ol>
-     * </pre>
-     * <p>
      * 【Camera2】将 Y:U:V == 4:2:2 的数据转换为 nv21。
      *
      * @param y      Y 数据
@@ -177,9 +192,8 @@ public class YUVUtils {
      * TODO: This method has not been implemented.
      */
     private static void nv21FromYUV420CutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
-
+        Timber.w("nv21FromYUV420CutToWidth has not been implemented.");
     }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // NV12
@@ -214,17 +228,17 @@ public class YUVUtils {
         // 回传数据是YUV422
         if (y.length / u.length == 2) {
             if (width == stride) {
-
+                //TODO
             } else {
-
+                //TODO
             }
         }
         // 回传数据是YUV420
         else if (y.length / u.length == 4) {
             if (width == stride) {
-
+                //TODO
             } else {
-
+                //TODO
             }
         }
     }

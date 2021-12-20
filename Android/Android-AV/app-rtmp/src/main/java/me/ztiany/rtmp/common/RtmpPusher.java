@@ -8,7 +8,7 @@ public class RtmpPusher {
         System.loadLibrary("android_rtmp");
     }
 
-    public static final int VIDEO_TYPE_YUV = 0;
+    public static final int VIDEO_TYPE_NV21 = 0;
     public static final int VIDEO_TYPE_X264 = 1;
     public static final int VIDEO_TYPE_PCM = 2;
     public static final int VIDEO_TYPE_AAC_INFO = 3;

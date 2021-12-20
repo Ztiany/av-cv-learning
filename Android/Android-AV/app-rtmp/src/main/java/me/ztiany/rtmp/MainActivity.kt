@@ -25,6 +25,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         binding.rtmpBtnScreenSoft.setOnClickListener {
             ToastUtils.showLong("不支持")
         }
+        binding.rtmpBtnCameraSoft.setOnClickListener {
+            liveCameraSoft()
+        }
         binding.rtmpBtnStop.setOnClickListener {
             pusher?.stop()
             showFunctions()
@@ -68,6 +71,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             this.pusher = it
             it.start(URL_SELF)
         }
+        //切换 UI
+        showController()
+    }
+
+    private fun liveCameraSoft() {
+
         //切换 UI
         showController()
     }
