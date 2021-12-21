@@ -193,7 +193,7 @@ public class YUVUtils {
     }
 
     /**
-     * TODO: This method has not been implemented.
+     * 【Camera2】TODO: This method has not been implemented.
      */
     private static void nv21FromYUV420CutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
         Timber.w("nv21FromYUV420CutToWidth has not been implemented.");
@@ -393,6 +393,9 @@ public class YUVUtils {
         }
     }
 
+    /**
+     * 【Camera2】
+     */
     private static void i420FromYUV422(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int height) {
         //copy y
         System.arraycopy(y, 0, i420, 0, y.length);
@@ -416,7 +419,7 @@ public class YUVUtils {
     }
 
     /**
-     * todo: to be tested
+     * 【Camera2】
      */
     private static void i420FromYUV422CutToWidth(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int width, int height) {
         //copy each line of y.
@@ -434,13 +437,6 @@ public class YUVUtils {
         int vIndex = uIndex + width * height / 4;
         int originalUVIndex = 0;
 
-        //1,555,200
-        Timber.d("height = %d", height);
-        Timber.d("width = %d", width);
-        Timber.d("uvLength = %d", width * height / 4);//259200
-        Timber.d("uIndex = %d", uIndex);//1036800
-        Timber.d("vIndex = %d", vIndex);//1296000
-
         for (int i = 0; i < height / 2; i++) {
             for (int j = 0; j < width / 2; j++) {
                 i420[uIndex + j] = u[originalUVIndex + uvStep];//1 2 3  <----> 0 2 4
@@ -455,7 +451,7 @@ public class YUVUtils {
     }
 
     /**
-     * todo: to be tested
+     * 【Camera2】todo: to be tested
      */
     private static void i420FromYUV420(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int height) {
         //copy y
@@ -479,6 +475,9 @@ public class YUVUtils {
         }
     }
 
+    /**
+     * 【Camera2】TODO: This method has not been implemented.
+     */
     private static void i420FromYUV420CutToWidth(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int width, int height) {
         Timber.w("i420FromYUV420CutToWidth has not been implemented.");
     }
