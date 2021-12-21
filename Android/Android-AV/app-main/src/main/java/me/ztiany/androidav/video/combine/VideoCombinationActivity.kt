@@ -12,7 +12,8 @@ import me.ztiany.lib.avbase.utils.Directory
 import java.io.File
 
 /**
- * 视频拼接，如果两个视频的音视频规格不一致，合并后的视频是有问题的。具体参考 [merging-concat-videos-in-android-through-ffmpeg](https://stackoverflow.com/questions/46724197/merging-concat-videos-in-android-through-ffmpeg)
+ * 视频拼接，如果两个视频的音视频规格不一致，合并后的视频是有问题的。
+ * 具体参考 [merging-concat-videos-in-android-through-ffmpeg](https://stackoverflow.com/questions/46724197/merging-concat-videos-in-android-through-ffmpeg)
  */
 class VideoCombinationActivity : AppCompatActivity() {
 

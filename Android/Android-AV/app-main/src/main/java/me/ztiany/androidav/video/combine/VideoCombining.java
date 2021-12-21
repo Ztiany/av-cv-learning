@@ -77,11 +77,9 @@ class VideoCombining {
         info.presentationTimeUs = 0;
         ByteBuffer buffer = ByteBuffer.allocate(500 * 1024);
         int sampleSize;
-        FileWriter fileWriter = new FileWriter(new File(Directory.createTempFilePath(Directory.VIDEO_FORMAT_TXT)));
         while ((sampleSize = videoExtractor1.readSampleData(buffer, 0)) > 0) {
             byte[] data = new byte[buffer.remaining()];
             buffer.get(data);
-            FileUtils.writeContent(fileWriter, data);
             info.offset = 0;
             info.size = sampleSize;
             info.flags = videoExtractor1.getSampleFlags();
@@ -89,7 +87,6 @@ class VideoCombining {
             mediaMuxer.writeSampleData(videoTrackIndex, buffer, info);
             videoExtractor1.advance();
         }
-        IOUtils.closeSafely(fileWriter);
 
         //2.write first audio track into muxer.
         videoExtractor1.unselectTrack(sourceVideoTrack1);

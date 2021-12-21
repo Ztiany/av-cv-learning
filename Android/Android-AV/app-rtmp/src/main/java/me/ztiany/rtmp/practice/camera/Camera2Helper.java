@@ -709,9 +709,9 @@ public class Camera2Helper {
                     Timber.i("Y limit = %d, position = %d, capacity = %d", bufferY.limit(), bufferY.position(), bufferY.capacity());
                     Timber.i("u limit = %d, position = %d, capacity = %d", bufferU.limit(), bufferU.position(), bufferU.capacity());
                     Timber.i("v limit = %d, position = %d, capacity = %d", bufferV.limit(), bufferV.position(), bufferV.capacity());
-                    Timber.i("planesY: row-stride) = %d, pixel-stride = %d", planes[0].getRowStride(), planes[0].getPixelStride());
-                    Timber.i("planesU: row-stride) = %d, pixel-stride = %d", planes[1].getRowStride(), planes[1].getPixelStride());
-                    Timber.i("planesV: row-stride) = %d, pixel-stride = %d", planes[2].getRowStride(), planes[2].getPixelStride());
+                    Timber.i("planesY: row-stride = %d, pixel-stride = %d", planes[0].getRowStride(), planes[0].getPixelStride());
+                    Timber.i("planesU: row-stride = %d, pixel-stride = %d", planes[1].getRowStride(), planes[1].getPixelStride());
+                    Timber.i("planesV: row-stride = %d, pixel-stride = %d", planes[2].getRowStride(), planes[2].getPixelStride());
                     Timber.i("preview-size = %dx%d", mPreviewSize.getWidth(), mPreviewSize.getHeight());
                     y = new byte[bufferY.limit() - bufferY.position()];
                     u = new byte[bufferU.limit() - bufferU.position()];

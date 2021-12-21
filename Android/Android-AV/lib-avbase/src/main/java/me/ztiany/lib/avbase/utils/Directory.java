@@ -37,6 +37,7 @@ public class Directory {
     public static final String PICTURE_FORMAT_JPEG = ".jpeg";
     public static final String PICTURE_FORMAT_PNG = ".png";
     public static final String VIDEO_FORMAT_MP4 = ".mp4";
+    public static final String VIDEO_FORMAT_YUV = ".yuv";
     public static final String VIDEO_FORMAT_H264 = ".h264";
     public static final String VIDEO_FORMAT_H265 = ".h265";
     public static final String VIDEO_FORMAT_TXT = ".txt";
@@ -194,6 +195,12 @@ public class Directory {
         return file;
     }
 
+    public static File createSDCardRootAppPathAndName(String format) {
+        File file = new File(getSDCardRootPath(), APP_NAME + "/" + createTempFileName(format));
+        makeParentPath(file, "createSDCardAppPath");
+        return file;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Tools
     ///////////////////////////////////////////////////////////////////////////
@@ -235,7 +242,7 @@ public class Directory {
      * 根据日期生成一个临时文件名，格式由 format 制定。
      */
     public static String createTempFileName(String format) {
-        String tempFileName = Objects.requireNonNull(SDF_HOLDER.get()).format(new Date()) + "_" + UUID.randomUUID().toString();
+        String tempFileName = Objects.requireNonNull(SDF_HOLDER.get()).format(new Date()) + "_" + UUID.randomUUID().toString().substring(30);
         return tempFileName + format;
     }
 

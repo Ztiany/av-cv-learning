@@ -1,6 +1,5 @@
 package me.ztiany.androidav.camera.camera2;
 
-import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
@@ -23,7 +22,7 @@ class H264Encoder {
     private final LinkedBlockingDeque<byte[]> mLinkedBlockingDeque = new LinkedBlockingDeque<>();
 
     private volatile MediaCodec mediaCodec;
-    private volatile boolean stopped = false;
+    private volatile boolean stopped = true;
 
     private byte[] nv21_rotated;
     private byte[] nv12;
@@ -33,10 +32,16 @@ class H264Encoder {
     private FileOutputStream mFileOutputStream;
     private FileWriter mFileWriter;
 
-    void initCodec(int width, int height) {
+    void initCodec(int width, int height, int displayOrientation) {
+        Timber.d(+width + "], height = [" + height + "], displayOrientation = [" + displayOrientation + "]");
+
+        if (!stopped) {
+            throw new IllegalStateException("already initialized");
+        }
+
         try {
-            mFileOutputStream = new FileOutputStream(Directory.createTimeNamingDCIMPath(Directory.VIDEO_FORMAT_H264));
-            mFileWriter = new FileWriter(Directory.createTimeNamingDCIMPath(Directory.VIDEO_FORMAT_TXT));
+            mFileOutputStream = new FileOutputStream(Directory.createSDCardRootAppPathAndName(Directory.VIDEO_FORMAT_H264));
+            mFileWriter = new FileWriter(Directory.createSDCardRootAppPathAndName(Directory.VIDEO_FORMAT_TXT));
         } catch (IOException e) {
             Timber.e(e);
             return;
@@ -44,7 +49,12 @@ class H264Encoder {
 
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc");
-            final MediaFormat format = MediaFormat.createVideoFormat("video/avc", width, height);
+            MediaFormat format;
+            if ((displayOrientation / 90) % 2 == 1) {
+                format = MediaFormat.createVideoFormat("video/avc", height, width);
+            } else {
+                format = MediaFormat.createVideoFormat("video/avc", width, height);
+            }
 
             /*
              * 使用 MediaCodec 将 YUV 编码为 H264 等格式时，如果指定格式为 `COLOR_FormatYUV420SemiPlanar`，在部分机型上，
@@ -73,9 +83,27 @@ class H264Encoder {
             return;
         }
 
+        stopped = false;
         startEncoder();
     }
 
+    void stop() {
+        mLinkedBlockingDeque.clear();
+        stopped = true;
+        if (mediaCodec != null) {
+            mediaCodec.stop();
+            mediaCodec.release();
+            mediaCodec = null;
+        }
+        IOUtils.closeAllSafely(mFileOutputStream, mFileWriter);
+        mFileOutputStream = null;
+        mFileWriter = null;
+        mFrameIndex = 0;
+        nv21_rotated = null;
+        nv12 = null;
+    }
+
+    //todo：适配横屏、前置摄像头
     void processCamaraData(byte[] nv21, Size previewSize, int stride, int displayOrientation, boolean isMirrorPreview, String openedCameraId) {
         if (nv21_rotated == null) {
             nv21_rotated = new byte[previewSize.getWidth() * previewSize.getHeight() * 3 / 2];
@@ -93,17 +121,6 @@ class H264Encoder {
         byte[] bytes = new byte[nv12.length];
         System.arraycopy(nv12, 0, bytes, 0, nv12.length);
         mLinkedBlockingDeque.add(bytes);
-    }
-
-    void stop() {
-        mLinkedBlockingDeque.clear();
-        stopped = true;
-        if (mediaCodec != null) {
-            mediaCodec.stop();
-            mediaCodec.release();
-            mediaCodec = null;
-        }
-        IOUtils.closeAllSafely(mFileOutputStream, mFileWriter);
     }
 
     private void startEncoder() {

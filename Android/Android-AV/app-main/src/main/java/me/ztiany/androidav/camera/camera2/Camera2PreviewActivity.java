@@ -58,10 +58,12 @@ public class Camera2PreviewActivity extends AppCompatActivity implements ViewTre
     private int currentIndex = 0;
 
     // 处理的间隔帧
-    private static final int PROCESS_INTERVAL = 30;
+    private static final int PROCESS_INTERVAL = 60;
 
     // 线程池
     private ExecutorService imageProcessExecutor;
+
+    private final YUVSaver yuvSaver = new YUVSaver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +173,9 @@ public class Camera2PreviewActivity extends AppCompatActivity implements ViewTre
                 if (nv21 == null) {
                     nv21 = new byte[stride * previewSize.getHeight() * 3 / 2];
                 }
+
+                yuvSaver.saveYUV(y, u, v, previewSize, stride, displayOrientation, isMirrorPreview);
+
                 YUVUtils.nv21FromYUV(y, u, v, nv21, stride, previewSize.getHeight());
                 YUVImageDisplay.showYUVImage(
                         Camera2PreviewActivity.this,

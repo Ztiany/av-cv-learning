@@ -55,7 +55,7 @@ public class YUVUtils {
     }
 
     /**
-     * 【Camera2】，注意：如果 stride = width，会有绿边。
+     * 【Camera2】，注意：如果 stride != width，会有绿边。
      * <pre>
      *     <ol>
      *         <li>
@@ -70,15 +70,17 @@ public class YUVUtils {
      *     </ol>
      * </pre>
      * 【Camera2】YUV【YUV422/YUV420】 to NV21。【有些设备，即使要求的 YUV420 的数据，回传的还是 YUV422 的格式】
+     *
+     * @param nv21 the length of nv21 should be [stride * height * 3 / 2]
      */
     public static void nv21FromYUV(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
         // 回传数据是YUV422
         if (y.length / u.length == 2) {
-            YUVUtils.nv21FromYUV422(y, u, v, nv21, stride, height);
+            nv21FromYUV422(y, u, v, nv21, stride, height);
         }
         // 回传数据是YUV420
         else if (y.length / u.length == 4) {
-            YUVUtils.nv21FromYUV420(y, u, v, nv21, stride, height);
+            nv21FromYUV420(y, u, v, nv21, stride, height);
         }
     }
 
@@ -98,6 +100,8 @@ public class YUVUtils {
      *     </ol>
      * </pre>
      * 【Camera2】回传的图像的 rowStride 不一定为 previewSize.getWidth()，但至少满足 rowStride >= previewSize.getWidth()，将 rowStride 裁剪到 width，防止在 rowStride >= previewSize.getWidth() 的情况下产生的绿边。
+     *
+     * @param nv21 the length of nv21 should be [width * height * 3 / 2]
      */
     public static void nv21FromYUVCutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
         // 回传数据是YUV422
@@ -128,7 +132,7 @@ public class YUVUtils {
      * @param stride 步长
      * @param height 图像高度
      */
-    public static void nv21FromYUV422(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+    private static void nv21FromYUV422(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
         System.arraycopy(y, 0, nv21, 0, y.length);
         // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算。
         int length = y.length + u.length / 2 + v.length / 2;
@@ -144,25 +148,25 @@ public class YUVUtils {
 
     private static void nv21FromYUV422CutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
         //copy each line of y.
-        int oYIndex = 0;
+        int originalYIndex = 0;
         int yIndex = 0;
         for (int i = 0; i < height; i++) {
-            System.arraycopy(y, oYIndex, nv21, yIndex, width);
-            oYIndex += stride;
+            System.arraycopy(y, originalYIndex, nv21, yIndex, width);
+            originalYIndex += stride;
             yIndex += width;
         }
         //copy uv
         int uvStep = 0;
         int uvIndex = width * height;
-        int oUVIndex = 0;
+        int originalUVIndex = 0;
         for (int i = 0; i < height / 2; i++) {
             for (int j = 0; j < width / 2; j++) {
-                nv21[uvIndex + 2 * j] = v[oUVIndex + uvStep];//0 2 4  <---->0 2 4
-                nv21[uvIndex + 2 * j + 1] = u[oUVIndex + uvStep];//1 3 5 <---->0 2 4
+                nv21[uvIndex + 2 * j] = v[originalUVIndex + uvStep];//0 2 4  <----> 0 2 4
+                nv21[uvIndex + 2 * j + 1] = u[originalUVIndex + uvStep];//1 3 5 <----> 0 2 4
                 uvStep += 2;
             }
             uvIndex += width;
-            oUVIndex += stride;
+            originalUVIndex += stride;
             uvStep = 0;
         }
     }
@@ -177,7 +181,7 @@ public class YUVUtils {
      * @param stride 步长
      * @param height 图像高度
      */
-    public static void nv21FromYUV420(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+    private static void nv21FromYUV420(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
         System.arraycopy(y, 0, nv21, 0, y.length);
         // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算
         int length = y.length + u.length + v.length;
@@ -198,50 +202,6 @@ public class YUVUtils {
     ///////////////////////////////////////////////////////////////////////////
     // NV12
     ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * NV21 转换为 * NV12
-     */
-    public static void nv12FromNV21(byte[] nv21, byte[] nv12) {
-        int size = nv21.length;
-        int len = size * 2 / 3;//length of y planer.
-        System.arraycopy(nv21, 0, nv12, 0, len);
-        int i = len;
-        while (i < size - 1) {
-            nv12[i] = nv21[i + 1];
-            nv12[i + 1] = nv21[i];
-            i += 2;
-        }
-    }
-
-    /**
-     * 【Camera2】YUV【YUV422/YUV420】 to NV21。【因为有些设备，即使要求的 YUV420 的数据，回传的还是 YUV422 的格式】
-     */
-    public static void nv12FromYUV(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
-
-    }
-
-    /**
-     * 【Camera2】回传的图像的 rowStride 不一定为 previewSize.getWidth()，但至少满足 rowStride >= previewSize.getWidth()，有些情况需要将 rowStride 裁剪到 width。
-     */
-    public static void nv12FromYUVCutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
-        // 回传数据是YUV422
-        if (y.length / u.length == 2) {
-            if (width == stride) {
-                //TODO
-            } else {
-                //TODO
-            }
-        }
-        // 回传数据是YUV420
-        else if (y.length / u.length == 4) {
-            if (width == stride) {
-                //TODO
-            } else {
-                //TODO
-            }
-        }
-    }
 
     /**
      * NV12 顺时针旋转 90°
@@ -265,115 +225,262 @@ public class YUVUtils {
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // I420: refer to <https://titanwolf.org/Network/Articles/Article?AID=00eb74a7-3d38-45cf-8c56-0319fb3c1b92>
-    ///////////////////////////////////////////////////////////////////////////
+    /**
+     * NV21 转换为 NV12
+     */
+    public static void nv12FromNV21(byte[] nv21, byte[] nv12) {
+        int size = nv21.length;
+        int len = size * 2 / 3;//length of y planer.
+        System.arraycopy(nv21, 0, nv12, 0, len);
+        int i = len;
+        while (i < size - 1) {
+            nv12[i] = nv21[i + 1];
+            nv12[i + 1] = nv21[i];
+            i += 2;
+        }
+    }
 
     /**
-     * I420 顺时针旋转 90°
+     * 【Camera2】
      */
-    public static void i420Rotate90CW(byte[] output, byte[] src, int imageWidth, int imageHeight) {
-        int i = 0, j = 0;
-        int index = 0;
-        int tempIndex = 0;
-        int div = 0;
-        int uStart = imageWidth * imageHeight;
+    public static void nv12FromYUV(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+        // 回传数据是YUV422
+        if (y.length / u.length == 2) {
+            nv12FromYUV422(y, u, v, nv21, stride, height);
+        }
+        // 回传数据是YUV420
+        else if (y.length / u.length == 4) {
+            nv12FromYUV420(y, u, v, nv21, stride, height);
+        }
+    }
 
-        for (i = 0; i < imageHeight; i++) {
-            div = i;
-            tempIndex = uStart;
-            for (j = 0; j < imageWidth; j++) {
-                tempIndex -= imageWidth;
-                output[index++] = src[tempIndex + div];
+    /**
+     * 【Camera2】
+     */
+    public static void nv12FromYUVCutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
+        // 回传数据是YUV422
+        if (y.length / u.length == 2) {
+            if (width == stride) {
+                nv12FromYUV422(y, u, v, nv21, stride, height);
+            } else {
+                nv12FromYUV422CutToWidth(y, u, v, nv21, stride, width, height);
             }
         }
-
-        int uDiv = imageWidth * imageHeight / 4;
-        int uWidth = imageWidth / 2;
-        int uHeight = imageHeight / 2;
-        index = uStart;
-        for (i = 0; i < uHeight; i++) {
-            div = i;
-            tempIndex = uStart + uDiv;
-            for (j = 0; j < uWidth; j++) {
-                tempIndex -= uWidth;
-                output[index] = src[tempIndex + div];
-                output[index + uDiv] = src[tempIndex + div + uDiv];
-                index++;
+        // 回传数据是YUV420
+        else if (y.length / u.length == 4) {
+            if (width == stride) {
+                nv12FromYUV420(y, u, v, nv21, stride, height);
+            } else {
+                nv12FromYUV420CutToWidth(y, u, v, nv21, stride, width, height);
             }
         }
     }
 
     /**
-     * I420 顺时针旋转 180°
+     * 【Camera2】
      */
-    public static void i420Rotate180CW(byte[] output, byte[] src, int imageWidth, int imageHeight) {
-        int i;
-        int j;
+    private static void nv12FromYUV422(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+        System.arraycopy(y, 0, nv21, 0, y.length);
+        // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算。
+        int length = y.length + u.length / 2 + v.length / 2;
+        int uIndex = 0, vIndex = 0;
+        int endOfY = stride * height;
+        for (int i = endOfY; i < length; i += 2) {
+            nv21[i] = u[uIndex];
+            nv21[i + 1] = v[vIndex];
+            vIndex += 2;
+            uIndex += 2;
+        }
+    }
 
-        int index = 0;
-        int tempIndex;
+    /**
+     * 【Camera2】
+     */
+    private static void nv12FromYUV422CutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
+        //copy each line of y.
+        int originalYIndex = 0;
+        int yIndex = 0;
+        for (int i = 0; i < height; i++) {
+            System.arraycopy(y, originalYIndex, nv21, yIndex, width);
+            originalYIndex += stride;
+            yIndex += width;
+        }
+        //copy uv
+        int uvStep = 0;
+        int uvIndex = width * height;
+        int originalUVIndex = 0;
+        for (int i = 0; i < height / 2; i++) {
+            for (int j = 0; j < width / 2; j++) {
+                nv21[uvIndex + 2 * j] = u[originalUVIndex + uvStep];//0 2 4  <----> 0 2 4
+                nv21[uvIndex + 2 * j + 1] = v[originalUVIndex + uvStep];//1 3 5 <----> 0 2 4
+                uvStep += 2;
+            }
+            uvIndex += width;
+            originalUVIndex += stride;
+            uvStep = 0;
+        }
+    }
 
-        int uStart = imageWidth * imageHeight;
-        tempIndex = uStart;
+    /**
+     * 【Camera2】
+     */
+    private static void nv12FromYUV420(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int height) {
+        System.arraycopy(y, 0, nv21, 0, y.length);
+        // 注意，若 length 值为 y.length * 3 / 2 会有数组越界的风险，需使用真实数据长度计算
+        int length = y.length + u.length + v.length;
+        int uIndex = 0, vIndex = 0;
+        for (int i = stride * height; i < length; i++) {
+            nv21[i] = u[uIndex++];
+            nv21[i + 1] = v[vIndex++];
+        }
+    }
 
-        for (i = 0; i < imageHeight; i++) {
-            tempIndex -= imageWidth;
-            for (j = 0; j < imageWidth; j++) {
-                output[index++] = src[tempIndex + j];
+    /**
+     * 【Camera2】
+     */
+    private static void nv12FromYUV420CutToWidth(byte[] y, byte[] u, byte[] v, byte[] nv21, int stride, int width, int height) {
+        Timber.w("nv12FromYUV420CutToWidth has not been implemented.");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // I420
+    ///////////////////////////////////////////////////////////////////////////
+    public static void i420Rotate90CW(byte[] data, byte[] output, int width, int height) {
+        int yLength = width * height;
+        int uLength = width * height >> 2;
+        int uvWidth = width >> 1;
+        int uvHeight = height >> 1;
+        int k = 0;
+        //rotate y
+        for (int j = 0; j < width; j++) {
+            for (int i = height - 1; i >= 0; i--) {
+                output[k++] = data[width * i + j];
             }
         }
-
-        int uDiv = imageWidth * imageHeight / 4;
-        int uWidth = imageWidth / 2;
-        int uHeight = imageHeight / 2;
-        index = uStart;
-        tempIndex = uStart + uDiv;
-        for (i = 0; i < uHeight; i++) {
-            tempIndex -= uWidth;
-            for (j = 0; j < uWidth; j++) {
-                output[index] = src[tempIndex + j];
-                output[index + uDiv] = src[tempIndex + j + uDiv];
-                index++;
+        //rotate u
+        for (int j = 0; j < uvWidth; j++) {
+            for (int i = (uvHeight) - 1; i >= 0; i--) {
+                output[k++] = data[yLength + uvWidth * i + j];
+            }
+        }
+        //rotate v
+        for (int j = 0; j < uvWidth; j++) {
+            for (int i = (uvHeight) - 1; i >= 0; i--) {
+                output[k++] = data[yLength + uLength + uvWidth * i + j];
             }
         }
     }
 
     /**
-     * I420 顺时针旋转 270°
+     * 【Camera2】
      */
-    public static void i420Rotate270CW(byte[] output, byte[] src, int imageWidth, int imageHeight) {
-        int i;
-        int j;
-        int index = 0;
-        int tempIndex;
-        int div;
-
-        for (i = 0; i < imageHeight; i++) {
-            div = i + 1;
-            tempIndex = 0;
-            for (j = 0; j < imageWidth; j++) {
-                tempIndex += imageWidth;
-                output[index++] = src[tempIndex - div];
+    public static void i420FromYUVCutToWidth(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int width, int height) {
+        // 回传数据是YUV422
+        if (y.length / u.length == 2) {
+            if (width == stride) {
+                i420FromYUV422(y, u, v, i420, stride, height);
+            } else {
+                i420FromYUV422CutToWidth(y, u, v, i420, stride, width, height);
             }
         }
-
-        int start = imageWidth * imageHeight;
-        int uDiv = imageWidth * imageHeight / 4;
-        int uWidth = imageWidth / 2;
-        int uHeight = imageHeight / 2;
-        index = start;
-
-        for (i = 0; i < uHeight; i++) {
-            div = i + 1;
-            tempIndex = start;
-            for (j = 0; j < uWidth; j++) {
-                tempIndex += uWidth;
-                output[index] = src[tempIndex - div];
-                output[index + uDiv] = src[tempIndex - div + uDiv];
-                index++;
+        // 回传数据是YUV420
+        else if (y.length / u.length == 4) {
+            if (width == stride) {
+                i420FromYUV420(y, u, v, i420, stride, height);
+            } else {
+                i420FromYUV420CutToWidth(y, u, v, i420, stride, width, height);
             }
         }
+    }
+
+    private static void i420FromYUV422(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int height) {
+        //copy y
+        System.arraycopy(y, 0, i420, 0, y.length);
+
+        //copy u
+        int uStart = stride * height;
+        int uIndex = 0;
+        for (int i = 0; i < u.length / 2; i++) {
+            i420[uStart + i] = u[uIndex];
+            uIndex += 2;
+        }
+
+        //copy v
+        int vIndex = 0;
+        int uLength = stride * height / 4;
+        int vStart = uStart + uLength;
+        for (int i = 0; i < v.length / 2; i++) {
+            i420[vStart + i] = v[vIndex];
+            vIndex += 2;
+        }
+    }
+
+    /**
+     * todo: to be tested
+     */
+    private static void i420FromYUV422CutToWidth(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int width, int height) {
+        //copy each line of y.
+        int originalYIndex = 0;
+        int yIndex = 0;
+        for (int i = 0; i < height; i++) {
+            System.arraycopy(y, originalYIndex, i420, yIndex, width);
+            originalYIndex += stride;
+            yIndex += width;
+        }
+
+        //copy uv
+        int uvStep = 0;
+        int uIndex = width * height;
+        int vIndex = uIndex + width * height / 4;
+        int originalUVIndex = 0;
+
+        //1,555,200
+        Timber.d("height = %d", height);
+        Timber.d("width = %d", width);
+        Timber.d("uvLength = %d", width * height / 4);//259200
+        Timber.d("uIndex = %d", uIndex);//1036800
+        Timber.d("vIndex = %d", vIndex);//1296000
+
+        for (int i = 0; i < height / 2; i++) {
+            for (int j = 0; j < width / 2; j++) {
+                i420[uIndex + j] = u[originalUVIndex + uvStep];//1 2 3  <----> 0 2 4
+                i420[vIndex + j] = v[originalUVIndex + uvStep];//1 2 3 <----> 0 2 4
+                uvStep += 2;
+            }
+            uIndex += width / 2;
+            vIndex += width / 2;
+            originalUVIndex += stride;
+            uvStep = 0;
+        }
+    }
+
+    /**
+     * todo: to be tested
+     */
+    private static void i420FromYUV420(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int height) {
+        //copy y
+        System.arraycopy(y, 0, i420, 0, y.length);
+
+        //copy u
+        int uStart = stride * height;
+        int uIndex = 0;
+        for (int i = 0; i < u.length; i++) {
+            i420[uStart + i] = u[uIndex];
+            uIndex += 1;
+        }
+
+        //copy v
+        int vIndex = 0;
+        int uLength = stride * height / 4;
+        int vStart = uStart + uLength;
+        for (int i = 0; i < v.length; i++) {
+            i420[vStart + i] = v[vIndex];
+            vIndex += 1;
+        }
+    }
+
+    private static void i420FromYUV420CutToWidth(byte[] y, byte[] u, byte[] v, byte[] i420, int stride, int width, int height) {
+        Timber.w("i420FromYUV420CutToWidth has not been implemented.");
     }
 
 }

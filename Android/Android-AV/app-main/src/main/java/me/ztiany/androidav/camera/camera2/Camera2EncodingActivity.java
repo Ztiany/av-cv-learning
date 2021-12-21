@@ -98,8 +98,8 @@ public class Camera2EncodingActivity extends AppCompatActivity implements ViewTr
         this.displayOrientation = displayOrientation;
         this.isMirrorPreview = isMirror;
         this.openedCameraId = cameraId;
-        //todo：适配横屏、前置摄像头
-        mH264Encoder.initCodec(previewSize.getHeight(), previewSize.getWidth());
+        mH264Encoder.stop();
+        mH264Encoder.initCodec(previewSize.getWidth(), previewSize.getHeight(), displayOrientation);
     }
 
     @Override
@@ -107,7 +107,6 @@ public class Camera2EncodingActivity extends AppCompatActivity implements ViewTr
         if (nv21 == null) {
             nv21 = new byte[previewSize.getWidth() * previewSize.getHeight() * 3 / 2];
         }
-        //todo：适配横屏、前置摄像头
         YUVUtils.nv21FromYUVCutToWidth(y, u, v, nv21, stride, previewSize.getWidth(), previewSize.getHeight());
         mH264Encoder.processCamaraData(nv21, previewSize, stride, displayOrientation, isMirrorPreview, openedCameraId);
     }
