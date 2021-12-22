@@ -8,11 +8,15 @@ public class RtmpPusher {
         System.loadLibrary("android_rtmp");
     }
 
-    public static final int VIDEO_TYPE_NV21 = 0;
+    public static final int VIDEO_FORMAT_I420 = 0;
+    public static final int VIDEO_FORMAT_NV21 = 1;
+    public static final int VIDEO_FORMAT_NV12 = 2;
+
+    public static final int VIDEO_TYPE_YUV = 0;
     public static final int VIDEO_TYPE_X264 = 1;
-    public static final int VIDEO_TYPE_PCM = 2;
-    public static final int VIDEO_TYPE_AAC_INFO = 3;
-    public static final int VIDEO_TYPE_AAC_DATA = 4;
+    public static final int AUDIO_TYPE_PCM = 2;
+    public static final int AUDIO_TYPE_AAC_INFO = 3;
+    public static final int AUDIO_TYPE_AAC_DATA = 4;
 
     private Callback mCallback;
 
@@ -28,7 +32,7 @@ public class RtmpPusher {
 
     public native void init();
 
-    public native void initVideoCodec(int width, int height, int fps, int bitrate);
+    public native void initVideoCodec(int width, int height, int fps, int bitrate, int format);
 
     public native void initAudioCodec(int sampleRate, int channels);
 

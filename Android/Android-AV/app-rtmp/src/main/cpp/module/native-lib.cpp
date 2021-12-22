@@ -31,9 +31,13 @@ Java_me_ztiany_rtmp_common_RtmpPusher_initVideoCodec(
         jint width,
         jint height,
         jint fps,
-        jint bitrate
+        jint bitrate,
+        jint format
 ) {
-    //todo：直接软编
+    if (!rtmpPusher) {
+        return;
+    }
+    rtmpPusher->initVideoCodec(width, height, fps, bitrate, format);
 }
 
 extern "C"

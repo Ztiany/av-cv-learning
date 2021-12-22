@@ -2,7 +2,14 @@
 #define ANDROID_AV_CONFIG_H
 
 enum VideoType {
-    NV21, X264
+    YUV,
+    X264
+};
+
+enum VideoFormat {
+    I420,
+    NV21,
+    NV12
 };
 
 enum AudioType {

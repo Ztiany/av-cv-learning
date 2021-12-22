@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.lib.avbase.utils.YUVUtils
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.common.RtmpPusher
-import me.ztiany.rtmp.common.RtmpPusher.VIDEO_TYPE_NV21
+import me.ztiany.rtmp.common.RtmpPusher.VIDEO_TYPE_YUV
 
 class CameraSoftPusher(
     private val cameraId: String,
@@ -39,9 +39,9 @@ class CameraSoftPusher(
             isMirror: Boolean
         ) {
             if ((displayOrientation / 90).mod(2) == 1) {//竖屏
-                rtmpPusher.initVideoCodec(previewSize.height, previewSize.width, 15, 800_000)
+                rtmpPusher.initVideoCodec(previewSize.height, previewSize.width, 15, 800_000, RtmpPusher.VIDEO_FORMAT_I420)
             } else {//横屏
-                rtmpPusher.initVideoCodec(previewSize.width, previewSize.height, 15, 800_000)
+                rtmpPusher.initVideoCodec(previewSize.width, previewSize.height, 15, 800_000, RtmpPusher.VIDEO_FORMAT_I420)
             }
         }
 
@@ -52,7 +52,7 @@ class CameraSoftPusher(
             }
             if (rtmpInitSucceeded) {
                 YUVUtils.nv21FromYUVCutToWidth(y, u, v, buffer, stride, previewSize.width, previewSize.height)
-                rtmpPusher.sendVideoPacket(buffer, VIDEO_TYPE_NV21, 0L)
+                rtmpPusher.sendVideoPacket(buffer, VIDEO_TYPE_YUV, 0L)
             }
         }
 

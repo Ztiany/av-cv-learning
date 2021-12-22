@@ -28,6 +28,8 @@ private:
     X264Parser x264Parser;
     AACParser aacParser;
 
+    X264Codec x264Codec;
+
     JavaCaller *_javaCaller = nullptr;
 
 public:
@@ -43,6 +45,8 @@ public:
             x264Parser.parsePacket(buf, len, tms, &_queue);
         } else if (type == AAC_INFO || type == AAC_DATA) {
             aacParser.parsePacket(buf, len, type, tms, &_queue);
+        } else if (YUV == type) {
+            x264Codec.encodeData(buf, len);
         }
     }
 
@@ -68,6 +72,10 @@ public:
 
     void initJavaCaller(JavaCaller *javaCaller) {
         this->_javaCaller = javaCaller;
+    }
+
+    void initVideoCodec(jint width, jint height, jint fps, jint bitrate, jint format) {
+        x264Codec.setVideoInfo(width, height, fps, bitrate, format);
     }
 
 private:

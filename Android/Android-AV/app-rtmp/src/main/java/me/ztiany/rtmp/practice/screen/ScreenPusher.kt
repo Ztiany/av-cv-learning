@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ScreenUtils
 import me.ztiany.rtmp.audio.AACAudioSource
 import me.ztiany.rtmp.common.*
-import kotlin.math.roundToInt
 
 class ScreenPusher(
     private val context: AppCompatActivity
@@ -100,13 +99,13 @@ class ScreenPusher(
         if (packet.type == TYPE_AUDIO_INFO) {
             rtmpPusher.sendAudioPacket(
                 packet.byteArray,
-                RtmpPusher.VIDEO_TYPE_AAC_INFO,
+                RtmpPusher.AUDIO_TYPE_AAC_INFO,
                 0L
             )
         } else {
             rtmpPusher.sendAudioPacket(
                 packet.byteArray,
-                RtmpPusher.VIDEO_TYPE_AAC_DATA,
+                RtmpPusher.AUDIO_TYPE_AAC_DATA,
                 packet.presentationTime
             )
         }
