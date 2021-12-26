@@ -14,10 +14,10 @@ class Camera2VideoSource(
     fun start(targetWidth: Int, targetHeight: Int, cameraId: String, camera2Listener: Camera2Listener) {
         Camera2Helper.Builder()
             .cameraListener(camera2Listener)
-            .maxPreviewSize(Point(1920, 1080))
-            .minPreviewSize(Point(1280, 720))
+            .maxPreviewSize(Point(1000, 1000))
+            .minPreviewSize(Point(240, 160))
             .previewViewSize(Point(textureView.width, textureView.height))
-            .previewSize(Point(targetHeight, targetWidth))/*摄像头的取景方向不同*/
+            .previewSize(Point(targetWidth, targetHeight))
             .specificCameraId(cameraId)
             .context(context.application)
             .previewOn(textureView)
@@ -30,6 +30,15 @@ class Camera2VideoSource(
 
     fun stop() {
         camera2Helper?.stop()
+        camera2Helper?.release()
+    }
+
+    fun pause() {
+        camera2Helper?.stop()
+    }
+
+    fun resume() {
+        camera2Helper?.start()
     }
 
 }

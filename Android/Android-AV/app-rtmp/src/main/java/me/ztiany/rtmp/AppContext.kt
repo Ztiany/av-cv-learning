@@ -13,6 +13,7 @@ class AppContext : Application() {
         Utils.init(this)
         //配置调试工具
         Timber.plant(Timber.DebugTree())
+        //日志收集
         CrashHandler.register(this)
     }
 

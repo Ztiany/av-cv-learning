@@ -50,6 +50,8 @@ public class RtmpPusher {
         void onInitSuccess();
 
         void onInitFailed();
+
+        void onSendError();
     }
 
     public void setCallback(Callback callback) {
@@ -67,6 +69,13 @@ public class RtmpPusher {
             } else {
                 mCallback.onInitFailed();
             }
+        }
+    }
+
+    public void onSendError() {
+        Timber.d("onSendError() called");
+        if (mCallback != null) {
+            mCallback.onSendError();
         }
     }
 

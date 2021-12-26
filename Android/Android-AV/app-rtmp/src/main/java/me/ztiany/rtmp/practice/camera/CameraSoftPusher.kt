@@ -8,6 +8,7 @@ import me.ztiany.lib.avbase.utils.YUVUtils
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.common.RtmpPusher
 import me.ztiany.rtmp.common.RtmpPusher.VIDEO_TYPE_YUV
+import java.util.concurrent.Executors
 
 class CameraSoftPusher(
     private val cameraId: String,
@@ -18,15 +19,19 @@ class CameraSoftPusher(
     private val camera2VideoSource = Camera2VideoSource(context, textureView)
 
     private val rtmpPusher = RtmpPusher.getInstance()
-    private var nv21: ByteArray? = null
+    private var i420: ByteArray? = null
 
-    private var rtmpInitSucceeded = false
+    @Volatile private var rtmpInitSucceeded = false
+
+    private val executor = Executors.newSingleThreadExecutor()
 
     private val rtmpCallback = object : RtmpPusher.Callback {
         override fun onInitFailed() = Unit
         override fun onInitSuccess() {
             rtmpInitSucceeded = true
         }
+
+        override fun onSendError() = Unit
     }
 
     private val camera2Listener = object : Camera2Listener {
@@ -46,13 +51,22 @@ class CameraSoftPusher(
         }
 
         override fun onPreview(y: ByteArray, u: ByteArray, v: ByteArray, previewSize: Size, stride: Int) {
-            var buffer = nv21
-            if (buffer == null || buffer.size != previewSize.width * previewSize.height * 3 / 2) {
-                buffer = ByteArray(previewSize.width * previewSize.height * 3 / 2)
+            if (!rtmpInitSucceeded) {
+                return
             }
-            if (rtmpInitSucceeded) {
-                YUVUtils.i420FromYUVCutToWidth(y, u, v, buffer, stride, previewSize.width, previewSize.height)
-                rtmpPusher.sendVideoPacket(buffer, VIDEO_TYPE_YUV, 0L)
+
+            var i420buffer = i420
+            if (i420buffer == null || i420buffer.size != previewSize.width * previewSize.height * 3 / 2) {
+                i420buffer = ByteArray(previewSize.width * previewSize.height * 3 / 2)
+            }
+
+            YUVUtils.i420FromYUVCutToWidth(y, u, v, i420buffer, stride, previewSize.width, previewSize.height)
+
+            val i420bufferRotated = ByteArray(previewSize.width * previewSize.height * 3 / 2)
+            YUVUtils.i420Rotate90CW(i420buffer, i420bufferRotated, previewSize.width, previewSize.height)
+
+            executor.execute {
+                rtmpPusher.sendVideoPacket(i420bufferRotated, VIDEO_TYPE_YUV, 0L)
             }
         }
 
@@ -66,13 +80,22 @@ class CameraSoftPusher(
     }
 
     override fun start(url: String) {
-        camera2VideoSource.start(480, 800, cameraId, camera2Listener)
         rtmpPusher.init()
         rtmpPusher.setCallback(rtmpCallback)
         rtmpPusher.start(url)
+        camera2VideoSource.start(640, 480, cameraId, camera2Listener)
+    }
+
+    override fun pause() {
+        camera2VideoSource.pause()
+    }
+
+    override fun resume() {
+        camera2VideoSource.resume()
     }
 
     override fun stop() {
+        rtmpInitSucceeded = false
         camera2VideoSource.stop()
         rtmpPusher.stop()
         rtmpPusher.release()

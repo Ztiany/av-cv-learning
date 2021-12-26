@@ -2,12 +2,13 @@ package me.ztiany.rtmp
 
 import android.content.Intent
 import android.view.View
+import com.blankj.utilcode.util.ToastUtils
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.lib.avbase.app.BaseActivity
-import me.ztiany.rtmp.practice.camera.Camera2Helper
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.databinding.ActivityMainBinding
+import me.ztiany.rtmp.practice.camera.Camera2Helper
 import me.ztiany.rtmp.practice.camera.CameraSoftPusher
 import me.ztiany.rtmp.practice.screen.ScreenPusher
 
@@ -27,7 +28,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             liveCameraSoft(Camera2Helper.CAMERA_ID_BACK)
         }
         binding.rtmpBtnCameraFront.setOnClickListener {
-            liveCameraSoft(Camera2Helper.CAMERA_ID_FRONT)
+            ToastUtils.showLong("TODO")
+            //liveCameraSoft(Camera2Helper.CAMERA_ID_FRONT)
         }
         binding.rtmpBtnStop.setOnClickListener {
             pusher?.stop()
@@ -79,7 +81,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun liveCameraSoft(cameraId: String) {
-        //TODO
         //开始直播
         CameraSoftPusher(
             cameraId,
@@ -91,6 +92,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
         //切换 UI
         showController()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pusher?.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        pusher?.resume()
     }
 
     override fun onDestroy() {

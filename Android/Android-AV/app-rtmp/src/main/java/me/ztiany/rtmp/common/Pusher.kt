@@ -12,4 +12,12 @@ interface Pusher {
 
     }
 
+    fun resume() {
+
+    }
+
+    fun pause() {
+
+    }
+
 }

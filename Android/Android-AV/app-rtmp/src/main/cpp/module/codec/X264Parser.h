@@ -100,7 +100,7 @@ private:
 
         packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
         packet->m_nBodySize = body_size;
-        packet->m_nChannel = 0x04;
+        packet->m_nChannel = RTMP_VIDEO_CHANNEL;
         packet->m_nTimeStamp = 0;
         packet->m_hasAbsTimestamp = 0;
         packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
@@ -139,7 +139,7 @@ private:
         //其他描述数据
         packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
         packet->m_nBodySize = body_size;
-        packet->m_nChannel = 0x04;
+        packet->m_nChannel = RTMP_VIDEO_CHANNEL;
         packet->m_nTimeStamp = tms;
         packet->m_hasAbsTimestamp = 0;
         packet->m_headerType = RTMP_PACKET_SIZE_LARGE;

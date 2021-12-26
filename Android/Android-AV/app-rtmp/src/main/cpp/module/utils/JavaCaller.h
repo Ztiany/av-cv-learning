@@ -17,6 +17,7 @@ private:
     jobject handle;
 
     jmethodID methodOnInitResult = nullptr;
+    jmethodID methodSendError = nullptr;
 
     void findJavaMethods() {
         jclass rtmpPusherClass = mainEnv->GetObjectClass(handle);
@@ -24,6 +25,7 @@ private:
             LOGE("get jclass wrong");
         }
         methodOnInitResult = mainEnv->GetMethodID(rtmpPusherClass, "onInitResult", "(Z)V");
+        methodSendError = mainEnv->GetMethodID(rtmpPusherClass, "onSendError", "()V");
     }
 
 public:
@@ -39,13 +41,17 @@ public:
     }
 
     void notifyInitResult(bool succeeded, int type) {
+        if (!methodOnInitResult) {
+            return;
+        }
+
         jboolean result = succeeded ? JNI_TRUE : JNI_FALSE;
         if (type == Main) {
             mainEnv->CallVoidMethod(handle, methodOnInitResult, result);
         } else {
             JNIEnv *jniEnv;
             if (jvm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
-                LOGE("call onCallTimeInfo worng");
+                LOGE("call onCallTimeInfo wrong");
                 return;
             }
             jniEnv->CallVoidMethod(handle, methodOnInitResult, result);
@@ -53,6 +59,23 @@ public:
         }
     }
 
+    void notifySendError(int type) {
+        if (!methodSendError) {
+            return;
+        }
+
+        if (type == Main) {
+            mainEnv->CallVoidMethod(handle, methodSendError);
+        } else {
+            JNIEnv *jniEnv;
+            if (jvm->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+                LOGE("call onSendError wrong");
+                return;
+            }
+            jniEnv->CallVoidMethod(handle, methodSendError);
+            jvm->DetachCurrentThread();
+        }
+    }
 };
 
 #endif //ANDROID_AV_JAVACALLER_H

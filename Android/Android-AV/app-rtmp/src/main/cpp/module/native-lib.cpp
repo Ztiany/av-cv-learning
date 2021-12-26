@@ -48,7 +48,10 @@ Java_me_ztiany_rtmp_common_RtmpPusher_initAudioCodec(
         jint sample_rate,
         jint channels
 ) {
-    //todo：直接软编
+    if (!rtmpPusher) {
+        return;
+    }
+    rtmpPusher->initAudioCodec(sample_rate, channels);
 }
 
 extern "C"

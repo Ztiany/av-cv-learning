@@ -1,6 +1,8 @@
 #ifndef ANDROID_AV_AACPARSER_H
 #define ANDROID_AV_AACPARSER_H
 
+#include "../utils/Config.h"
+
 class AACParser {
 
 public:
@@ -40,7 +42,7 @@ public:
 
         //其他描述信息
         packet->m_packetType = RTMP_PACKET_TYPE_AUDIO;
-        packet->m_nChannel = 0x04;
+        packet->m_nChannel = RTMP_AUDIO_CHANNEL;
         packet->m_nBodySize = body_size;
         packet->m_nTimeStamp = tms;
         packet->m_hasAbsTimestamp = 0;

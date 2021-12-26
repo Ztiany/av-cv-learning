@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ScreenUtils
 import me.ztiany.rtmp.audio.AACAudioSource
 import me.ztiany.rtmp.common.*
+import kotlin.math.roundToInt
 
 class ScreenPusher(
     private val context: AppCompatActivity
@@ -45,6 +46,8 @@ class ScreenPusher(
         override fun onInitSuccess() {
             startScreenLiveHard(mediaProjection)
         }
+
+        override fun onSendError() = Unit
     }
 
     init {

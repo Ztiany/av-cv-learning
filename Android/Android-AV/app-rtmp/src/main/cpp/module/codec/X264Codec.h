@@ -3,7 +3,7 @@
 
 #include <x264/x264.h>
 #include <rtmp.h>
-#include "utils/Config.h"
+#include "../utils/Config.h"
 
 typedef void (*VideoCodecCallback)(void *attachment, RTMPPacket *rtmpPacket);
 
@@ -12,8 +12,6 @@ class X264Codec {
 private:
     int _width = 0;
     int _height = 0;
-    int _fps = 0;
-    int _bitrate = 0;
 
     x264_picture_t *_pic_in = nullptr;
     int _ySize = 0;
@@ -24,12 +22,31 @@ private:
     VideoCodecCallback _videoCodecCallback = nullptr;
 
 private:
+    void clean() {
+        if (_pic_in) {
+            x264_picture_clean(_pic_in);
+            delete _pic_in;
+        }
+        if (_videoCodec) {
+            x264_encoder_close(_videoCodec);
+            _videoCodec = nullptr;
+        }
+    }
+
+public:
+    X264Codec() = default;
+
+    ~X264Codec() {
+        clean();
+    }
+
+private:
     int calcUVSize(int format) {
         if (I420 == format) {
-            return _width * _height * 3 / 2;
+            return _ySize / 4;
         }
         //TODO：兼容其他格式
-        return _width * _height * 3 / 2;
+        return _ySize / 4;
     }
 
     void copyYUVtoImg(int8_t *data) {
@@ -84,7 +101,7 @@ private:
         packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
         packet->m_nBodySize = bodySize;
         //随意分配一个管道（尽量避开 rtmp.c 中使用的）
-        packet->m_nChannel = 0x10;
+        packet->m_nChannel = RTMP_VIDEO_CHANNEL;
         //sps pps没有时间戳
         packet->m_nTimeStamp = 0;
         //不使用绝对时间
@@ -133,28 +150,23 @@ private:
         packet->m_hasAbsTimestamp = 0;
         packet->m_nBodySize = bodySize;
         packet->m_packetType = RTMP_PACKET_TYPE_VIDEO;
-        packet->m_nChannel = 0x10;
+        packet->m_nChannel = RTMP_VIDEO_CHANNEL;
         packet->m_headerType = RTMP_PACKET_SIZE_LARGE;
 
         return packet;
     }
 
 public:
-    void setVideoInfo(int width, int height, int fps, int bitrate, jint format) {
+    void initCodec(int width, int height, int fps, int bitrate, jint format) {
+        clean();
+        LOGI("setVideoInfo, w = %d, h = %d, fps = %d, bitrate = %d", width, height, fps, bitrate);
+
         //save video info
         _width = width;
         _height = height;
-        _fps = fps;
-        _bitrate = bitrate;
         //calc size
         _ySize = _width * _height;
         _uvSize = calcUVSize(format);
-
-        //如果之前有初始化过，则释放
-        if (_videoCodec) {
-            x264_encoder_close(_videoCodec);
-            _videoCodec = nullptr;
-        }
 
         //初始化编码器参数
         x264_param_t param;
@@ -208,6 +220,8 @@ public:
         _pic_in = new x264_picture_t;
         //为容器初始化大小，容器大小是确定的。
         x264_picture_alloc(_pic_in, X264_CSP_I420, width, height);
+
+        LOGI("x264 编码器初始化成功");
     }
 
     void encodeData(int8_t *data, int len, void *attachment) {
@@ -217,29 +231,25 @@ public:
         //编码成 H264 码流
         //	1：定义出参
         int pi_nal; //the number of NAL units outputted in pp_nal
-        x264_nal_t *pp_nals; //编码出的数据 H264
+        x264_nal_t *pp_nal; //编码出的数据 H264
         x264_picture_t pic_out;
         //	2：执行编码
-        x264_encoder_encode(_videoCodec, &pp_nals, &pi_nal, _pic_in, &pic_out);
-
-        LOGE("videoCodec value  %p", _videoCodec);
+        x264_encoder_encode(_videoCodec, &pp_nal, &pi_nal, _pic_in, &pic_out);
 
         uint8_t sps[100];
         uint8_t pps[100];
         int sps_len, pps_len;
-        LOGE("编码出的帧数  %d", pi_nal);
 
         if (pi_nal > 0) {
             for (int i = 0; i < pi_nal; ++i) {
-                LOGE("输出索引:  %d 输出长度 %d", i, pi_nal);
-                if (pp_nals[i].i_type == NAL_SPS) {
-                    sps_len = pp_nals[i].i_payload - 4;//丢掉 nal 分隔符
+                if (pp_nal[i].i_type == NAL_SPS) {
+                    sps_len = pp_nal[i].i_payload - 4;//丢掉 nal 分隔符
                     //把 sps 存下来
-                    memcpy(sps, pp_nals[i].p_payload + 4, sps_len);
-                } else if (pp_nals[i].i_type == NAL_PPS) {
-                    pps_len = pp_nals[i].i_payload - 4;//丢掉 nal 分隔符
+                    memcpy(sps, pp_nal[i].p_payload + 4, sps_len);
+                } else if (pp_nal[i].i_type == NAL_PPS) {
+                    pps_len = pp_nal[i].i_payload - 4;//丢掉 nal 分隔符
                     //把 pps 拷贝出来
-                    memcpy(pps, pp_nals[i].p_payload + 4, pps_len);
+                    memcpy(pps, pp_nal[i].p_payload + 4, pps_len);
                     //发送 sps 和 pps
                     RTMPPacket *packet = createSpsPpsPacket(sps, pps, sps_len, pps_len);
                     if (this->_videoCodecCallback) {
@@ -247,17 +257,15 @@ public:
                     }
                 } else {
                     //关键帧、非关键帧
-                    // pp_nals[i].p_payload 中存储的是编码后的数据
-                    // pp_nals[i].i_payload 表示的是对应 p_payload 的长度。
-                    RTMPPacket *packet = createFramePacket(pp_nals[i].i_type, pp_nals[i].i_payload, pp_nals[i].p_payload);
+                    // pp_nal[i].p_payload 中存储的是编码后的数据
+                    // pp_nal[i].i_payload 表示的是对应 p_payload 的长度。
+                    RTMPPacket *packet = createFramePacket(pp_nal[i].i_type, pp_nal[i].i_payload, pp_nal[i].p_payload);
                     if (this->_videoCodecCallback) {
                         this->_videoCodecCallback(attachment, packet);
                     }
                 }
             }
         }
-
-        LOGE("pi_nal  %d", pi_nal);
     }
 
     void setCodecCallback(VideoCodecCallback videoCodecCallback) {
