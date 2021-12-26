@@ -51,7 +51,7 @@ class CameraSoftPusher(
                 buffer = ByteArray(previewSize.width * previewSize.height * 3 / 2)
             }
             if (rtmpInitSucceeded) {
-                YUVUtils.nv21FromYUVCutToWidth(y, u, v, buffer, stride, previewSize.width, previewSize.height)
+                YUVUtils.i420FromYUVCutToWidth(y, u, v, buffer, stride, previewSize.width, previewSize.height)
                 rtmpPusher.sendVideoPacket(buffer, VIDEO_TYPE_YUV, 0L)
             }
         }
@@ -73,7 +73,10 @@ class CameraSoftPusher(
     }
 
     override fun stop() {
-
+        camera2VideoSource.stop()
+        rtmpPusher.stop()
+        rtmpPusher.release()
+        rtmpPusher.setCallback(null)
     }
 
 }

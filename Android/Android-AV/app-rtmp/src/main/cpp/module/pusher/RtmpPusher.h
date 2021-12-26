@@ -32,6 +32,18 @@ private:
 
     JavaCaller *_javaCaller = nullptr;
 
+private:
+    static void codecCallback(void *attachment, RTMPPacket *rtmpPacket) {
+        auto *pusher = static_cast<RtmpPusher *>(attachment);
+        if (pusher->_queue.size() > 80) {//防止内存溢出
+            LOGE("clear queue, sizer more than 80");
+            pusher->_queue.clear();
+        }
+        rtmpPacket->m_nTimeStamp = RTMP_GetTime() - pusher->_start_time;
+        LOGI("rtmp pusher codecCallback called. type = %d, TimeStamp = %d", rtmpPacket->m_packetType, rtmpPacket->m_nTimeStamp);
+        pusher->_queue.push(rtmpPacket);
+    }
+
 public:
     RtmpPusher() = default;
 
@@ -46,7 +58,7 @@ public:
         } else if (type == AAC_INFO || type == AAC_DATA) {
             aacParser.parsePacket(buf, len, type, tms, &_queue);
         } else if (YUV == type) {
-            x264Codec.encodeData(buf, len);
+            x264Codec.encodeData(buf, len, this);
         }
     }
 
@@ -76,6 +88,7 @@ public:
 
     void initVideoCodec(jint width, jint height, jint fps, jint bitrate, jint format) {
         x264Codec.setVideoInfo(width, height, fps, bitrate, format);
+        x264Codec.setCodecCallback(RtmpPusher::codecCallback);
     }
 
 private:
