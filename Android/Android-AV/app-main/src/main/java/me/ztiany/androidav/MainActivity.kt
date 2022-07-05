@@ -7,16 +7,15 @@ import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
-import me.ztiany.lib.avbase.utils.printMediaCodecInfo
+import me.ztiany.androidav.codec.CodecActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
 import me.ztiany.androidav.video.VideoActivity
+import me.ztiany.lib.avbase.utils.printMediaCodecInfo
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
-
-
 
     private lateinit var binding: ActivityMainBinding
 
@@ -27,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setUpView()
-        printAllMediaInformation()
     }
 
     private fun setUpView() {
@@ -50,6 +48,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnVideo.setOnClickListener {
             startActivity(Intent(this, VideoActivity::class.java))
         }
+
+        binding.btnCodec.setOnClickListener {
+            startActivity(Intent(this, CodecActivity::class.java))
+        }
     }
 
     private fun requestAllPermissions() {
@@ -64,10 +66,6 @@ class MainActivity : AppCompatActivity() {
                 supportFinishAfterTransition()
             }
             .start()
-    }
-
-    private fun printAllMediaInformation() {
-        printMediaCodecInfo()
     }
 
 }
