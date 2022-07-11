@@ -7,12 +7,11 @@ import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
-import me.ztiany.androidav.codec.CodecActivity
+import me.ztiany.androidav.codec.ToolsActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
 import me.ztiany.androidav.video.VideoActivity
-import me.ztiany.lib.avbase.utils.printMediaCodecInfo
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
@@ -29,16 +28,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-        binding.btnOpenglJava.setOnClickListener {
-            startActivity(Intent(this, JavaWithOpenGLMainActivity::class.java))
-        }
-
-        binding.btnOpenglNative.setOnClickListener {
-            startActivity(Intent(this, NativeWithOpenGLMainActivity::class.java))
-        }
-
-        binding.btnCamera.setOnClickListener {
-            startActivity(Intent(this, CameraActivity::class.java))
+        binding.btnTools.setOnClickListener {
+            startActivity(Intent(this, ToolsActivity::class.java))
         }
 
         binding.btnAudio.setOnClickListener {
@@ -49,8 +40,16 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, VideoActivity::class.java))
         }
 
-        binding.btnCodec.setOnClickListener {
-            startActivity(Intent(this, CodecActivity::class.java))
+        binding.btnCamera.setOnClickListener {
+            startActivity(Intent(this, CameraActivity::class.java))
+        }
+
+        binding.btnOpenglJava.setOnClickListener {
+            startActivity(Intent(this, JavaWithOpenGLMainActivity::class.java))
+        }
+
+        binding.btnOpenglNative.setOnClickListener {
+            startActivity(Intent(this, NativeWithOpenGLMainActivity::class.java))
         }
     }
 

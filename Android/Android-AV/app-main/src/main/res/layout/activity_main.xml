@@ -12,35 +12,56 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_opengl_java"
-            style="@style/Button_Entrance"
-            android:text="OpenGL with Java" />
+        <LinearLayout style="@style/LL_Block">
 
-        <Button
-            android:id="@+id/btn_opengl_native"
-            style="@style/Button_Entrance"
-            android:text="OpenGL with Native" />
+            <TextView
+                style="@style/Text_Label"
+                android:text="Android 原生音视频 API" />
+
+            <Button
+                android:id="@+id/btn_tools"
+                style="@style/Button_Entrance"
+                android:text="AV Tools" />
+
+            <Button
+                android:id="@+id/btn_audio"
+                style="@style/Button_Entrance"
+                android:text="Audio" />
+
+            <Button
+                android:id="@+id/btn_video"
+                style="@style/Button_Entrance"
+                android:text="Video" />
+
+            <Button
+                android:id="@+id/btn_player"
+                style="@style/Button_Entrance"
+                android:text="Player" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btn_camera"
             style="@style/Button_Entrance"
             android:text="Camera" />
 
-        <Button
-            android:id="@+id/btn_codec"
-            style="@style/Button_Entrance"
-            android:text="Codec" />
+        <LinearLayout style="@style/LL_Block">
 
-        <Button
-            android:id="@+id/btn_audio"
-            style="@style/Button_Entrance"
-            android:text="Audio" />
+            <TextView
+                style="@style/Text_Label"
+                android:text="Open GLES2" />
 
-        <Button
-            android:id="@+id/btn_video"
-            style="@style/Button_Entrance"
-            android:text="Video" />
+            <Button
+                android:id="@+id/btn_opengl_java"
+                style="@style/Button_Entrance"
+                android:text="OpenGL with Java" />
+
+            <Button
+                android:id="@+id/btn_opengl_native"
+                style="@style/Button_Entrance"
+                android:text="OpenGL with Native" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
