@@ -1,57 +1,42 @@
-package me.ztiany.androidav.audio.mixing;
+package me.ztiany.lib.avbase.utils;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+/**
+ * pcm 文件转 wav 文件
+ */
 public class PcmToWavUtil {
-
-    private final int mBufferSize;
-    private int mSampleRate;
-    private int mChannelConfig = AudioFormat.CHANNEL_IN_STEREO;
-    private int mChannelCount = 2;
-    private int mEncoding = AudioFormat.ENCODING_PCM_16BIT;
-
-    /**
-     * @param sampleRate    sample rate【采样率】
-     * @param channelConfig channel【声道】
-     * @param channelCount  声道数
-     * @param encoding      audio data format【位深度】
-     */
-    public PcmToWavUtil(int sampleRate, int channelConfig, int channelCount, int encoding) {
-        this.mSampleRate = sampleRate;
-        this.mChannelConfig = channelConfig;
-        this.mChannelCount = channelCount;
-        this.mEncoding = encoding;
-        this.mBufferSize = AudioRecord.getMinBufferSize(mSampleRate, mChannelConfig, mEncoding);
-    }
 
     /**
      * pcm 文件转 wav 文件。
      *
-     * @param inFilename  源文件路径
-     * @param outFilename 目标文件路径
+     * @param inFilename    源文件路径
+     * @param outFilename   目标文件路径
+     * @param sampleRate    sample rate【采样率】
+     * @param channelConfig channel config【声道配置】
+     * @param channelCount  channel count【声道数】
+     * @param encoding      audio data format【位深度】
      */
-    public void pcmToWav(String inFilename, String outFilename) {
+    public static void pcmToWav(String inFilename, String outFilename, int sampleRate, int channelConfig, int channelCount, int encoding) {
         FileInputStream in;
         FileOutputStream out;
 
         long totalAudioLen;
         long totalDataLen;
-        long longSampleRate = mSampleRate;
-        int channels = mChannelCount;
-        long byteRate = 16L * mSampleRate * channels / 8;
-        byte[] data = new byte[mBufferSize];
+        long byteRate = 16L * sampleRate * channelCount / 8;
+        int bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, encoding);
+        byte[] data = new byte[bufferSize];
 
         try {
             in = new FileInputStream(inFilename);
             out = new FileOutputStream(outFilename);
             totalAudioLen = in.getChannel().size();
             totalDataLen = totalAudioLen + 36;
-            writeWaveFileHeader(out, totalAudioLen, totalDataLen, longSampleRate, channels, byteRate);
+            writeWaveFileHeader(out, totalAudioLen, totalDataLen, sampleRate, channelCount, byteRate);
             while (in.read(data) != -1) {
                 out.write(data);
             }
@@ -63,9 +48,9 @@ public class PcmToWavUtil {
     }
 
     /**
-     * 加入wav文件头
+     * 加入 wav 文件头
      */
-    private void writeWaveFileHeader(
+    private static void writeWaveFileHeader(
             FileOutputStream out,
             long totalAudioLen,
             long totalDataLen,

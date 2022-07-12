@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
 
 import timber.log.Timber;
 
@@ -24,7 +23,7 @@ import timber.log.Timber;
 public class Directory {
 
     private static final String APP_NAME = "Alien-AV";
-    public static final String SDCARD_FOLDER_NAME = "APP_NAME";
+    public static final String SDCARD_FOLDER_NAME = "Alien-AV";
 
     private static final String TEMP_PICTURE = "temp-pictures";
     private static final String TEMP_FILES = "temp-files";
@@ -42,22 +41,12 @@ public class Directory {
     public static final String VIDEO_FORMAT_H265 = ".h265";
     public static final String VIDEO_FORMAT_TXT = ".txt";
     public static final String AUDIO_FORMAT_PCM = ".pcm";
+    public static final String AUDIO_FORMAT_WAV = ".wav";
     public static final String AUDIO_FORMAT_AAC = ".aac";
 
     ///////////////////////////////////////////////////////////////////////////
     // sd card private
     ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * APK 下载路径
-     *
-     * @param version apk 版本
-     */
-    public static String createAppDownloadPath(String version) {
-        String path = getAppExternalPrivatePath(Environment.DIRECTORY_DOWNLOADS) + "apk" + File.separator + version + ".apk";
-        makeParentPath(new File(path), "createAppDownloadPath");
-        return path;
-    }
 
     /**
      * 根据日期生成一个临时的用于存储文件的全路径，格式由 format 制定。
@@ -121,30 +110,49 @@ public class Directory {
     ///////////////////////////////////////////////////////////////////////////
     // sd card public
     ///////////////////////////////////////////////////////////////////////////
+    @NonNull
+    public static String createDCIMPath(String filename) {
+        return createMediaPath(Environment.DIRECTORY_DCIM, filename);
+    }
 
-    /**
-     * 获取 DCIM 存储图片的路径。
-     *
-     * @return /storage/sdcard0/DCIM/APP_NAME/xxx.png
-     */
     @NonNull
     public static String createTimeNamingDCIMPath(String format) {
-        String path = getSDCardPublicDirectoryPath(Environment.DIRECTORY_DCIM).toString() + File.separator + APP_NAME + File.separator;
+        return createTimeNamingMediaPath(Environment.DIRECTORY_DCIM, format);
+    }
+
+    @NonNull
+    public static String createAudioPath(String filename) {
+        return createMediaPath(Environment.DIRECTORY_MUSIC, filename);
+    }
+
+    @NonNull
+    public static String createTimeNamingAudioPath(String format) {
+        return createTimeNamingMediaPath(Environment.DIRECTORY_MUSIC, format);
+    }
+
+    /**
+     * 获取外部媒体存储路径。
+     *
+     * @return like /storage/sdcard0/DCIM/APP_NAME/xxx.png
+     */
+    @NonNull
+    private static String createTimeNamingMediaPath(String type, String format) {
+        String path = getSDCardPublicDirectoryPath(type).toString() + File.separator + APP_NAME + File.separator;
         File file = new File(path + createTempFileName(format));
-        makeParentPath(file, "createDCIMPictureStorePath() called mkdirs: ");
+        makeParentPath(file, "createTimeNamingMediaPath() called mkdirs: ");
         return file.getAbsolutePath();
     }
 
     /**
-     * 获取 DCIM 存储图片的路径。
+     * 获取外部媒体存储路径。
      *
-     * @return /storage/sdcard0/DCIM/APP_NAME/xxx.png
+     * @return like /storage/sdcard0/DCIM/APP_NAME/xxx.png
      */
     @NonNull
-    public static String createDCIMPath(String filename) {
-        String path = getSDCardPublicDirectoryPath(Environment.DIRECTORY_DCIM).toString() + File.separator + APP_NAME + File.separator;
+    private static String createMediaPath(String type, String filename) {
+        String path = getSDCardPublicDirectoryPath(type).toString() + File.separator + APP_NAME + File.separator;
         File file = new File(path + filename);
-        makeParentPath(file, "createDCIMPictureStorePath() called mkdirs: ");
+        makeParentPath(file, "createMediaPath() called mkdirs: ");
         return file.getAbsolutePath();
     }
 
@@ -154,7 +162,7 @@ public class Directory {
      * @param type {@link Environment#DIRECTORY_DOWNLOADS}, {@link Environment#DIRECTORY_DCIM}, ect
      * @return DIRECTORY_DCIM = /storage/sdcard0/DCIM , DIRECTORY_DOWNLOADS =  /storage/sdcard0/Download ...ect
      */
-    public static File getSDCardPublicDirectoryPath(@NonNull String type) {
+    private static File getSDCardPublicDirectoryPath(@NonNull String type) {
         String state = Environment.getExternalStorageState();
         File dir;
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -162,17 +170,20 @@ public class Directory {
         } else {
             dir = new File(Utils.getApp().getFilesDir(), type);
         }
-        makePath(dir, "getExternalStoragePublicDirectory");
+        makePath(dir, "getSDCardPublicDirectoryPath");
         return dir;
     }
 
-    /**
-     * 获取 APP 在 SD 卡上的外部存储目录。
-     */
-    public static String getSDCardPublicAppStoragePath() {
-        String path = getSDCardRootPath() + File.separator + SDCARD_FOLDER_NAME;
-        makePath(new File(path), "getAppSDCardExternalStorePath");
-        return path;
+    public static File createSDCardRootAppPath(String fileName) {
+        File file = new File(getSDCardRootPath(), APP_NAME + "/" + fileName);
+        makeParentPath(file, "createSDCardRootAppPath");
+        return file;
+    }
+
+    public static File createSDCardRootAppTimeNamingPath(String format) {
+        File file = new File(getSDCardRootPath(), APP_NAME + "/" + createTempFileName(format));
+        makeParentPath(file, "createSDCardRootAppTimeNamingPath");
+        return file;
     }
 
     /**
@@ -187,18 +198,6 @@ public class Directory {
         } else {
             return Utils.getApp().getFilesDir();
         }
-    }
-
-    public static File createSDCardRootAppPath(String fileName) {
-        File file = new File(getSDCardRootPath(), APP_NAME + "/" + fileName);
-        makeParentPath(file, "createSDCardAppPath");
-        return file;
-    }
-
-    public static File createSDCardRootAppPathAndName(String format) {
-        File file = new File(getSDCardRootPath(), APP_NAME + "/" + createTempFileName(format));
-        makeParentPath(file, "createSDCardAppPath");
-        return file;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -242,7 +241,7 @@ public class Directory {
      * 根据日期生成一个临时文件名，格式由 format 制定。
      */
     public static String createTempFileName(String format) {
-        String tempFileName = Objects.requireNonNull(SDF_HOLDER.get()).format(new Date()) + "_" + UUID.randomUUID().toString().substring(30);
+        String tempFileName = Objects.requireNonNull(SDF_HOLDER.get()).format(new Date());
         return tempFileName + format;
     }
 

@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             .permission(
                 Permission.Group.STORAGE,
                 Permission.Group.CAMERA,
-                Permission.Group.MICROPHONE
+                Permission.Group.MICROPHONE,
             )
             .onDenied {
                 supportFinishAfterTransition()

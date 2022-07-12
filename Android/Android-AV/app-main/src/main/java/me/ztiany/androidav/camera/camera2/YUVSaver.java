@@ -42,12 +42,12 @@ public class YUVSaver {
         YUVUtils.nv21RotateCW(nv21, nv21_rotated, previewSize.getWidth(), previewSize.getHeight(), 90);
         YUVUtils.nv12Rotate90CW(nv12, nv12_rotated, previewSize.getWidth(), previewSize.getHeight());
 
-        save(i420, Directory.createSDCardRootAppPathAndName("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_i420" + Directory.VIDEO_FORMAT_YUV));
-        save(nv21, Directory.createSDCardRootAppPathAndName("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_nv21" + Directory.VIDEO_FORMAT_YUV));
-        save(nv12, Directory.createSDCardRootAppPathAndName("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_nv12" + Directory.VIDEO_FORMAT_YUV));
-        save(i420_rotated, Directory.createSDCardRootAppPathAndName("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_i420" + Directory.VIDEO_FORMAT_YUV));
-        save(nv21_rotated, Directory.createSDCardRootAppPathAndName("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_nv21" + Directory.VIDEO_FORMAT_YUV));
-        save(nv12_rotated, Directory.createSDCardRootAppPathAndName("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_nv12" + Directory.VIDEO_FORMAT_YUV));
+        save(i420, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_i420" + Directory.VIDEO_FORMAT_YUV));
+        save(nv21, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_nv21" + Directory.VIDEO_FORMAT_YUV));
+        save(nv12, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getWidth() + "x" + previewSize.getHeight() + "_nv12" + Directory.VIDEO_FORMAT_YUV));
+        save(i420_rotated, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_i420" + Directory.VIDEO_FORMAT_YUV));
+        save(nv21_rotated, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_nv21" + Directory.VIDEO_FORMAT_YUV));
+        save(nv12_rotated, Directory.createSDCardRootAppTimeNamingPath("_" + previewSize.getHeight() + "x" + previewSize.getWidth() + "_nv12" + Directory.VIDEO_FORMAT_YUV));
     }
 
     private void save(byte[] data, File file) {

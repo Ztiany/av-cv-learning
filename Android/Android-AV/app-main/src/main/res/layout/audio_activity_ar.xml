@@ -5,22 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity"
     tools:ignore="HardcodedText">
 
     <Button
-        android:id="@+id/audio_record_by_mr"
+        android:id="@+id/audio_btn_start"
         style="@style/Button_Entrance"
-        android:text="MediaRecord 录音" />
+        android:text="开始录音" />
 
     <Button
-        android:id="@+id/audio_record_by_ar"
+        android:id="@+id/audio_btn_end"
         style="@style/Button_Entrance"
-        android:text="AudioRecord 录音" />
-
-    <Button
-        android:id="@+id/audio_mixing_audio"
-        style="@style/Button_Entrance"
-        android:text="混音（给视频加背景音）" />
+        android:text="停止录音" />
 
 </LinearLayout>

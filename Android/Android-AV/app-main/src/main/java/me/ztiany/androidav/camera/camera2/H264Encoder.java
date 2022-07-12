@@ -40,8 +40,8 @@ class H264Encoder {
         }
 
         try {
-            mFileOutputStream = new FileOutputStream(Directory.createSDCardRootAppPathAndName(Directory.VIDEO_FORMAT_H264));
-            mFileWriter = new FileWriter(Directory.createSDCardRootAppPathAndName(Directory.VIDEO_FORMAT_TXT));
+            mFileOutputStream = new FileOutputStream(Directory.createSDCardRootAppTimeNamingPath(Directory.VIDEO_FORMAT_H264));
+            mFileWriter = new FileWriter(Directory.createSDCardRootAppTimeNamingPath(Directory.VIDEO_FORMAT_TXT));
         } catch (IOException e) {
             Timber.e(e);
             return;
