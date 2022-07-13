@@ -19,6 +19,16 @@
         android:text="AudioRecord 录音" />
 
     <Button
+        android:id="@+id/audio_play_by_mp"
+        style="@style/Button_Entrance"
+        android:text="MediaPlayer 播放音频" />
+
+    <Button
+        android:id="@+id/audio_play_by_at"
+        style="@style/Button_Entrance"
+        android:text="AudioTrack 播放音频" />
+
+    <Button
         android:id="@+id/audio_mixing_audio"
         style="@style/Button_Entrance"
         android:text="混音（给视频加背景音）" />

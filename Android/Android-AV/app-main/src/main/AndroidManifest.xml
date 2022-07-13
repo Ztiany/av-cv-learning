@@ -77,14 +77,17 @@
             android:name=".audio.AudioActivity"
             android:label="Android Audio" />
         <activity
-            android:name=".audio.mixing.MixingAudioActivity"
-            android:label="Mixing Audio/Video" />
+            android:name=".audio.mediarecord.MediaRecordActivity"
+            android:label="Media Record" />
         <activity
             android:name=".audio.audiorecord.AudioRecordActivity"
             android:label="Audio Record" />
         <activity
-            android:name=".audio.mediarecord.MediaRecordActivity"
-            android:label="Media Record" />
+            android:name=".audio.autiotrack.AudioTrackActivity"
+            android:label="Audio Track" />
+        <activity
+            android:name=".audio.mixing.MixingAudioActivity"
+            android:label="Mixing Audio/Video" />
         <!-- ==================================================== Video ==================================================== -->
         <activity
             android:name=".video.VideoActivity"

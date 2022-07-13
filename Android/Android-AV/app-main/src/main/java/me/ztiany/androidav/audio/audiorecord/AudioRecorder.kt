@@ -4,19 +4,19 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.annotation.WorkerThread
-import me.ztiany.lib.avbase.utils.PcmToWavUtil
+import me.ztiany.lib.avbase.utils.PcmWavUtils
 import timber.log.Timber
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
-/** 采样率：现在能够保证在所有设备上使用的采样率是 44100Hz，其也是最常见的采样率。*/
+/** 采样率：能够保证在所有设备上使用的采样率是 44100Hz，其也是最常见的采样率。*/
 private const val SAMPLE_RATE_IN_HZ = 44100
 
 /** 声道数：CHANNEL_IN_MONO 为单声道，CHANNEL_IN_STEREO 双声道，其中 CHANNEL_IN_MONO 可以保证在所有设备能够使用。【有的设备不支持双声道】 */
 private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
 
-/** 位深度：每个采用用多少数据才存储。*/
+/** 位深度：每个采样用多少数据来存储。*/
 private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 
 /**
@@ -111,24 +111,17 @@ class AudioRecorder {
             Timber.e("FileOutputStream close", e)
         }
 
-        PcmToWavUtil.pcmToWav(
-            pcmPath, wavPath,
+        PcmWavUtils.pcmToWav(
+            pcmPath,
+            wavPath,
             SAMPLE_RATE_IN_HZ,
             CHANNEL_CONFIG,
-            getChannelCount(CHANNEL_CONFIG),
             AUDIO_FORMAT
         )
 
         return true
     }
 
-    private fun getChannelCount(channelConfig: Int): Int {
-        return when (channelConfig) {
-            AudioFormat.CHANNEL_IN_MONO -> 1
-            AudioFormat.CHANNEL_IN_STEREO -> 2
-            else -> throw IllegalArgumentException("getChannelCount received: $channelConfig")
-        }
-    }
 
     fun end() {
         isRecording.set(false)
