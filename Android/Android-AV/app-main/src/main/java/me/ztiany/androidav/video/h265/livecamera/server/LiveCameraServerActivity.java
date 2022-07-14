@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import me.ztiany.androidav.R;
-import me.ztiany.androidav.video.SocketLive;
+import me.ztiany.androidav.video.common.SocketLive;
 import me.ztiany.androidav.video.h265.livecamera.Constants;
 import me.ztiany.androidav.video.h265.livecamera.DecodePlayerLiveH265;
 import me.ztiany.androidav.video.h265.livecamera.EncodePushLiveH265;

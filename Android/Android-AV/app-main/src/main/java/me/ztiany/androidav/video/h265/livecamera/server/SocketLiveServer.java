@@ -7,7 +7,7 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import me.ztiany.androidav.video.SocketLive;
+import me.ztiany.androidav.video.common.SocketLive;
 
 public class SocketLiveServer implements SocketLive {
 

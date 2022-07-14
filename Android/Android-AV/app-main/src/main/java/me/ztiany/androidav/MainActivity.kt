@@ -11,6 +11,7 @@ import me.ztiany.androidav.codec.ToolsActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
+import me.ztiany.androidav.screen.ScreenRecordActivity
 import me.ztiany.androidav.video.VideoActivity
 import timber.log.Timber
 
@@ -42,6 +43,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnCamera.setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))
+        }
+
+        binding.btnScreenRecorder.setOnClickListener {
+            startActivity(Intent(this, ScreenRecordActivity::class.java))
         }
 
         binding.btnOpenglJava.setOnClickListener {

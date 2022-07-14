@@ -86,8 +86,15 @@
             android:name=".audio.autiotrack.AudioTrackActivity"
             android:label="Audio Track" />
         <activity
+            android:name=".audio.mediaplayer.AudioMediaPlayerActivity"
+            android:label="Media Player(Audio)" />
+        <activity
+            android:name=".audio.autiotrack.MediaExtractorAudioTrackActivity"
+            android:label="MediaExtractor + AudioTrack" />
+        <activity
             android:name=".audio.mixing.MixingAudioActivity"
             android:label="Mixing Audio/Video" />
+
         <!-- ==================================================== Video ==================================================== -->
         <activity
             android:name=".video.VideoActivity"
@@ -107,6 +114,11 @@
         <activity
             android:name=".video.combine.VideoCombinationActivity"
             android:label="Video Mosaic" />
+
+        <!-- ==================================================== Screen ==================================================== -->
+        <activity
+            android:name=".screen.ScreenRecordActivity"
+            android:label="Screen Record" />
 
     </application>
 

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.video;
+package me.ztiany.androidav.video.common;
 
 public interface SocketLive {
 

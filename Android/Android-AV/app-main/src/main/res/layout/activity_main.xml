@@ -12,44 +12,45 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout style="@style/LL_Block">
+        <TextView
+            style="@style/Text_Label"
+            android:text="Android 原生音视频 API" />
 
-            <TextView
-                style="@style/Text_Label"
-                android:text="Android 原生音视频 API" />
+        <Button
+            android:id="@+id/btn_tools"
+            style="@style/Button_Entrance"
+            android:text="AV Tools" />
 
-            <Button
-                android:id="@+id/btn_tools"
-                style="@style/Button_Entrance"
-                android:text="AV Tools" />
+        <Button
+            android:id="@+id/btn_audio"
+            style="@style/Button_Entrance"
+            android:text="Audio" />
 
-            <Button
-                android:id="@+id/btn_audio"
-                style="@style/Button_Entrance"
-                android:text="Audio" />
+        <Button
+            android:id="@+id/btn_video"
+            style="@style/Button_Entrance"
+            android:text="Video" />
 
-            <Button
-                android:id="@+id/btn_video"
-                style="@style/Button_Entrance"
-                android:text="Video" />
-
-            <Button
-                android:id="@+id/btn_player"
-                style="@style/Button_Entrance"
-                android:text="Player" />
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/btn_player"
+            style="@style/Button_Entrance"
+            android:text="音视频播放器" />
 
         <Button
             android:id="@+id/btn_camera"
             style="@style/Button_Entrance"
             android:text="Camera" />
 
+        <Button
+            android:id="@+id/btn_screen_recorder"
+            style="@style/Button_Entrance"
+            android:text="录屏 API" />
+
         <LinearLayout style="@style/LL_Block">
 
             <TextView
                 style="@style/Text_Label"
-                android:text="Open GLES2" />
+                android:text="Open GL ES" />
 
             <Button
                 android:id="@+id/btn_opengl_java"

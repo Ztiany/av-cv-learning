@@ -6,7 +6,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
-import me.ztiany.androidav.video.SocketLive;
+import me.ztiany.androidav.video.common.SocketLive;
 
 public class SocketLiveClient implements SocketLive {
 
