@@ -46,6 +46,7 @@ set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${JNI_LIBS}/${ANDROID_
 aux_source_directory(module DIR_MODULE)
 aux_source_directory(module/common DIR_COMMON)
 aux_source_directory(module/opengl DIR_OPENGL)
+aux_source_directory(module/opensl DIR_OPENSL)
 
 #构建共享库
 add_library(
@@ -54,6 +55,7 @@ add_library(
     ${DIR_MODULE}
     ${DIR_COMMON}
     ${DIR_OPENGL}
+    ${DIR_OPENSL}
 )
 
 #链接

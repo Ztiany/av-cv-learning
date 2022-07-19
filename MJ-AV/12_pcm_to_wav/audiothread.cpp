@@ -80,7 +80,7 @@ void pcm2wav(AVFormatContext *ctx, QString &pcmFilePath, QString &wavFilePath) {
   //构建 WAV Header
   WAVHeader header;
   header.sampleRate = params->sample_rate;                         //采样率
-  header.bitsPerSample = av_get_bits_per_sample(params->codec_id); //函数获取单个采样点的字节数
+  header.bitsPerSample = av_get_bits_per_sample(params->codec_id); //函数获取单个采样点的比特位数
   header.numChannels = params->channels;                           //声道数
   // 从 FFmpeg 中 AVCodecID 枚举的定义来看，AV_CODEC_ID_PCM_F32BE 定义在 AUDIO_FORMAT_PCM 后面，所以可以通过下面公式进行判断
   // AV_CODEC_ID_PCM_F32BE 是 ffmpeg 中定义的标识，AUDIO_FORMAT_FLOAT 和 AUDIO_FORMAT_PCM 是 wav header 定义的标识

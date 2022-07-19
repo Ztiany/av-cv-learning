@@ -13,7 +13,7 @@ import java.io.File
 import java.io.InputStream
 import java.util.concurrent.atomic.AtomicBoolean
 
-class AudioTracker(private val context: Context) {
+internal class AudioTracker(private val context: Context) {
 
     private val isPlaying = AtomicBoolean(false)
 

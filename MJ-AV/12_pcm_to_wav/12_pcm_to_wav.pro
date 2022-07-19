@@ -39,8 +39,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 win32:{
 message("running at windows")
-FFMPEG_HOME = ../../Libraries/ffmpeg
-SDL_HOME = ../../Libraries/sdl
+FFMPEG_HOME = D:/dev_tools/msys64/usr/local/ffmpeg/
+SDL_HOME = D:/code/learn/av-cv/source/sdl2/SDL2-2.0.14/i686-w64-mingw32/sdl/
 }
 
 # ========================================配置【mac】========================================
