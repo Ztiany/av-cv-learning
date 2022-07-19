@@ -11,7 +11,7 @@ message("PROJECT_BINARY_DIR = " ${PROJECT_BINARY_DIR}) #运行 cmake 命令的�
 message("CMAKE_CURRENT_LIST_LINE = " ${CMAKE_CURRENT_LIST_LINE}) #当前所在的行
 message("cmake running properties end-------------------------------------------------------")
 
-#添加头文件
+#添加库头文件
 include_directories(include)
 include_directories(include/Glm/core)
 include_directories(include/Glm/gtx)
@@ -22,6 +22,9 @@ include_directories(include/ffmpeg)
 include_directories(include/openssl)
 include_directories(include/fdk-aac)
 include_directories(include/x2h64)
+
+#添加本地头文件
+include_directories(module/common)
 
 #引入预编译库
 set(JNI_LIBS ${CMAKE_SOURCE_DIR}/library/)
@@ -72,4 +75,5 @@ target_link_libraries(
     log
     android
     GlESv2
+    OpenSLES
 )
