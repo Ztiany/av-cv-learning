@@ -9,6 +9,7 @@ import me.ztiany.androidav.audio.autiotrack.MediaExtractorAudioTrackActivity
 import me.ztiany.androidav.audio.mediaplayer.AudioMediaPlayerActivity
 import me.ztiany.androidav.audio.mediarecord.MediaRecordActivity
 import me.ztiany.androidav.audio.mixing.MixingAudioActivity
+import me.ztiany.androidav.audio.opensles.OpenSLESActivity
 import me.ztiany.androidav.databinding.AudioActivityMainBinding
 
 class AudioActivity : AppCompatActivity() {
@@ -46,6 +47,11 @@ class AudioActivity : AppCompatActivity() {
         //MediaTractor + AudioTrack 播放音频
         binding.audioPlayByMeAt.setOnClickListener {
             startActivity(Intent(this, MediaExtractorAudioTrackActivity::class.java))
+        }
+
+        //OpenSLES
+        binding.audioOpensl.setOnClickListener {
+            startActivity(Intent(this, OpenSLESActivity::class.java))
         }
 
         //混音

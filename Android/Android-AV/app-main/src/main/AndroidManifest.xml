@@ -114,6 +114,9 @@
         <activity
             android:name=".video.combine.VideoCombinationActivity"
             android:label="Video Mosaic" />
+        <activity
+            android:name=".audio.opensles.OpenSLESActivity"
+            android:label="OpenSL ES" />
 
         <!-- ==================================================== Screen ==================================================== -->
         <activity

@@ -10,8 +10,9 @@ JavaVM *javaVM;
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     javaVM = vm;
-    XLOGE("Native -------------------------------开始加载");
-    XLOGE("FFmpeg configuration: %s", avutil_configuration());
-    XLOGE("Native -------------------------------加载完成");
+    xLogE("Native -------------------------------开始加载");
+    xLogE("FFmpeg configuration");
+    xLogE(avutil_configuration());
+    xLogE("Native -------------------------------加载完成");
     return JNI_VERSION_1_4;
 }

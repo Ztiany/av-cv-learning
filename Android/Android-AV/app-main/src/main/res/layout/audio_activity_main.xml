@@ -34,6 +34,11 @@
         android:text="MediaTractor + AudioTrack 播放音频" />
 
     <Button
+        android:id="@+id/audio_opensl"
+        style="@style/Button_Entrance"
+        android:text="OpenSLES" />
+
+    <Button
         android:id="@+id/audio_mixing_audio"
         style="@style/Button_Entrance"
         android:text="混音（给视频加背景音）" />
