@@ -21,7 +21,7 @@ uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 void main(){
-    gl_Position= uProjectionMatrix*uViewMatrix*aPosition;
+    gl_Position= uProjectionMatrix*uViewMatrix*uModelMatrix*aPosition;
     vColor = aColor;
     vTextureCoordinate = aTextureCoordinate;
 }

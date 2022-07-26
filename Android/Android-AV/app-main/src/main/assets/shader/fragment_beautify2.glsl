@@ -1,4 +1,4 @@
-//参考：//https://github.com/wuhaoyu1990/MagicCamera/blob/master/Project-AndroidStudio/magicfilter/src/main/res/raw/beauty.glsl
+//参考：https://github.com/wuhaoyu1990/MagicCamera/blob/master/Project-AndroidStudio/magicfilter/src/main/res/raw/beauty.glsl
 precision lowp float;
 uniform sampler2D uTexture;
 varying  vec2 vTextureCoordinate;

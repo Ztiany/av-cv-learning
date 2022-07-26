@@ -6,13 +6,14 @@ import timber.log.Timber
 class GLMVPMatrix {
 
     companion object {
-        private const val DEFAULT_CAMERA_Z = 3F
+        /** Camera 在 Z 轴的位置 */
+        private const val DEFAULT_CAMERA_Z = 5F
 
-        /**视点原点到近平面的距离*/
-        private const val DEFAULT_NEAR = -1F
+        /** 视点原点（Camera 位置）到近平面的距离 */
+        private const val DEFAULT_NEAR = 1F
 
-        /**视点原点到远平面的距离*/
-        private const val DEFAULT_FAR = 3F
+        /** 视点原点（Camera 位置）到远平面的距离 */
+        private const val DEFAULT_FAR = 6F
     }
 
     /**用于接收 mvp 的计算结果*/
@@ -34,7 +35,7 @@ class GLMVPMatrix {
         0.0F, 0F, 0F, 1.0F,
     )
 
-    /**默认为单位矩阵*/
+    /** 默认为单位矩阵 */
     val projectionMatrix = floatArrayOf(
         1.0F, 0F, 0F, 0F,
         0.0F, 1.0F, 0F, 0F,
@@ -84,7 +85,7 @@ class GLMVPMatrix {
             viewMatrix, 0,
             //相机位置
             eyeX, eyeY, eyeZ,
-            //看向哪个点
+            //看向哪个点【这个点要在裁剪区域内，即保证其在近平面与远平面的区间内】
             centerX, centerY, centerZ,
             //决定哪个坐标轴竖直向上，且该向量与视线是垂直的，可理解为人正常平视物体时，头顶所指方向为竖直向上向量，视线此刻与该向量垂直的。
             upX, upY, upZ
@@ -116,7 +117,7 @@ class GLMVPMatrix {
                 val actualRatio = originRatio / worldRatio
                 Matrix.orthoM(
                     projectionMatrix, 0,
-                    -1f, 1f,
+                    -1F, 1F,
                     -actualRatio, actualRatio,
                     near, far
                 )
@@ -125,7 +126,7 @@ class GLMVPMatrix {
                 Matrix.orthoM(
                     projectionMatrix, 0,
                     -actualRatio, actualRatio,
-                    -1f, 1f,
+                    -1F, 1F,
                     near, far
                 )
             }
@@ -134,7 +135,7 @@ class GLMVPMatrix {
                 val actualRatio = originRatio / worldRatio
                 Matrix.orthoM(
                     projectionMatrix, 0,
-                    -1f, 1f,
+                    -1F, 1F,
                     -actualRatio, actualRatio,
                     near, far
                 )
@@ -143,7 +144,7 @@ class GLMVPMatrix {
                 Matrix.orthoM(
                     projectionMatrix, 0,
                     -actualRatio, actualRatio,
-                    -1f, 1f,
+                    -1F, 1F,
                     near, far
                 )
             }
@@ -151,7 +152,14 @@ class GLMVPMatrix {
     }
 
     fun combineMVP() {
-        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
+        val temp = floatArrayOf(
+            0.0F, 0F, 0F, 0F,
+            0.0F, 0.0F, 0F, 0F,
+            0.0F, 0F, 0.0F, 0F,
+            0.0F, 0F, 0F, 0.0F,
+        )
+        Matrix.multiplyMM(temp, 0, viewMatrix, 0, modelMatrix, 0)
+        Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, temp, 0)
     }
 
     fun resetToIdentity(floatArray: FloatArray) {
