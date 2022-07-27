@@ -9,11 +9,11 @@ class GLFBO(val name: Int) {
 }
 
 class GLFBOWithTexture(
-    val name: Int,
+    val id: Int,
     val texture: GLTexture
 ) {
     override fun toString(): String {
-        return "GLFBOWithTexture(name=$name, texture=$texture)"
+        return "GLFBOWithTexture(id=$id, texture=$texture)"
     }
 }
 
@@ -30,8 +30,8 @@ fun generateFBOWithTexture(glTexture: GLTexture): GLFBOWithTexture {
 }
 
 fun GLFBOWithTexture.bindFBO() {
-    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, name)
-    GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture.name, 0)
+    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, id)
+    GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, texture.id, 0)
 }
 
 fun unbindFBO() {
@@ -47,7 +47,7 @@ fun GLFBOWithTexture.use(onDraw: GLFBOWithTexture.() -> Unit) {
 fun GLFBOWithTexture.delete() {
     //删除 FBO
     GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_NONE)
-    GLES20.glDeleteFramebuffers(1, intArrayOf(name), 0)
+    GLES20.glDeleteFramebuffers(1, intArrayOf(id), 0)
     //删除 Texture
     texture.deleteTexture()
 }

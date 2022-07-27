@@ -36,6 +36,11 @@ fun newVertexCoordinateFull3() = floatArrayOf(
     1.0F, 1.0F, 0.0F,//right-top
 )
 
+fun newRectangleIndices() = intArrayOf(
+    0, 1, 2,
+    2, 3, 1
+)
+
 /**
  * 返回一个矩形的纹理坐标数组，每个点 2 个元素。顺序为：
  * 1. left-bottom
@@ -132,8 +137,7 @@ fun generateGLProgramFromAssets(vertexPath: String, fragmentPath: String): Int {
 }
 
 /**
- * 顶点缓冲对象（Vertex Buffer Objects，VBO），VBO 是在显卡存储空间中开辟出的一块内存缓存区，
- * 用于存储顶点的各类属性信息，如顶点坐标，顶点法向量，顶点颜色数据等。
+ * 顶点缓冲对象（Vertex Buffer Objects，VBO），VBO 是在显卡存储空间中开辟出的一块内存缓存区， * 用于存储顶点的各类属性信息，如顶点坐标，顶点法向量，顶点颜色数据等。
  */
 fun generateVBOBuffer(vboData: FloatArray): FloatBuffer = ByteBuffer.allocateDirect(vboData.size * 4 /*one float has four bytes.*/)
     .order(ByteOrder.nativeOrder())

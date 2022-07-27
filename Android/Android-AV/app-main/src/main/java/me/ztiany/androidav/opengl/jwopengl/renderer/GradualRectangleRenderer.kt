@@ -32,7 +32,7 @@ class GradualRectangleRenderer : GLRenderer {
         program = GLProgram.fromAssets("shader/vertex_base.glsl", "shader/fragment_coloring.glsl")
         program.activeAttribute("aPosition")
         program.activeAttribute("aColor")
-        program.setColor(0.7F, 0.5F, 0.5F, 1.0F)
+        program.setBgColor(0.7F, 0.5F, 0.5F, 1.0F)
     }
 
     override fun onSurfaceChanged(width: Int, height: Int) {

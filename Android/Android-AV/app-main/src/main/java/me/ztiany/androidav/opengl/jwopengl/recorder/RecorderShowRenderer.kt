@@ -71,7 +71,7 @@ class RecorderShowRenderer(
             GLES11Ext.GL_TEXTURE_EXTERNAL_OES
         )
 
-        cameraSurfaceTexture = SurfaceTexture(cameraTexture.name)
+        cameraSurfaceTexture = SurfaceTexture(cameraTexture.id)
 
         ContextCompat.getMainExecutor(context).execute {
             onSurfaceText?.invoke(cameraSurfaceTexture)

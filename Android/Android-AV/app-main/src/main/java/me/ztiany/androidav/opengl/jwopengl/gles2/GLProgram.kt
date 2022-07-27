@@ -31,7 +31,7 @@ class GLProgram(
         uniformMap[uniformName] = attribLocation
     }
 
-    fun setColor(red: Float, green: Float, blue: Float, alpha: Float) {
+    fun setBgColor(red: Float, green: Float, blue: Float, alpha: Float) {
         GLES20.glClearColor(red, green, blue, alpha)
     }
 
@@ -67,7 +67,7 @@ class GLProgram(
             elementsPerVertex,
             GLES20.GL_FLOAT,
             false,
-            elementsPerVertex * 4/*每个点 4 个 float，每 float 4 byte*/,
+            elementsPerVertex * 4/*每个点 4 个 float，每个 float 4 个  byte*/,
             vbo
         )
     }
@@ -85,7 +85,7 @@ class GLProgram(
             elementsPerVertex,
             GLES20.GL_INT,
             false,
-            elementsPerVertex * 4/*每个点 4 个 float，每 float 4 byte*/,
+            elementsPerVertex * 4/*每个点 4 个 float，每个 float 4 个  byte*/,
             vbo
         )
     }

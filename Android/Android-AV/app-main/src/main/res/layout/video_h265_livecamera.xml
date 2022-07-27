@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <me.ztiany.androidav.video.h265.livecamera.LocalSurfaceView
+    <me.ztiany.androidav.video.codec.livecamera.LocalSurfaceView
         android:id="@+id/video_localSurfaceView"
         android:layout_width="100dp"
         android:layout_height="100dp"

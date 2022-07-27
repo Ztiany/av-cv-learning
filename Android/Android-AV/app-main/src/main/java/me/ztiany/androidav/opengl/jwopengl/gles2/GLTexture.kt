@@ -7,10 +7,12 @@ import android.opengl.GLUtils
 import timber.log.Timber
 
 class GLTexture(
-    val name: Int,
-    val textureType: Int,
-    /**Not necessary, May be 0.*/
-    val handle: Int,
+    /**An allocated id to this Texture.*/
+    val id: Int,
+    /**The type of this Texture.*/
+    val type: Int,
+    /**The handle to Vertex Shader。Not necessary, May be 0.*/
+    val handleInShader: Int,
     /**Not necessary, May be 0.*/
     val index: Int,
     /**Not necessary, May be 0.*/
@@ -24,40 +26,40 @@ class GLTexture(
     }
 
     override fun toString(): String {
-        return "GLTexture(name=$name, textureType=$textureType, handle=$handle, width=$width, height=$height, index=$index)"
+        return "GLTexture(id=$id, type=$type, handleInShader=$handleInShader, width=$width, height=$height, index=$index)"
     }
 }
 
 fun GLTexture.activeTexture() {
-    if (handle == GLTexture.NONE) {
+    if (handleInShader == GLTexture.NONE) {
         throw IllegalStateException("The GLTexture was not bound with a handle. Call an alternative one instead.")
     }
     //激活指定纹理单元【有 32 个纹理单位，默认只有 0 号纹理单元是激活的】为了代码的统一性，不管哪个纹理，都调用一次 glActiveTexture，多次调用没有问题。
     GLES20.glActiveTexture(getTextureIdentificationByIndex(index))
     //绑定纹理 ID 到当前激活的纹理单元。
-    GLES20.glBindTexture(textureType, name)
+    GLES20.glBindTexture(type, id)
     //将激活的纹理单元传递到着色器里面。
     //我们使用 glUniform1i 设置 uniform 采样器的位置值，或者说纹理单元。通过 glUniform1i 的设置，我们保证每个 uniform 采样器对应着正确的纹理单元。
     //为一个纹理变量指定纹理数值 0，表示从 GL_TEXTURE0 采样。
     //为一个纹理变量指定纹理数值 1，表示从 GL_TEXTURE1 采样。
-    GLES20.glUniform1i(handle, index)
+    GLES20.glUniform1i(handleInShader, index)
 }
 
 fun GLTexture.activeTexture(handle: Int) {
     GLES20.glActiveTexture(getTextureIdentificationByIndex(index))
-    GLES20.glBindTexture(textureType, name)
+    GLES20.glBindTexture(type, id)
     GLES20.glUniform1i(handle, index)
 }
 
 fun GLTexture.activeTexture(handle: Int, index: Int) {
     GLES20.glActiveTexture(getTextureIdentificationByIndex(index))
-    GLES20.glBindTexture(textureType, name)
+    GLES20.glBindTexture(type, id)
     GLES20.glUniform1i(handle, index)
 }
 
 fun GLTexture.deleteTexture() {
-    GLES20.glBindTexture(textureType, 0)
-    GLES20.glDeleteTextures(1, intArrayOf(name), 0)
+    GLES20.glBindTexture(type, 0)
+    GLES20.glDeleteTextures(1, intArrayOf(id), 0)
 }
 
 /**
@@ -127,7 +129,7 @@ fun generateFBOTexture(
     val textureType = GLES20.GL_TEXTURE_2D
     setCommonAttribute(textureType, textureObjectIds[0])
 
-    //通过 OpenGL 对象读取 Bitmap 数据，并且绑定到纹理对象上，绑定之后就可以回收 Bitmap 对象。
+    //这里应该是申请了内存
     GLES20.glBindTexture(textureType, textureObjectIds[0])
     GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null)
     GLES20.glBindTexture(textureType, 0)
@@ -151,9 +153,9 @@ private fun setCommonAttribute(textureType: Int, textureObjectId: Int) {
 
     //纹理坐标的范围是 0-1。超出这一范围的坐标将被 OpenGL 根据 GL_TEXTURE_WRAP 参数的值进行处理
     //  GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T 分别为 x，y 方向。
-    //  GL_REPEAT: 平铺。
-    //  GL_MIRRORED_REPEAT: 纹理坐标是奇数时使用镜像平铺。
-    //  GL_CLAMP_TO_EDGE:: 坐标超出部分被截取成 0、1，边缘拉伸。
+    //  GL_REPEAT：平铺。
+    //  GL_MIRRORED_REPEAT：纹理坐标是奇数时使用镜像平铺。
+    //  GL_CLAMP_TO_EDGE：坐标超出部分被截取成 0、1，边缘拉伸。
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
     GLES20.glTexParameteri(textureType, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
 

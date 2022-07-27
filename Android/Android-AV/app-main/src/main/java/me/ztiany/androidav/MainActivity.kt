@@ -7,7 +7,7 @@ import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
-import me.ztiany.androidav.codec.ToolsActivity
+import me.ztiany.androidav.tool.ToolsActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity

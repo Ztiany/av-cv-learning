@@ -12,8 +12,9 @@ import me.ztiany.lib.avbase.utils.Directory
 import java.io.File
 
 /**
- * 视频拼接，如果两个视频的音视频规格不一致，合并后的视频是有问题的。
- * 具体参考 [merging-concat-videos-in-android-through-ffmpeg](https://stackoverflow.com/questions/46724197/merging-concat-videos-in-android-through-ffmpeg)
+ * 简易的视频拼接，如果两个视频的音视频规格不一致，则合并后的视频是有问题的。
+ * 具体参考 [merging-concat-videos-in-android-through-ffmpeg](https://stackoverflow.com/questions/46724197/merging-concat-videos-in-android-through-ffmpeg)。
+ * 要实现任意格式的视频拼接，则需要使用 FFmpeg 来首先，先对音视频进行重采样，统一格式后进行拼接。
  */
 class VideoCombinationActivity : AppCompatActivity() {
 
@@ -25,6 +26,7 @@ class VideoCombinationActivity : AppCompatActivity() {
     fun execute(view: android.view.View) {
         val originVideo1 = File(Directory.getSDCardRootPath(), "input1.mp4")
         val originVideo2 = File(Directory.getSDCardRootPath(), "input2.mp4")
+
         if (originVideo1.exists() && originVideo2.exists()) {
             lifecycleScope.launch {
                 view.isEnabled = false

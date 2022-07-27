@@ -4,11 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.databinding.VideoActivityMainBinding
-import me.ztiany.androidav.video.h265.livecamera.client.LiveCameraClientActivity
-import me.ztiany.androidav.video.h265.livecamera.server.LiveCameraServerActivity
-import me.ztiany.androidav.video.h265.livescreen.receiver.ScreenReceiverActivity
-import me.ztiany.androidav.video.h265.livescreen.sender.ScreenSenderActivity
+import me.ztiany.androidav.video.codec.livecamera.client.LiveCameraClientActivity
+import me.ztiany.androidav.video.codec.livecamera.server.LiveCameraServerActivity
+import me.ztiany.androidav.video.codec.livescreen.receiver.ScreenReceiverActivity
+import me.ztiany.androidav.video.codec.livescreen.sender.ScreenSenderActivity
 import me.ztiany.androidav.video.combine.VideoCombinationActivity
+import me.ztiany.androidav.video.rendering.VideoMediaPlayerActivity
 
 class VideoActivity : AppCompatActivity() {
 
@@ -22,6 +23,16 @@ class VideoActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
+        //视频渲染
+        binding.videoRenderByMp.setOnClickListener {
+            startActivity(Intent(this, VideoMediaPlayerActivity::class.java))
+        }
+
+        //视频拼接
+        binding.videoMosaic.setOnClickListener {
+            startActivity(Intent(this, VideoCombinationActivity::class.java))
+        }
+
         //投屏
         binding.videoH265ProjectScreenReceiver.setOnClickListener {
             startActivity(Intent(this, ScreenReceiverActivity::class.java))
@@ -38,10 +49,6 @@ class VideoActivity : AppCompatActivity() {
             startActivity(Intent(this, LiveCameraClientActivity::class.java))
         }
 
-        //视频拼接
-        binding.videoMosaic.setOnClickListener {
-            startActivity(Intent(this, VideoCombinationActivity::class.java))
-        }
     }
 
 }

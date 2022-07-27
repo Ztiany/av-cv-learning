@@ -69,7 +69,7 @@
 
         <!-- ==================================================== Codec ==================================================== -->
         <activity
-            android:name=".codec.ToolsActivity"
+            android:name=".tool.ToolsActivity"
             android:label="Codec" />
 
         <!-- ==================================================== Video ==================================================== -->
@@ -100,16 +100,19 @@
             android:name=".video.VideoActivity"
             android:label="Android Video" />
         <activity
-            android:name=".video.h265.livescreen.sender.ScreenSenderActivity"
+            android:name=".video.rendering.VideoMediaPlayerActivity"
+            android:label="MediaPlayer + OpenGLES" />
+        <activity
+            android:name=".video.codec.livescreen.sender.ScreenSenderActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".video.h265.livescreen.receiver.ScreenReceiverActivity"
+            android:name=".video.codec.livescreen.receiver.ScreenReceiverActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".video.h265.livecamera.client.LiveCameraClientActivity"
+            android:name=".video.codec.livecamera.client.LiveCameraClientActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".video.h265.livecamera.server.LiveCameraServerActivity"
+            android:name=".video.codec.livecamera.server.LiveCameraServerActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
             android:name=".video.combine.VideoCombinationActivity"
