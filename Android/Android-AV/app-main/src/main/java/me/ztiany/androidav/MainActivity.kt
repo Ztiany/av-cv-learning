@@ -1,17 +1,18 @@
 package me.ztiany.androidav
 
 import android.content.Intent
+import android.graphics.drawable.ColorStateListDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.audio.AudioActivity
 import me.ztiany.androidav.camera.CameraActivity
-import me.ztiany.androidav.tool.ToolsActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
 import me.ztiany.androidav.screen.ScreenRecordActivity
+import me.ztiany.androidav.tool.ToolsActivity
 import me.ztiany.androidav.video.VideoActivity
 import timber.log.Timber
 
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("Android-AV Started")
+        ColorStateListDrawable()
         requestAllPermissions()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
