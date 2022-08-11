@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -37,7 +36,7 @@
         <!-- ==================================================== AvTest ==================================================== -->
 
         <activity
-            android:name=".tool.ToolsActivity"
+            android:name=".avtest.ToolsActivity"
             android:label="Codec" />
 
         <!-- ==================================================== AV Operation ==================================================== -->
@@ -129,19 +128,19 @@
             android:name=".opengl.nwopengl.NativeWithOpenGLMainActivity"
             android:label="GLSurfaceView with Native" />
         <activity
-            android:name=".opengl.jwopengl.JavaWithOpenGLMainActivity"
+            android:name=".opengl.jwopengl.usecase.camera.JavaWithOpenGLMainActivity"
             android:label="OpenGLES with Java" />
         <activity
-            android:name=".opengl.jwopengl.JavaWithOpenGLCommonActivity"
+            android:name=".opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity"
             android:label="OpenGLES with Java Common" />
         <activity
             android:name=".opengl.jwopengl.OpenGLCameraPreviewActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".opengl.jwopengl.EGLCameraPreviewWithActivity"
+            android:name=".opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
-            android:name=".opengl.jwopengl.OpenGLRecorderActivity"
+            android:name=".opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity"
             android:theme="@style/Theme.FullScreen" />
 
         <!-- ==================================================== FFmpeg ==================================================== -->

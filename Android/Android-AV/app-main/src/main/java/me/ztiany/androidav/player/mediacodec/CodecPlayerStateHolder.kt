@@ -25,6 +25,9 @@ class CodecPlayerStateHolder {
         return true
     }
 
+    val isStarted: Boolean
+        get() = currentState.get() == STARTED
+
     private fun notifyNewState() {
         val newState = currentState.get()
         onStateListeners.forEach { it(newState) }

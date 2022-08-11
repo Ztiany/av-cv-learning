@@ -8,29 +8,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
 class AudioDataDecoder(
-    private val stateHolder: CodecPlayerStateHolder
+    private val mediaFormat: MediaFormat,
+    private val stateHolder: CodecPlayerStateHolder,
+    private val provider: MediaDataProvider,
+    private val renderer: MediaDataRenderer
 ) : MediaDataDecoder {
 
-    private lateinit var provider: MediaDataProvider
     private lateinit var decoder: MediaCodec
-    private lateinit var renderer: MediaDataRenderer
     private val isRunning = AtomicBoolean(false)
     private var reachEndOfStream = false
 
     private val outputBufferInfo by lazy {
         MediaCodec.BufferInfo()
-    }
-
-    override fun setMediaDataProvider(provider: MediaDataProvider) {
-        this.provider = provider
-    }
-
-    override fun setMediaDataRenderer(renderer: MediaDataRenderer) {
-        this.renderer = renderer
-    }
-
-    override fun initMediaDecoder() {
-        initAudioDecoder(provider.getMediaFormat())
     }
 
     private fun initAudioDecoder(mediaFormat: MediaFormat) {
@@ -57,7 +46,7 @@ class AudioDataDecoder(
     }
 
     private fun pushData() {
-        if (reachEndOfStream) {
+        /*if (reachEndOfStream) {
             Timber.d("AudioDataDecoder pushData reachEndOfStream")
             return
         }
@@ -76,7 +65,7 @@ class AudioDataDecoder(
             reachEndOfStream = true
         } else {
             decoder.queueInputBuffer(inputBufferIndex, 0, sampleSize, bufferInfo.sampleTime, 0)
-        }
+        }*/
     }
 
     private fun pullData() {
@@ -103,13 +92,13 @@ class AudioDataDecoder(
         }
     }
 
-    override fun stop() {
-        isRunning.set(false)
-    }
-
-    override fun release() {
+    private fun release() {
         decoder.stop()
         decoder.release()
+    }
+
+    override fun stop() {
+        isRunning.set(false)
     }
 
 }

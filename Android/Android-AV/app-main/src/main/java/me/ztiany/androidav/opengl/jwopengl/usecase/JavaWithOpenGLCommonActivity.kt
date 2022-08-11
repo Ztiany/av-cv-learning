@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl
+package me.ztiany.androidav.opengl.jwopengl.usecase
 
 import android.content.Context
 import android.content.Intent

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.tool
+package me.ztiany.androidav.avtest
 
 import android.content.Context
 import android.media.MediaExtractor
@@ -10,43 +10,47 @@ import timber.log.Timber
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
-class MediaExtractorMultiThreadingCase(
+/** 按照网上所说到，不调用 selectTrack，直接调用 readSampleData，在一个 MediaExtractor 中读取所有的 track。【事实上，根本就是错误的用法】*/
+class MediaExtractorAllInOneCase(
     private val context: Context,
     private val source: Uri,
 ) : TestCase {
 
-
     private lateinit var mediaExtractor: MediaExtractor
-
-    private var audioTrack = -1
-    private var videoTrack = -1
 
     @Volatile private var isTesting = false
 
     override fun start() {
         isTesting = true
         initMediaExtractor()
-        startReader(audioTrack, 5, "Audio")
-        //startReader(videoTrack, "Video")
+        startReader(20)
     }
 
-    private fun startReader(track: Int, readTime: Int, flag: String) {
+    private fun startReader(readTime: Int) {
         val buffer = ByteBuffer.allocate(1024 * 1024 * 5)
         thread {
+
             var count = 0
+
             while (isTesting) {
-                Timber.d("before read $flag, sampleTime = ${mediaExtractor.sampleTime}, sampleTrackIndex = ${mediaExtractor.sampleTrackIndex}")
-                mediaExtractor.selectTrack(track)
+                Timber.d("before read, sampleTime = ${mediaExtractor.sampleTime}, sampleTrackIndex = ${mediaExtractor.sampleTrackIndex}")
                 val readSize = mediaExtractor.readSampleData(buffer, 0)
-                Timber.d("after read $flag, readSize = $readSize,  sampleTime = ${mediaExtractor.sampleTime}, sampleTrackIndex = ${mediaExtractor.sampleTrackIndex}")
-                if (++count > readTime) {
+                Timber.d("after read, readSize = $readSize,  sampleTime = ${mediaExtractor.sampleTime}, sampleTrackIndex = ${mediaExtractor.sampleTrackIndex}")
+                mediaExtractor.advance()
+
+                if (++count > readTime || count < 0) {
                     break
                 }
             }
+
+            mediaExtractor.release()
         }
     }
 
     private fun initMediaExtractor() {
+        var audioTrack = 0
+        var videoTrack = 0
+
         mediaExtractor = MediaExtractor().apply {
             setDataSource(context, source, null)
             val trackCount = trackCount
@@ -55,10 +59,10 @@ class MediaExtractorMultiThreadingCase(
                 tempFormat = getTrackFormat(track)
                 if (AUDIO_SELECTOR(tempFormat)) {
                     audioTrack = track
-                    Timber.d("select: $tempFormat as AudioTrack.")
+                    Timber.d("AudioTrack is $track and format is  $tempFormat")
                 } else if (VIDEO_SELECTOR(tempFormat)) {
                     videoTrack = track
-                    Timber.d(" select: $tempFormat as VideoTrack.")
+                    Timber.d("VideoTrack is $track and format is  $tempFormat")
                 }
                 if (videoTrack != -1 && audioTrack != -1) {
                     break

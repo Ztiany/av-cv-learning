@@ -1,4 +1,4 @@
-package me.ztiany.androidav.tool
+package me.ztiany.androidav.avtest
 
 import android.content.Context
 import android.media.MediaMetadataRetriever

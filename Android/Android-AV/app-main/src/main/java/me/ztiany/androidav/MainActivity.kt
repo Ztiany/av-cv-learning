@@ -6,13 +6,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.avapi.MediaApiActivity
+import me.ztiany.androidav.avtest.ToolsActivity
 import me.ztiany.androidav.camera.CameraActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.ffmpeg.FFmpegActivity
 import me.ztiany.androidav.opengl.OpenGLESMainActivity
 import me.ztiany.androidav.player.PlayerMainActivity
 import me.ztiany.androidav.stream.StreamingMediaActivity
-import me.ztiany.androidav.tool.ToolsActivity
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package me.ztiany.androidav.opengl.jwopengl
+package me.ztiany.androidav.opengl.jwopengl.usecase.camera
 
 import android.graphics.Point
 import android.os.Bundle

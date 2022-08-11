@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
-import me.ztiany.androidav.tool.loadMediaMetadata
+import me.ztiany.androidav.avtest.loadMediaMetadata
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

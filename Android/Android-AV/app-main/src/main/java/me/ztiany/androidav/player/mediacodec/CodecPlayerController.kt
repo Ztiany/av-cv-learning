@@ -12,7 +12,7 @@ class CodecPlayerController(
     private val bufferPool = ByteBufferPool()
     private val stateHolder = CodecPlayerStateHolder()
 
-    private val mediaDataExtractor by lazy {
+    private val mediaDataExtractor: MediaDataExtractor by lazy {
         MediaDataExtractorImpl(context, bufferPool)
     }
 
@@ -27,10 +27,15 @@ class CodecPlayerController(
     }
 
     fun setVideoRenderer(surface: Surface) {
-
+        if (stateHolder.isStarted) {
+            throw UnsupportedOperationException("Set a surface before you start.")
+        }
     }
 
     fun setVideoRenderer(videoRenderer: MediaDataRenderer) {
+        if (stateHolder.isStarted) {
+            throw UnsupportedOperationException("Set a MediaDataRenderer before you start.")
+        }
         this.videoRenderer = videoRenderer
     }
 
@@ -50,14 +55,16 @@ class CodecPlayerController(
         if (audioFormat == null) {
             return
         }
-        audioDecoder = AudioDataDecoder(stateHolder).apply {
-            setMediaDataProvider(object : MediaDataProvider {
+        audioDecoder = AudioDataDecoder(
+            audioFormat,
+            stateHolder,
+            object : MediaDataProvider {
                 override fun getPacket(): Packet? {
                     return mediaDataExtractor.getAudioPacket()
                 }
-            })
-            setMediaDataRenderer(PCMAudioDataRenderer())
-        }
+            },
+            PCMAudioDataRenderer()
+        )
     }
 
     private fun initVideoDecoder(videoFormat: MediaFormat?) {
