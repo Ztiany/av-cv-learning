@@ -5,7 +5,7 @@ static PcmPlayerConfig pcmPlayerConfig;
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_me_ztiany_androidav_audio_opensles_OpenSlES_createPCMPlayer(
+Java_me_ztiany_androidav_avapi_audio_opensles_OpenSlES_createPCMPlayer(
         JNIEnv *env,
         jobject thiz,
         jint sample_rate,
@@ -22,7 +22,7 @@ Java_me_ztiany_androidav_audio_opensles_OpenSlES_createPCMPlayer(
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_me_ztiany_androidav_audio_opensles_OpenSlES_startPcmPlayer(JNIEnv *env, jobject thiz, jstring file_path) {
+Java_me_ztiany_androidav_avapi_audio_opensles_OpenSlES_startPcmPlayer(JNIEnv *env, jobject thiz, jstring file_path) {
     const char *filePath = env->GetStringUTFChars(file_path, nullptr);
     if (filePath == nullptr) {
         LOGE("startPcmPlayer error for GetStringUTFChars");
@@ -38,18 +38,19 @@ Java_me_ztiany_androidav_audio_opensles_OpenSlES_startPcmPlayer(JNIEnv *env, job
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_me_ztiany_androidav_audio_opensles_OpenSlES_pausePcmPlayer(JNIEnv *env, jobject thiz) {
+Java_me_ztiany_androidav_avapi_audio_opensles_OpenSlES_pausePcmPlayer(JNIEnv *env, jobject thiz) {
     return pausePcmPlayer();
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_me_ztiany_androidav_audio_opensles_OpenSlES_resumePcmPlayer(JNIEnv *env, jobject thiz) {
+Java_me_ztiany_androidav_avapi_audio_opensles_OpenSlES_resumePcmPlayer(JNIEnv *env, jobject thiz) {
     return resumePcmPlayer();
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_me_ztiany_androidav_audio_opensles_OpenSlES_stopPcmPlayer(JNIEnv *env, jobject thiz) {
+Java_me_ztiany_androidav_avapi_audio_opensles_OpenSlES_stopPcmPlayer(JNIEnv *env, jobject thiz) {
     return stopPcmPlayerForFilePath();
 }
+ 

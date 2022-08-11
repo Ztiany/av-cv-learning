@@ -1,19 +1,18 @@
 package me.ztiany.androidav
 
 import android.content.Intent
-import android.graphics.drawable.ColorStateListDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
-import me.ztiany.androidav.audio.AudioActivity
+import me.ztiany.androidav.avapi.MediaApiActivity
 import me.ztiany.androidav.camera.CameraActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
-import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
-import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
-import me.ztiany.androidav.screen.ScreenRecordActivity
+import me.ztiany.androidav.ffmpeg.FFmpegActivity
+import me.ztiany.androidav.opengl.OpenGLESMainActivity
+import me.ztiany.androidav.player.PlayerMainActivity
+import me.ztiany.androidav.stream.StreamingMediaActivity
 import me.ztiany.androidav.tool.ToolsActivity
-import me.ztiany.androidav.video.VideoActivity
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +22,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("Android-AV Started")
-        ColorStateListDrawable()
         requestAllPermissions()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -31,32 +29,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-        binding.btnTools.setOnClickListener {
+        binding.btnAvTest.setOnClickListener {
             startActivity(Intent(this, ToolsActivity::class.java))
         }
 
-        binding.btnAudio.setOnClickListener {
-            startActivity(Intent(this, AudioActivity::class.java))
-        }
-
-        binding.btnVideo.setOnClickListener {
-            startActivity(Intent(this, VideoActivity::class.java))
+        binding.btnAvOperation.setOnClickListener {
+            startActivity(Intent(this, MediaApiActivity::class.java))
         }
 
         binding.btnCamera.setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))
         }
 
-        binding.btnScreenRecorder.setOnClickListener {
-            startActivity(Intent(this, ScreenRecordActivity::class.java))
+        binding.btnPlayer.setOnClickListener {
+            startActivity(Intent(this, PlayerMainActivity::class.java))
         }
 
-        binding.btnOpenglJava.setOnClickListener {
-            startActivity(Intent(this, JavaWithOpenGLMainActivity::class.java))
+        binding.btnOpenGL.setOnClickListener {
+            startActivity(Intent(this, OpenGLESMainActivity::class.java))
         }
 
-        binding.btnOpenglNative.setOnClickListener {
-            startActivity(Intent(this, NativeWithOpenGLMainActivity::class.java))
+        binding.btnFfmpeg.setOnClickListener {
+            startActivity(Intent(this, FFmpegActivity::class.java))
+        }
+
+        binding.btnStreamingMedia.setOnClickListener {
+            startActivity(Intent(this, StreamingMediaActivity::class.java))
         }
     }
 

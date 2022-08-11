@@ -30,12 +30,92 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- ==================================================== AvTest ==================================================== -->
+
+        <activity
+            android:name=".tool.ToolsActivity"
+            android:label="Codec" />
+
+        <!-- ==================================================== AV Operation ==================================================== -->
+
+        <activity
+            android:name=".avapi.MediaApiActivity"
+            android:label="Android Media API" />
+
+        <!--Video-->
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.mediarecord.MediaRecordActivity"
+            android:label="Media Record" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.audiorecord.AudioRecordActivity"
+            android:label="Audio Record" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.autiotrack.AudioTrackActivity"
+            android:label="Audio Track" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.mediaplayer.AudioMediaPlayerActivity"
+            android:label="Media Player(Audio)" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.autiotrack.MediaExtractorAudioTrackActivity"
+            android:label="MediaExtractor + AudioTrack" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.mixing.MixingAudioActivity"
+            android:label="Mixing Audio/Video" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.screen.ScreenRecordingActivity"
+            android:label="Screen Record" />
+
+        <!--Audio-->
+        <activity
+            android:name="me.ztiany.androidav.player.mediaplayer.VideoMediaPlayerActivity"
+            android:label="MediaPlayer + OpenGLES" />
+        <activity
+            android:name=".stream.livescreen.sender.ScreenSenderActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".stream.livescreen.receiver.ScreenReceiverActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".stream.livecamera.client.LiveCameraClientActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".stream.livecamera.server.LiveCameraServerActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.video.combine.VideoCombinationActivity"
+            android:label="Video Mosaic" />
+        <activity
+            android:name="me.ztiany.androidav.avapi.audio.opensles.OpenSLESActivity"
+            android:label="OpenSL ES" />
+
+        <!-- ==================================================== Camera ==================================================== -->
+
+        <activity android:name=".camera.CameraActivity" />
+        <activity
+            android:name=".camera.camera1.Camera1Activity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".camera.camera2.Camera2PreviewActivity"
+            android:theme="@style/Theme.FullScreen" />
+        <activity
+            android:name=".camera.camera2.Camera2EncodingActivity"
+            android:theme="@style/Theme.FullScreen" />
+
+        <!-- ==================================================== Player ==================================================== -->
+
+        <activity
+            android:name=".player.PlayerMainActivity"
+            android:label="Av Player" />
+
         <!-- ==================================================== OpenGL ==================================================== -->
+
+        <activity
+            android:name=".opengl.OpenGLESMainActivity"
+            android:label="OpenGL ES" />
         <activity
             android:name=".opengl.nwopengl.NativeWithOpenGLMainActivity"
             android:label="GLSurfaceView with Native" />
@@ -55,76 +135,17 @@
             android:name=".opengl.jwopengl.OpenGLRecorderActivity"
             android:theme="@style/Theme.FullScreen" />
 
-        <!-- ==================================================== Camera ==================================================== -->
-        <activity android:name=".camera.CameraActivity" />
-        <activity
-            android:name=".camera.camera1.Camera1Activity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".camera.camera2.Camera2PreviewActivity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".camera.camera2.Camera2EncodingActivity"
-            android:theme="@style/Theme.FullScreen" />
+        <!-- ==================================================== FFmpeg ==================================================== -->
 
-        <!-- ==================================================== Codec ==================================================== -->
         <activity
-            android:name=".tool.ToolsActivity"
-            android:label="Codec" />
+            android:name=".ffmpeg.FFmpegActivity"
+            android:label="FFmpeg" />
 
-        <!-- ==================================================== Video ==================================================== -->
-        <activity
-            android:name=".audio.AudioActivity"
-            android:label="Android Audio" />
-        <activity
-            android:name=".audio.mediarecord.MediaRecordActivity"
-            android:label="Media Record" />
-        <activity
-            android:name=".audio.audiorecord.AudioRecordActivity"
-            android:label="Audio Record" />
-        <activity
-            android:name=".audio.autiotrack.AudioTrackActivity"
-            android:label="Audio Track" />
-        <activity
-            android:name=".audio.mediaplayer.AudioMediaPlayerActivity"
-            android:label="Media Player(Audio)" />
-        <activity
-            android:name=".audio.autiotrack.MediaExtractorAudioTrackActivity"
-            android:label="MediaExtractor + AudioTrack" />
-        <activity
-            android:name=".audio.mixing.MixingAudioActivity"
-            android:label="Mixing Audio/Video" />
+        <!-- ==================================================== Streaming Media ==================================================== -->
 
-        <!-- ==================================================== Video ==================================================== -->
         <activity
-            android:name=".video.VideoActivity"
-            android:label="Android Video" />
-        <activity
-            android:name=".video.rendering.VideoMediaPlayerActivity"
-            android:label="MediaPlayer + OpenGLES" />
-        <activity
-            android:name=".video.codec.livescreen.sender.ScreenSenderActivity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".video.codec.livescreen.receiver.ScreenReceiverActivity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".video.codec.livecamera.client.LiveCameraClientActivity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".video.codec.livecamera.server.LiveCameraServerActivity"
-            android:theme="@style/Theme.FullScreen" />
-        <activity
-            android:name=".video.combine.VideoCombinationActivity"
-            android:label="Video Mosaic" />
-        <activity
-            android:name=".audio.opensles.OpenSLESActivity"
-            android:label="OpenSL ES" />
-
-        <!-- ==================================================== Screen ==================================================== -->
-        <activity
-            android:name=".screen.ScreenRecordActivity"
-            android:label="Screen Record" />
+            android:name=".stream.StreamingMediaActivity"
+            android:label="Streaming Media" />
 
     </application>
 
