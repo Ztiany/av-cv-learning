@@ -10,7 +10,7 @@ import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
-import me.ztiany.androidav.databinding.VideoActivityMpBinding
+import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
 import me.ztiany.androidav.tool.loadMediaMetadata
@@ -21,7 +21,7 @@ class VideoMediaPlayerActivity : DelegateActivity() {
 
     private var selectedFile: Uri? = null
 
-    private lateinit var binding: VideoActivityMpBinding
+    private lateinit var binding: PlyaerActivityMediaPlayerBinding
 
     private val videoPlayer = VideoPlayer()
 
@@ -51,7 +51,7 @@ class VideoMediaPlayerActivity : DelegateActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = VideoActivityMpBinding.inflate(layoutInflater)
+        binding = PlyaerActivityMediaPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setUpGLSurfaceView()
         setUpButtons()

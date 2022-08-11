@@ -7,7 +7,9 @@ import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
-class AudioDataDecoder : MediaDataDecoder {
+class AudioDataDecoder(
+    private val stateHolder: CodecPlayerStateHolder
+) : MediaDataDecoder {
 
     private lateinit var provider: MediaDataProvider
     private lateinit var decoder: MediaCodec

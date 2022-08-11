@@ -46,7 +46,7 @@
             android:name=".avapi.MediaApiActivity"
             android:label="Android Media API" />
 
-        <!--Video-->
+        <!--Audio-->
         <activity
             android:name="me.ztiany.androidav.avapi.audio.mediarecord.MediaRecordActivity"
             android:label="Media Record" />
@@ -69,10 +69,7 @@
             android:name="me.ztiany.androidav.avapi.screen.ScreenRecordingActivity"
             android:label="Screen Record" />
 
-        <!--Audio-->
-        <activity
-            android:name="me.ztiany.androidav.player.mediaplayer.VideoMediaPlayerActivity"
-            android:label="MediaPlayer + OpenGLES" />
+        <!--Video-->
         <activity
             android:name=".stream.livescreen.sender.ScreenSenderActivity"
             android:theme="@style/Theme.FullScreen" />
@@ -110,6 +107,18 @@
         <activity
             android:name=".player.PlayerMainActivity"
             android:label="Av Player" />
+
+        <activity
+            android:name=".player.mediaplayer.VideoMediaPlayerActivity"
+            android:label="MediaPlayer + OpenGLES" />
+
+        <activity
+            android:name=".player.mediacodec.MediaCodecPlayerActivity"
+            android:label="MediaCodecPlayer" />
+
+        <activity
+            android:name=".player.openglplayer.OpenGNESPlayerActivity"
+            android:label="OpenGLPlayer" />
 
         <!-- ==================================================== OpenGL ==================================================== -->
 

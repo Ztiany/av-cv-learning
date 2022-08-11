@@ -6,12 +6,6 @@ interface MediaDataDecoder {
 
     fun setMediaDataRenderer(renderer: MediaDataRenderer)
 
-    fun initMediaDecoder()
-
     fun start()
-
-    fun stop()
-
-    fun release()
 
 }

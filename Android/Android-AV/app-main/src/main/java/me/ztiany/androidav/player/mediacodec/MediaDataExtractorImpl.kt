@@ -4,36 +4,132 @@ import android.content.Context
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import kotlinx.coroutines.yield
 import timber.log.Timber
-import java.nio.ByteBuffer
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
-class MediaDataExtractorImpl(private val context: Context) : MediaDataExtractor {
+class MediaDataExtractorImpl(
+    private val context: Context,
+    private val byteBufferPool: ByteBufferPool
+) : MediaDataExtractor {
 
     private var mediaExtractor: MediaExtractor? = null
 
-    private var format: MediaFormat? = null
-
-    private val bufferInfo: BufferInfo = BufferInfo(0, 0, -1)
-    private val bufferInfoCopy: BufferInfo = BufferInfo(0, 0, -1)
-
-    private lateinit var selector: TrackSelector
     private lateinit var source: Uri
+
+    private var audioFormat: MediaFormat? = null
+    private var audioTrack = -1
+
+    private var videoFormat: MediaFormat? = null
+    private var videoTrack = -1
+
+    private var audioSelector: TrackSelector = AUDIO_SELECTOR
+    private var videoSelector: TrackSelector = VIDEO_SELECTOR
+
+    private val maxVideoPacketCount = 100
+    private val yieldVideoPacketCount = 90
+    private val maxAudioPacketCount = 50
+    private val yieldAudioPacketCount = 45
+
+    @Volatile private var seekTime = -1L
+
+    private val started = AtomicBoolean(false)
+
+    @Volatile private var audioReachEnd = false
+    @Volatile private var videoReachEnd = false
+
+    private var onPrepared: ((audioFormat: MediaFormat?, videoFormat: MediaFormat?) -> Unit)? = null
+
+    private val audioPacketQueue = ArrayBlockingQueue<Packet>(maxVideoPacketCount)
+    private val videoPacketQueue = ArrayBlockingQueue<Packet>(maxAudioPacketCount)
 
     override fun setSource(source: Uri) {
         this.source = source
     }
 
-    override fun setTrackSelector(selector: TrackSelector) {
-        this.selector = selector
+    override fun setAudioTrackSelector(selector: TrackSelector) {
+        this.audioSelector = selector
     }
 
-    override fun initExtractor() {
+    override fun setVideoTrackSelector(selector: TrackSelector) {
+        this.videoSelector = selector
+    }
+
+    override fun start() {
+        if (started.compareAndSet(false, true)) {
+            internalStart()
+        }
+    }
+
+    override fun invokeOnPrepared(onPrepared: (audioFormat: MediaFormat?, videoFormat: MediaFormat?) -> Unit) {
+        this.onPrepared = onPrepared
+    }
+
+    private fun internalStart() {
+        thread {
+            release()
+            initExtractor()
+            onPrepared?.invoke(audioFormat, videoFormat)
+            if (audioFormat == null && videoFormat == null) {
+                return@thread
+            }
+            while (started.get() && (!audioReachEnd && !videoReachEnd)) {
+                handleSeek()
+                checkIfNeedYield()
+                readAudio()
+                readVideo()
+            }
+            release()
+        }
+    }
+
+    private fun checkIfNeedYield() {
+        if (audioPacketQueue.size >= yieldAudioPacketCount && videoPacketQueue.size >= yieldVideoPacketCount) {
+            Thread.yield()
+        }
+    }
+
+    private fun readAudio() {
+        if (audioReachEnd || audioTrack == -1 || audioPacketQueue.size >= maxAudioPacketCount) {
+            return
+        }
+        readSamples(audioTrack, audioPacketQueue)
+    }
+
+    private fun readVideo() {
+        if (videoReachEnd || videoTrack == -1 || videoPacketQueue.size >= maxVideoPacketCount) {
+            return
+        }
+        readSamples(videoTrack, videoPacketQueue)
+    }
+
+    private fun readSamples(track: Int, queue: ArrayBlockingQueue<Packet>) {
+        val extractor = mediaExtractor ?: throw IllegalStateException("never happen")
+        extractor.selectTrack(track)
+        val byteBuffer = byteBufferPool.getByteBuffer(extractor.sampleSize)
+        val readSize = extractor.readSampleData(byteBuffer, 0)
+        if (readSize < 0) {
+            onTrackReachEnd(track)
+            return
+        }
+        val packet = Packet(byteBuffer, readSize, extractor.sampleTime, extractor.sampleFlags)
+        queue.put(packet)
+        extractor.advance()
+    }
+
+    private fun onTrackReachEnd(track: Int) {
+        if (track == audioTrack) {
+            audioReachEnd = true
+        } else if (track == videoTrack) {
+            videoReachEnd = true
+        }
+    }
+
+    private fun initExtractor() {
         if (!::source.isInitialized) {
             throw IllegalStateException("call setSource first.")
-        }
-
-        if (!::selector.isInitialized) {
-            throw IllegalStateException("cal setTrackSelector first. ")
         }
 
         val extractor = MediaExtractor().apply {
@@ -45,54 +141,74 @@ class MediaDataExtractorImpl(private val context: Context) : MediaDataExtractor 
         var mediaFormat: MediaFormat
         for (track in 0 until trackCount) {
             mediaFormat = extractor.getTrackFormat(track)
-            if (selector(mediaFormat)) {
-                bufferInfo.track = track
-                format = mediaFormat
-                extractor.selectTrack(track)
-                Timber.d("MediaDataExtractorImpl select: $mediaFormat .")
-                break
+            if (audioSelector(mediaFormat)) {
+                audioTrack = track
+                audioFormat = mediaFormat
+                Timber.d("MediaDataExtractorImpl select audio: track($track) and format is $mediaFormat.")
+            } else if (videoSelector(mediaFormat)) {
+                videoTrack = track
+                videoFormat = mediaFormat
+                Timber.d("MediaDataExtractorImpl select audio: track($track) and format is $mediaFormat.")
             }
         }
+    }
 
-        if (bufferInfo.track == -1) {
-            throw IllegalStateException("no tract satisfied.")
+    private fun handleSeek() {
+        if (seekTime != -1L) {
+            mediaExtractor?.run {
+
+                audioPacketQueue.clear()
+                videoPacketQueue.clear()
+
+                if (audioTrack != -1) {
+                    selectTrack(audioTrack)
+                    seekTo(seekTime, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+                    advance()
+                }
+                if (videoTrack != -1) {
+                    selectTrack(videoTrack)
+                    seekTo(seekTime, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+                    advance()
+                }
+            }
+            seekTime = -1L
         }
     }
 
-    override fun read(buffer: ByteBuffer): Int {
-        val extractor = mediaExtractor ?: throw IllegalStateException("call start first.")
-        buffer.clear()
-        val readSize = extractor.readSampleData(buffer, 0)
-        if (readSize < 0) {
-            return -1
+    override fun getAudioPacket(): Packet? {
+        if (audioReachEnd && audioPacketQueue.isEmpty()) {
+            return null
         }
-        bufferInfo.sampleTime = extractor.sampleTime
-        bufferInfo.sampleFlags = extractor.sampleFlags
-        extractor.advance()
-        return readSize
+        return audioPacketQueue.take()
     }
 
-    override fun release() {
+    override fun getVideoPacket(): Packet? {
+        if (videoReachEnd && videoPacketQueue.isEmpty()) {
+            return null
+        }
+        return videoPacketQueue.take()
+    }
+
+    private fun release() {
         mediaExtractor?.release()
         mediaExtractor = null
-        format = null
+        audioReachEnd = false
+        videoReachEnd = false
+        audioTrack = -1
+        videoTrack = -1
+        audioFormat = null
+        videoFormat = null
+        audioPacketQueue.clear()
+        videoPacketQueue.clear()
+        started.set(false)
     }
 
-    override fun getCurrentBufferInfo(): BufferInfo {
-        bufferInfoCopy.track = bufferInfo.track
-        bufferInfoCopy.sampleFlags = bufferInfo.sampleFlags
-        bufferInfoCopy.sampleTime = bufferInfo.sampleTime
-        return bufferInfoCopy
+    override fun seek(position: Long) {
+        seekTime = position
     }
 
-    override fun seek(position: Long): Long {
-        val extractor = mediaExtractor ?: throw IllegalStateException("call start first.")
-        extractor.seekTo(position, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-        return extractor.sampleTime
-    }
-
-    override fun getMediaFormat(): MediaFormat {
-        return format ?: throw IllegalStateException("MediaDataExtractorImpl is not working.")
+    override fun stop() {
+        started.compareAndSet(true, false)
     }
 
 }
