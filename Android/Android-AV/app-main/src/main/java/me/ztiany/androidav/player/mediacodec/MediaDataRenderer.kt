@@ -6,10 +6,10 @@ import java.nio.ByteBuffer
 
 interface MediaDataRenderer {
 
-    fun initRenderer(mediaFormat: MediaFormat)
+    fun updateMediaFormat(mediaFormat: MediaFormat)
 
     fun render(mediaData: ByteBuffer, bufferInfo: MediaCodec.BufferInfo)
 
-    fun releaseRenderer()
+    fun release()
 
 }

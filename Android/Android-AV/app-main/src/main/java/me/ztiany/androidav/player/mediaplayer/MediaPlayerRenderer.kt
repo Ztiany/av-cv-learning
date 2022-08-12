@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.gles2.*
-import me.ztiany.androidav.avtest.MediaMetadata
+import me.ztiany.lib.avbase.utils.MediaMetadata
 import timber.log.Timber
 
 class MediaPlayerRenderer(

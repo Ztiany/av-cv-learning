@@ -2,6 +2,7 @@ package me.ztiany.androidav.player.mediacodec
 
 import android.media.MediaFormat
 import android.net.Uri
+import me.ztiany.lib.avbase.utils.MediaMetadata
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -17,22 +18,26 @@ interface MediaDataExtractor {
      * @throws IllegalStateException 没有提前调用 [setSource], [setAudioTrackSelector], [setVideoTrackSelector] 方法。
      * @throws IOException 数据源错误
      */
-    fun start()
+    fun prepare(): MediaInfo
 
-    fun invokeOnPrepared(onPrepared: (audioFormat: MediaFormat?, videoFormat: MediaFormat?) -> Unit)
+    fun readAudioPacket(buffer: ByteBuffer, packet: PacketInfo? = null): Int
 
-    fun getAudioPacket(): Packet?
-
-    fun getVideoPacket(): Packet?
+    fun readVideoPacket(buffer: ByteBuffer, packet: PacketInfo? = null): Int
 
     /**
      * Seek 到指定位置，并返回实际帧的时间戳
      */
     fun seek(position: Long)
 
-    fun stop()
+    fun release()
 
 }
+
+class MediaInfo(
+    val metadata: MediaMetadata,
+    val audioFormat: MediaFormat?,
+    val videoFormat: MediaFormat?
+)
 
 typealias TrackSelector = (MediaFormat) -> Boolean
 
@@ -44,10 +49,8 @@ val VIDEO_SELECTOR: TrackSelector = {
     it.getString(MediaFormat.KEY_MIME)?.startsWith("video/") ?: false
 }
 
-data class Packet(
-    val data: ByteBuffer,
-    val size: Int,
-    val sampleTime: Long,
-    val sampleFlags: Int
+data class PacketInfo(
+    var sampleTime: Long,
+    var sampleFlags: Int
 )
 

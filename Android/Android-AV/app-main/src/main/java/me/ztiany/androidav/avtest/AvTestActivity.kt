@@ -9,7 +9,7 @@ import me.ztiany.androidav.databinding.ToolsActivityBinding
 import me.ztiany.lib.avbase.utils.printMediaCodecInfo
 import timber.log.Timber
 
-class ToolsActivity : DelegateActivity() {
+class AvTestActivity : DelegateActivity() {
 
     private val systemMediaSelector by lazy {
         newSystemMediaSelector(this, object : ResultListener {

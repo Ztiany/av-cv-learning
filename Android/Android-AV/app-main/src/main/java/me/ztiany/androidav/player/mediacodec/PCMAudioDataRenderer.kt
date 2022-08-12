@@ -11,7 +11,7 @@ class PCMAudioDataRenderer : MediaDataRenderer {
 
     private lateinit var audioOutTempBuffer: ShortArray
 
-    override fun initRenderer(mediaFormat: MediaFormat) {
+    override fun updateMediaFormat(mediaFormat: MediaFormat) {
         val channelCount = mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         val sampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
         val pcmEncoding = if (mediaFormat.containsKey(MediaFormat.KEY_PCM_ENCODING)) {
@@ -64,7 +64,7 @@ class PCMAudioDataRenderer : MediaDataRenderer {
         }
     }
 
-    override fun releaseRenderer() {
+    override fun release() {
         val track = audioTrack
         audioTrack = null
         track?.run {

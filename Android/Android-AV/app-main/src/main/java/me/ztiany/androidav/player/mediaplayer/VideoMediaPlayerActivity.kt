@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
-import me.ztiany.androidav.avtest.loadMediaMetadata
+import me.ztiany.lib.avbase.utils.loadMediaMetadataSuspend
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -44,7 +44,7 @@ class VideoMediaPlayerActivity : DelegateActivity() {
         binding.videoSelectedFile.text = "已经选择：${selectedFile.toString()}"
         selectedFile?.let {
             lifecycleScope.launch {
-                Timber.d(loadMediaMetadata(this@VideoMediaPlayerActivity, it).toString())
+                Timber.d(loadMediaMetadataSuspend(this@VideoMediaPlayerActivity, it).toString())
             }
         }
     }
@@ -128,7 +128,7 @@ class VideoMediaPlayerActivity : DelegateActivity() {
 
     private fun startVideoPlayer(uri: Uri) {
         lifecycleScope.launch {
-            val metadata = loadMediaMetadata(this@VideoMediaPlayerActivity, uri)
+            val metadata = loadMediaMetadataSuspend(this@VideoMediaPlayerActivity, uri)
             glRenderer.onGetMediaMetaData(metadata, binding.videoCbAdjust.isChecked)
             videoPlayer.setDataSource(this@VideoMediaPlayerActivity, uri)
             videoPlayer.isLooping = true

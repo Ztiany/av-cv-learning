@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import me.ztiany.androidav.avapi.MediaApiActivity
-import me.ztiany.androidav.avtest.ToolsActivity
+import me.ztiany.androidav.avtest.AvTestActivity
 import me.ztiany.androidav.camera.CameraActivity
 import me.ztiany.androidav.databinding.ActivityMainBinding
 import me.ztiany.androidav.ffmpeg.FFmpegActivity
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpView() {
         binding.btnAvTest.setOnClickListener {
-            startActivity(Intent(this, ToolsActivity::class.java))
+            startActivity(Intent(this, AvTestActivity::class.java))
         }
 
         binding.btnAvOperation.setOnClickListener {
