@@ -5,13 +5,17 @@ import me.ztiany.lib.avbase.utils.getChannelOutConfig
 import timber.log.Timber
 import java.nio.ByteBuffer
 
-class PCMAudioDataRenderer : MediaDataRenderer {
+class AudioPCMDataRenderer : MediaDataRenderer {
 
     private var audioTrack: AudioTrack? = null
 
     private lateinit var audioOutTempBuffer: ShortArray
 
     override fun updateMediaFormat(mediaFormat: MediaFormat) {
+        //释放之前的 Track
+        releaseAudioTrack()
+
+        //声音的规格
         val channelCount = mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         val sampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
         val pcmEncoding = if (mediaFormat.containsKey(MediaFormat.KEY_PCM_ENCODING)) {
@@ -22,22 +26,41 @@ class PCMAudioDataRenderer : MediaDataRenderer {
 
         val channelConfig = getChannelOutConfig(channelCount)
         val minBufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, pcmEncoding)
+        val maxBufferSize: Int = try {
+            mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)
+        } catch (e: Exception) {
+            Timber.e("get KEY_MAX_INPUT_SIZE", e)
+            0
+        }
+        val finalBufferSize = if (maxBufferSize == 0 || minBufferSize * 2 > maxBufferSize) {
+            minBufferSize
+        } else {
+            minBufferSize * 2
+        }
 
+        Timber.d("updateMediaFormat channelCount = $channelCount, sampleRate = $sampleRate, pcmEncoding = $pcmEncoding")
+        Timber.d("updateMediaFormat minBufferSize = $minBufferSize, maxBufferSize = $maxBufferSize, finalBufferSize = $finalBufferSize")
+
+        //初始化 AudioTrack
         audioTrack = AudioTrack(
+
             AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .build(),
+
             AudioFormat.Builder()
                 .setSampleRate(sampleRate)
                 .setEncoding(pcmEncoding)
                 .setChannelMask(channelConfig)
                 .build(),
-            minBufferSize,
+
+            finalBufferSize,
             AudioTrack.MODE_STREAM,
             AudioManager.AUDIO_SESSION_ID_GENERATE
         )
 
+        //开启 AudioTrack
         audioTrack?.play()
     }
 
@@ -65,6 +88,10 @@ class PCMAudioDataRenderer : MediaDataRenderer {
     }
 
     override fun release() {
+        releaseAudioTrack()
+    }
+
+    private fun releaseAudioTrack() {
         val track = audioTrack
         audioTrack = null
         track?.run {

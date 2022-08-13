@@ -147,7 +147,7 @@ public class VideoAudioMixing {
             //获取编码完的数据
             int outputBufferIndex = encoder.dequeueOutputBuffer(info, TIMEOUT);
             while (outputBufferIndex >= 0) {
-                if (info.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
+                if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     encodeDone = true;
                     break;
                 }

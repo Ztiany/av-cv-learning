@@ -99,7 +99,8 @@
         <me.ztiany.lib.avbase.view.AspectSurfaceView
             android:id="@+id/video_surface_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
 
     </FrameLayout>
 

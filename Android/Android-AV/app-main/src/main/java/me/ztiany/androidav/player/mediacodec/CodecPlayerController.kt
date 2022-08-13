@@ -36,15 +36,10 @@ class CodecPlayerController(
     }
 
     fun setVideoRenderer(surface: Surface) {
-        if (stateHolder.isStarted) {
-            throw UnsupportedOperationException("Set a surface before you start.")
-        }
+        this.videoRenderer = VideoSurfaceRenderer(surface)
     }
 
     fun setVideoRenderer(videoRenderer: MediaDataRenderer) {
-        if (stateHolder.isStarted) {
-            throw UnsupportedOperationException("Set a MediaDataRenderer before you start.")
-        }
         this.videoRenderer = videoRenderer
     }
 
@@ -77,18 +72,18 @@ class CodecPlayerController(
 
     private fun initAudioDecoder(mediaMetadata: MediaMetadata, audioFormat: MediaFormat?) {
         if (audioFormat == null) {
-            Timber.w("initAudioDecoder no audioFormat provide.")
+            Timber.w("initAudioDecoder no audioFormat provide")
             return
         }
         audioDecoder = AudioDataDecoder(
-            audioFormat,
             stateHolder,
+            audioFormat,
             object : MediaDataProvider {
                 override fun readPacket(buffer: ByteBuffer, packet: PacketInfo?): Int {
                     return mediaDataExtractor.readAudioPacket(buffer, packet)
                 }
             },
-            PCMAudioDataRenderer().apply {
+            AudioPCMDataRenderer().apply {
                 updateMediaFormat(audioFormat)
                 audioRenderer = this
             }
@@ -96,7 +91,22 @@ class CodecPlayerController(
     }
 
     private fun initVideoDecoder(mediaMetadata: MediaMetadata, videoFormat: MediaFormat?) {
+        if (videoFormat == null) {
+            Timber.w("initVideoDecoder no videoFormat provide")
+            return
+        }
+        val renderer = checkObject(videoRenderer, "initVideoDecoder no videoRenderer provide.") ?: return
 
+        videoDecoder = VideoDataDecoder(
+            stateHolder,
+            videoFormat,
+            object : MediaDataProvider {
+                override fun readPacket(buffer: ByteBuffer, packet: PacketInfo?): Int {
+                    return mediaDataExtractor.readVideoPacket(buffer, packet)
+                }
+            },
+            renderer
+        )
     }
 
     fun pause() {
@@ -153,6 +163,13 @@ class CodecPlayerController(
 
     companion object {
         const val ERROR_UNSUPPORTED = 1
+    }
+
+    private fun <T> checkObject(obj: T, message: String): T {
+        if (obj == null) {
+            Timber.d(message)
+        }
+        return obj
     }
 
 }

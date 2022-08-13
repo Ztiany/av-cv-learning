@@ -7,7 +7,7 @@ import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import com.blankj.utilcode.util.UriUtils
 import me.ztiany.androidav.databinding.AudioActivityOpenslesBinding
-import me.ztiany.androidav.player.mediacodec.printMediaTrackInfo
+import me.ztiany.lib.avbase.utils.printMediaTrackInfo
 import timber.log.Timber
 
 class OpenSLESActivity : DelegateActivity() {

@@ -6,7 +6,7 @@ import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import me.ztiany.androidav.databinding.AudioActivityMeAtBinding
-import me.ztiany.androidav.player.mediacodec.printMediaTrackInfo
+import me.ztiany.lib.avbase.utils.printMediaTrackInfo
 import timber.log.Timber
 
 class MediaExtractorAudioTrackActivity : DelegateActivity() {

@@ -57,7 +57,7 @@ class MediaDataExtractorImpl(
     }
 
     override fun readVideoPacket(buffer: ByteBuffer, packet: PacketInfo?): Int {
-        if (audioTrack == -1) {
+        if (videoTrack == -1) {
             throw IllegalStateException("No Video Track")
         }
         synchronized(this) {
@@ -67,11 +67,15 @@ class MediaDataExtractorImpl(
 
     private fun readSamples(track: Int, buffer: ByteBuffer, packet: PacketInfo?): Int {
         val extractor = mediaExtractor ?: return -1
+
+        Timber.d("start readSamples track($track)")
         extractor.selectTrack(track)
         val readSize = extractor.readSampleData(buffer, 0)
         packet?.sampleFlags = extractor.sampleFlags
         packet?.sampleTime = extractor.sampleTime
         extractor.advance()
+        Timber.d("end readSamples track($track)")
+
         return readSize
     }
 
@@ -102,6 +106,7 @@ class MediaDataExtractorImpl(
     }
 
     override fun release() {
+        Timber.d("release")
         mediaExtractor?.release()
         mediaExtractor = null
         audioTrack = -1

@@ -171,7 +171,7 @@ internal class MediaExtractorAudioTrackKit(private val context: Context) {
         }
         val byteBuffer = mediaCodec.getInputBuffer(inputBufferIndex) ?: return
         val sampleSize = readFromMediaExtractor(byteBuffer)
-        Timber.d("pushData sampleTime = $sampleTime")
+        Timber.d("pushData sampleSize = $sampleSize sampleTime = $sampleTime")
         if (sampleSize < 0) {
             mediaCodec.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
             reachEndOfStream = true
@@ -189,7 +189,7 @@ internal class MediaExtractorAudioTrackKit(private val context: Context) {
         }
         when {
             index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-
+                Timber.d("pullData received INFO_OUTPUT_FORMAT_CHANGED ${mediaCodec.outputFormat}")
             }
             index == MediaCodec.INFO_TRY_AGAIN_LATER -> {
 
