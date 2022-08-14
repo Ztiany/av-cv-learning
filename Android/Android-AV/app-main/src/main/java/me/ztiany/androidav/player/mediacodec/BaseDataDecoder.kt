@@ -82,14 +82,15 @@ abstract class BaseDataDecoder(
     }
 
     private fun initDecoder(): Boolean {
-        val mediaCodec = initDecoder(mediaFormat, renderer)
-        if (mediaCodec != null) {
-            decoder = mediaCodec
+        return try {
+            decoder = initDecoder(mediaFormat, renderer)
+            true
+        } catch (e: Exception) {
+            false
         }
-        return mediaCodec != null
     }
 
-    abstract fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec?
+    abstract fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec
 
     override fun stop() {
         isRunning.set(false)

@@ -15,23 +15,18 @@ class VideoDataDecoder(
 
     private val isSurfaceMode = renderer is SurfaceRenderer
 
-    override fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec? {
-        return try {
-            val name = MediaCodecList(MediaCodecList.ALL_CODECS).findDecoderForFormat(mediaFormat)
-            Timber.d("initDecoder.findDecoderForFormat: $name")
-            val decoder = MediaCodec.createByCodecName(name)
+    override fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec {
+        val name = MediaCodecList(MediaCodecList.ALL_CODECS).findDecoderForFormat(mediaFormat)
+        Timber.d("initDecoder.findDecoderForFormat: $name")
+        return MediaCodec.createByCodecName(name).apply {
             if (renderer is SurfaceRenderer) {
                 Timber.d("config surface mode")
-                decoder.configure(mediaFormat, renderer.provideSurface(), null, 0)
+                configure(mediaFormat, renderer.provideSurface(), null, 0)
                 Timber.d("config non-surface mode")
             } else {
-                decoder.configure(mediaFormat, null, null, 0)
+                configure(mediaFormat, null, null, 0)
             }
             Timber.d("initDecoder success")
-            decoder
-        } catch (e: Exception) {
-            Timber.e(e, "initDecoder error")
-            null
         }
     }
 
