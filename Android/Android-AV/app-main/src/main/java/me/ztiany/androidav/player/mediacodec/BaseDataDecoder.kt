@@ -15,7 +15,9 @@ abstract class BaseDataDecoder(
     private val stateHolder: CodecPlayerStateHolder,
     private val mediaFormat: MediaFormat,
     private val provider: MediaDataProvider,
-    private val renderer: MediaDataRenderer
+    private val renderer: MediaDataRenderer,
+    private val syncToPts: Boolean = false,
+    private val decodeTimeoutUs: Long = 10000L
 ) : MediaDataDecoder {
 
     protected lateinit var decoder: MediaCodec
@@ -29,6 +31,8 @@ abstract class BaseDataDecoder(
 
     private val outputLock by lazy { ReentrantLock() }
     private val outputCondition by lazy { outputLock.newCondition() }
+
+    private var startTimeForSync = -1L
 
     private val outputBufferInfo by lazy {
         MediaCodec.BufferInfo()
@@ -46,17 +50,34 @@ abstract class BaseDataDecoder(
 
     private fun startInputWorker() {
         thread {
-            startWork(inputLock, inputCondition, inputDone) {
-                pushData()
-            }
+            startWork(inputLock, inputCondition, inputDone,
+                task = {
+                    pushData()
+                },
+                onPause = {
+
+                },
+                onWakeUp = {
+
+                })
         }
     }
 
     private fun startOutputWorker() {
         thread {
-            startWork(outputLock, outputCondition, outputDone) {
-                pullData()
-            }
+            startWork(outputLock, outputCondition, outputDone,
+                task = {
+                    pullData()
+                },
+                onPause = {
+
+                },
+                onWakeUp = {
+                    if (syncToPts) {
+                        startTimeForSync = System.currentTimeMillis() - getCurrentPts()
+                    }
+                }
+            )
         }
     }
 
@@ -66,7 +87,14 @@ abstract class BaseDataDecoder(
         isRunning.set(false)
     }
 
-    private fun startWork(lock: Lock, condition: Condition, workDone: AtomicBoolean, task: Runnable) {
+    private fun startWork(
+        lock: Lock,
+        condition: Condition,
+        workDone: AtomicBoolean,
+        task: () -> Unit,
+        onPause: () -> Unit,
+        onWakeUp: () -> Unit,
+    ) {
         outputDone.set(false)
 
         val onStateChanged: StateListener = {
@@ -81,9 +109,9 @@ abstract class BaseDataDecoder(
                     stop()
                     break
                 }
-                stateHolder.isPaused -> handleOnPause(lock, condition)
+                stateHolder.isPaused -> handleOnPause(lock, condition, onPause, onWakeUp)
                 stateHolder.isStarted -> {
-                    task.run()
+                    task()
                 }
             }
         }
@@ -100,9 +128,15 @@ abstract class BaseDataDecoder(
         }
     }
 
-    private fun handleOnPause(lock: Lock, condition: Condition) {
+    private fun handleOnPause(
+        lock: Lock,
+        condition: Condition,
+        onPause: () -> Unit,
+        onWakeUp: () -> Unit
+    ) {
+        onPause()
+        lock.lock()
         try {
-            lock.lock()
             while (stateHolder.isPaused) {
                 Timber.d("Decoder State: isPaused = true, do await")
                 condition.await(5, TimeUnit.SECONDS)
@@ -110,11 +144,12 @@ abstract class BaseDataDecoder(
         } finally {
             lock.unlock()
         }
+        onWakeUp()
     }
 
     private fun tryNotify(lock: Lock, condition: Condition) {
+        lock.lock()
         try {
-            lock.lock()
             if (!stateHolder.isPaused) {
                 Timber.d("Decoder State: isPaused = false, do signal")
                 condition.signal()
@@ -131,7 +166,7 @@ abstract class BaseDataDecoder(
         }
 
         val inputBufferIndex = try {
-            decoder.dequeueInputBuffer(10000)
+            decoder.dequeueInputBuffer(decodeTimeoutUs)
         } catch (e: Exception) {
             Timber.e(e, "Decoder dequeueInputBuffer")
             -1
@@ -144,7 +179,6 @@ abstract class BaseDataDecoder(
 
         val byteBuffer = decoder.getInputBuffer(inputBufferIndex) ?: return
         val readSize = provider.readPacket(byteBuffer, packInfo)
-        Timber.d("readPacket readSize = $readSize sampleTime = ${packInfo.sampleTime}")
 
         if (readSize < 0) {
             decoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
@@ -157,7 +191,7 @@ abstract class BaseDataDecoder(
 
     private fun pullData() {
         val index = try {
-            decoder.dequeueOutputBuffer(outputBufferInfo, 10000)
+            decoder.dequeueOutputBuffer(outputBufferInfo, decodeTimeoutUs)
         } catch (e: Exception) {
             Timber.e(e, "Decoder dequeueOutputBuffer")
             -1
@@ -182,6 +216,8 @@ abstract class BaseDataDecoder(
                 outputDone.set(true)
             }
             index >= 0 -> {
+                doSync()
+
                 decoder.getOutputBuffer(index)?.let {
                     deliverFrame(renderer, it, outputBufferInfo, index)
                 }
@@ -189,6 +225,27 @@ abstract class BaseDataDecoder(
         }
     }
 
+    private fun doSync() {
+        if (!syncToPts) {
+            return
+        }
+
+        if (startTimeForSync == -1L) {
+            startTimeForSync = System.currentTimeMillis()
+        }
+
+        val passTime = System.currentTimeMillis() - startTimeForSync
+        val currentPTS = getCurrentPts()
+        if (currentPTS > passTime) {
+            //Timber.d("doSync $currentPTS - $passTime = ${currentPTS - passTime}")
+            Thread.sleep(currentPTS - passTime)
+        }
+    }
+
     abstract fun deliverFrame(renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int)
+
+    private fun getCurrentPts(): Long {
+        return outputBufferInfo.presentationTimeUs / 1000
+    }
 
 }

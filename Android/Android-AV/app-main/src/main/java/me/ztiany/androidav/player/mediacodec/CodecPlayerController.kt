@@ -17,7 +17,7 @@ class CodecPlayerController(
     private val stateHolder = CodecPlayerStateHolder()
 
     private val mediaDataExtractor: MediaDataExtractor by lazy {
-        MediaDataExtractorImpl(context)
+        MediaDataExtractorImplFixed(context)
     }
 
     private var audioDecoder: MediaDataDecoder? = null

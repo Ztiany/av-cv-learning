@@ -20,16 +20,17 @@ interface MediaDataExtractor {
      */
     fun prepare(): MediaInfo
 
+    fun release()
+
     fun readAudioPacket(buffer: ByteBuffer, packet: PacketInfo? = null): Int
 
     fun readVideoPacket(buffer: ByteBuffer, packet: PacketInfo? = null): Int
 
     /**
-     * Seek 到指定位置，并返回实际帧的时间戳
+     * seek 到指定位置，多线程环境下，seek 与读操作（[readAudioPacket] 和 [readVideoPacket] ）不保证线程安全，
+     * 也就是说多线程环境下，请保证在 seek 的同时没有其他线程在 read packet。
      */
     fun seek(position: Long)
-
-    fun release()
 
 }
 

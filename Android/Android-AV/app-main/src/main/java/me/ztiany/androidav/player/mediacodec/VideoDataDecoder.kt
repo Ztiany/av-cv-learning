@@ -11,7 +11,7 @@ class VideoDataDecoder(
     mediaFormat: MediaFormat,
     provider: MediaDataProvider,
     renderer: MediaDataRenderer
-) : BaseDataDecoder(stateHolder, mediaFormat, provider, renderer) {
+) : BaseDataDecoder(stateHolder, mediaFormat, provider, renderer, syncToPts = true) {
 
     private val isSurfaceMode = renderer is SurfaceRenderer
 
