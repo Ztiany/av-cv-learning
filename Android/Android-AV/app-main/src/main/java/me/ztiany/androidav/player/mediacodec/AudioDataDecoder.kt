@@ -13,21 +13,21 @@ class AudioDataDecoder(
     renderer: MediaDataRenderer
 ) : BaseDataDecoder(stateHolder, mediaFormat, provider, renderer) {
 
-    override fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): Boolean {
+    override fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec? {
         return try {
             val name = MediaCodecList(MediaCodecList.ALL_CODECS).findDecoderForFormat(mediaFormat)
             Timber.d("initDecoder.findDecoderForFormat: $name")
-            decoder = MediaCodec.createByCodecName(name)
+            val decoder = MediaCodec.createByCodecName(name)
             decoder.configure(mediaFormat, null, null, 0)
             Timber.d("initDecoder success")
-            true
+            decoder
         } catch (e: Exception) {
             Timber.e(e, "initDecoder error")
-            false
+            null
         }
     }
 
-    override fun deliverFrame(renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int) {
+    override fun deliverFrame(decoder: MediaCodec, renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int) {
         renderer.render(data, outputBufferInfo)
         decoder.releaseOutputBuffer(index, false)
     }

@@ -20,7 +20,7 @@ abstract class BaseDataDecoder(
     private val decodeTimeoutUs: Long = 10000L
 ) : MediaDataDecoder {
 
-    protected lateinit var decoder: MediaCodec
+    private lateinit var decoder: MediaCodec
 
     private val isRunning = AtomicBoolean(false)
     private val inputDone = AtomicBoolean(false)
@@ -41,7 +41,7 @@ abstract class BaseDataDecoder(
     private val packInfo = PacketInfo(0, 0)
 
     override fun start() {
-        if (isRunning.compareAndSet(false, true) && initDecoder(mediaFormat, renderer)) {
+        if (isRunning.compareAndSet(false, true) && initDecoder()) {
             decoder.start()
             startInputWorker()
             startOutputWorker()
@@ -81,7 +81,15 @@ abstract class BaseDataDecoder(
         }
     }
 
-    abstract fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): Boolean
+    private fun initDecoder(): Boolean {
+        val mediaCodec = initDecoder(mediaFormat, renderer)
+        if (mediaCodec != null) {
+            decoder = mediaCodec
+        }
+        return mediaCodec != null
+    }
+
+    abstract fun initDecoder(mediaFormat: MediaFormat, renderer: MediaDataRenderer): MediaCodec?
 
     override fun stop() {
         isRunning.set(false)
@@ -219,7 +227,7 @@ abstract class BaseDataDecoder(
                 doSync()
 
                 decoder.getOutputBuffer(index)?.let {
-                    deliverFrame(renderer, it, outputBufferInfo, index)
+                    deliverFrame(decoder, renderer, it, outputBufferInfo, index)
                 }
             }
         }
@@ -242,7 +250,7 @@ abstract class BaseDataDecoder(
         }
     }
 
-    abstract fun deliverFrame(renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int)
+    abstract fun deliverFrame(decoder: MediaCodec, renderer: MediaDataRenderer, data: ByteBuffer, outputBufferInfo: MediaCodec.BufferInfo, index: Int)
 
     private fun getCurrentPts(): Long {
         return outputBufferInfo.presentationTimeUs / 1000
