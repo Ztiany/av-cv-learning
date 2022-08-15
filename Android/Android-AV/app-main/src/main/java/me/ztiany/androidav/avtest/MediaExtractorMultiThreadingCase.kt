@@ -11,7 +11,12 @@ import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
-/** 在一个 MediaExtractor 中读取所有的 track，其实是可以的，只不过要注意多线程环境下需要处理好同步。*/
+/**
+ * （1）在一个 MediaExtractor 中读取所有的 track，其实是可以的，只不过要注意多线程环境下需要处理好同步。
+ * （2）但是如果是要做播放器，音频和和视频解码器共用一个 MediaExtractor 会出现异常。
+ *
+ * 因此推荐对于纯粹的解封操作，可以只使用一个 MediaExtractor，而如果是播放器，应该让每一个 MediaCodec 对应一个 MediaExtractor。
+ */
 class MediaExtractorMultiThreadingCase(
     private val context: Context,
     private val source: Uri,
