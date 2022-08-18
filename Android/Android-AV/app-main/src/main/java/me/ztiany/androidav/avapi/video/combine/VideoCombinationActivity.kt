@@ -24,8 +24,8 @@ class VideoCombinationActivity : AppCompatActivity() {
     }
 
     fun execute(view: android.view.View) {
-        val originVideo1 = File(Directory.getSDCardRootPath(), "input1.mp4")
-        val originVideo2 = File(Directory.getSDCardRootPath(), "input2.mp4")
+        val originVideo1 = Directory.createSDCardRootAppPath("input1.mp4")
+        val originVideo2 = Directory.createSDCardRootAppPath("input2.mp4")
 
         if (originVideo1.exists() && originVideo2.exists()) {
             lifecycleScope.launch {
@@ -45,7 +45,7 @@ class VideoCombinationActivity : AppCompatActivity() {
         VideoCombining.combine(
             originVideo1.absolutePath,
             originVideo2.absolutePath,
-            File(Directory.getSDCardRootPath(), "mosaic_result.mp4").absolutePath
+            Directory.createSDCardRootAppPath("mosaic_result.mp4").absolutePath
         )
     } catch (e: Exception) {
         false

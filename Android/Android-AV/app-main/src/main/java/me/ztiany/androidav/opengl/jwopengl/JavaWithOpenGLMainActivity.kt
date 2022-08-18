@@ -1,15 +1,16 @@
-package me.ztiany.androidav.opengl.jwopengl.usecase.camera
+package me.ztiany.androidav.opengl.jwopengl
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.androidav.opengl.jwopengl.OpenGLCameraPreviewActivity
 import me.ztiany.androidav.opengl.jwopengl.common.GLController
 import me.ztiany.androidav.opengl.jwopengl.common.GLParams
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.renderer.*
 import me.ztiany.androidav.opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity
+import me.ztiany.androidav.opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity
+import me.ztiany.androidav.opengl.jwopengl.usecase.camera.OpenGLCameraPreviewActivity
 import me.ztiany.androidav.opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity
 import me.ztiany.lib.avbase.utils.IEntrance
 import me.ztiany.lib.avbase.utils.buildLayoutEntrance

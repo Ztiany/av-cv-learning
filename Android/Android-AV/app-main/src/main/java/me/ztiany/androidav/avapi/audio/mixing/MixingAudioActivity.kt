@@ -12,8 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ztiany.lib.avbase.utils.Directory
 import me.ztiany.androidav.databinding.AudioActivityMixingBinding
+import me.ztiany.lib.avbase.utils.Directory
 import timber.log.Timber
 import java.io.File
 
@@ -24,8 +24,8 @@ class MixingAudioActivity : AppCompatActivity() {
     private var videoVolume = 0
     private var duration = 0F
 
-    private val originVideoPath = File(Directory.getSDCardRootPath(), "input.mp4").absolutePath
-    private val originMusicPath = File(Directory.getSDCardRootPath(), "input.mp3").absolutePath
+    private val originVideoPath = Directory.createSDCardRootAppPath("input.mp4").absolutePath
+    private val originMusicPath = Directory.createSDCardRootAppPath("input.mp3").absolutePath
 
     private val handler = Handler(Looper.getMainLooper())
     private var times = 0
@@ -137,7 +137,7 @@ class MixingAudioActivity : AppCompatActivity() {
                 VideoAudioMixing.mixAudioTrack(
                     originVideoPath,
                     originMusicPath,
-                    File(Directory.getSDCardRootPath(), "output-${times++}.mp4").absolutePath,
+                    Directory.createSDCardRootAppPath("output-${times++}.mp4").absolutePath,
                     (binding.audioRangeSeekBar.currentRange[0] * 1000 * 1000).toInt(),
                     (binding.audioRangeSeekBar.currentRange[1] * 1000 * 1000).toInt(),
                     videoVolume,

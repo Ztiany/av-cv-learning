@@ -2,23 +2,39 @@ package me.ztiany.androidav.opengl.nwopengl
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.androidav.databinding.OpenglActivityNativeGlsurvMainBinding
-import me.ztiany.lib.avbase.utils.newMMLayoutParams
+import me.ztiany.lib.avbase.utils.IEntrance
+import me.ztiany.lib.avbase.utils.buildLayoutEntrance
+
+private const val RENDER_TYPE_BACKGROUND = 0
 
 class NativeWithOpenGLMainActivity : AppCompatActivity() {
 
-    private lateinit var binding: OpenglActivityNativeGlsurvMainBinding
+    private data class CommonItem(
+        override val title: String,
+        val rendererType: Int
+    ) : IEntrance
+
+    private val entrances = listOf(
+        CommonItem("绘制背景", RENDER_TYPE_BACKGROUND),
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = OpenglActivityNativeGlsurvMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setUpView()
+        setContentView(
+            buildLayoutEntrance(
+                this,
+                entrances
+            ) { _, index ->
+                handleClicked(index)
+            }
+        )
     }
 
-    private fun setUpView() {
-        binding.flRoot.addView(TemplateGLSurfaceView(this, NativeRenderer()), newMMLayoutParams())
+    private fun handleClicked(index: Int) {
+        val item = entrances[index]
+        if (item is CommonItem) {
+            NativeWithOpenGLCommonActivity.start(this, item.title, item.rendererType)
+        }
     }
 
 }

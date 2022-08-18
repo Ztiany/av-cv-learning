@@ -46,34 +46,41 @@ add_library(crypto SHARED IMPORTED)
 set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${JNI_LIBS}/${ANDROID_ABI}/libcrypto.so)
 
 #查找指定目录下的所有源文件，并将名称保存到指定的变量
-aux_source_directory(module DIR_MODULE)
-aux_source_directory(module/common DIR_COMMON)
-aux_source_directory(module/opengl DIR_OPENGL)
-aux_source_directory(module/opensl DIR_OPENSL)
+file(
+        GLOB SRC-FILES
+        #common
+        ${CMAKE_SOURCE_DIR}/module/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/common/*.cpp
+        #opengl
+        ${CMAKE_SOURCE_DIR}/module/opengl/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/opengl/common/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/opengl/egl/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/opengl/eglsample/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/opengl/sample/*.cpp
+        #opensl
+        ${CMAKE_SOURCE_DIR}/module/opensl/*.cpp
+)
 
 #构建共享库
 add_library(
-    androidav
-    SHARED
-    ${DIR_MODULE}
-    ${DIR_COMMON}
-    ${DIR_OPENGL}
-    ${DIR_OPENSL}
+        androidav
+        SHARED
+        ${SRC-FILES}
 )
 
 #链接
 target_link_libraries(
-    androidav
-    avcodec
-    avfilter
-    avformat
-    avutil
-    swresample
-    swscale
-    ssl
-    crypto
-    log
-    android
-    GlESv2
-    OpenSLES
+        androidav
+        avcodec
+        avfilter
+        avformat
+        avutil
+        swresample
+        swscale
+        ssl
+        crypto
+        log
+        android
+        GlESv2
+        OpenSLES
 )

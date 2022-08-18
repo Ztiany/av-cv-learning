@@ -14,7 +14,6 @@ import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
 import me.ztiany.lib.avbase.app.BaseActivity
 import me.ztiany.lib.avbase.utils.Directory
-import java.io.File
 
 /**RENDERMODE_WHEN_DIRTY 不需要调用 surface 的 onResume/onPause */
 class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
@@ -94,7 +93,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
                 Toast.makeText(this, "视频保存到了 $storePath", Toast.LENGTH_LONG).show()
                 binding.openglBtnStart.text = "开始"
             } else {
-                storePath = File(Directory.getSDCardRootPath(), Directory.createTempFileName(Directory.VIDEO_FORMAT_MP4)).absolutePath
+                storePath = Directory.createSDCardRootAppTimeNamingPath(Directory.VIDEO_FORMAT_MP4).absolutePath
                 recorderManager.startRecording(storePath)
                 binding.openglBtnStart.text = "停止"
             }

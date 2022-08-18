@@ -61,4 +61,7 @@ dependencies {
     api 'com.blankj:utilcode:1.30.6'
     api 'com.yanzhenjie:permission:2.0.3'
     api 'com.jakewharton.timber:timber:4.7.1'
+
+    api 'io.github.ztiany:android-media-selector:1.1.0'
+    api 'io.github.ztiany:android-arch-delegate:1.0.1'
 }

@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import me.ztiany.androidav.databinding.OpenglActivityMainBinding
-import me.ztiany.androidav.opengl.jwopengl.usecase.camera.JavaWithOpenGLMainActivity
+import me.ztiany.androidav.opengl.jwopengl.JavaWithOpenGLMainActivity
 import me.ztiany.androidav.opengl.nwopengl.NativeWithOpenGLMainActivity
 
 class OpenGLESMainActivity : AppCompatActivity() {

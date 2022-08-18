@@ -122,20 +122,18 @@
 
         <!-- ==================================================== OpenGL ==================================================== -->
 
+        <!--Java-->
         <activity
             android:name=".opengl.OpenGLESMainActivity"
             android:label="OpenGL ES" />
         <activity
-            android:name=".opengl.nwopengl.NativeWithOpenGLMainActivity"
-            android:label="GLSurfaceView with Native" />
-        <activity
-            android:name=".opengl.jwopengl.usecase.camera.JavaWithOpenGLMainActivity"
+            android:name=".opengl.jwopengl.JavaWithOpenGLMainActivity"
             android:label="OpenGLES with Java" />
         <activity
             android:name=".opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity"
             android:label="OpenGLES with Java Common" />
         <activity
-            android:name=".opengl.jwopengl.OpenGLCameraPreviewActivity"
+            android:name=".opengl.jwopengl.usecase.camera.OpenGLCameraPreviewActivity"
             android:theme="@style/Theme.FullScreen" />
         <activity
             android:name=".opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity"
@@ -143,6 +141,13 @@
         <activity
             android:name=".opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity"
             android:theme="@style/Theme.FullScreen" />
+        <!--Native-->
+        <activity
+            android:name=".opengl.nwopengl.NativeWithOpenGLMainActivity"
+            android:label="GLSurfaceView with Native" />
+        <activity
+            android:name=".opengl.nwopengl.NativeWithOpenGLCommonActivity"
+            android:label="OpenGLES with Native Common" />
 
         <!-- ==================================================== FFmpeg ==================================================== -->
 

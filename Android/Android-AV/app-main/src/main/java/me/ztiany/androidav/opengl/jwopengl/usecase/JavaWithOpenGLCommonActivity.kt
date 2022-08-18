@@ -40,8 +40,14 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
     }
 
     override fun setUpView() {
+        showTitle()
         initGlSurfaceView()
         setUpGlSurfaceView()
+    }
+
+    private fun showTitle() {
+        val title = intent.getStringExtra(KEY_TITLE)
+        supportActionBar?.title = title
     }
 
     private fun initGlSurfaceView() {
@@ -51,12 +57,6 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
 
     private fun setUpGlSurfaceView() {
         val defaultPainter = intent.getSerializableExtra(KEY_DEFAULT_PAINTER) as Class<*>
-        val title = intent.getStringExtra(KEY_TITLE)
-
-        //title
-        supportActionBar?.title = title
-
-        //renderer
         val renderer = defaultPainter.newInstance() as GLRenderer
         binding.openglGlSurfaceView.setGLRenderer(renderer)
         binding.openglGlSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY

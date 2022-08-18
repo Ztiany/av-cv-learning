@@ -38,10 +38,10 @@ public class VideoAudioMixing {
             int bgVolume
     ) throws Exception {
         //定义输出文件
-        File bgPCM = new File(Directory.getSDCardRootPath(), "bg.pcm");
-        File videoPCM = new File(Directory.getSDCardRootPath(), "video.pcm");
-        File mixedPCM = new File(Directory.getSDCardRootPath(), "mixed.pcm");
-        File mixedWAV = new File(Directory.getSDCardRootPath(), "mixed.wav");
+        File bgPCM = Directory.createSDCardRootAppPath("bg.pcm");
+        File videoPCM = Directory.createSDCardRootAppPath("video.pcm");
+        File mixedPCM = Directory.createSDCardRootAppPath("mixed.pcm");
+        File mixedWAV = Directory.createSDCardRootAppPath("mixed.wav");
 
         //TODO: 根据媒体时长调整时间。
         adjustStartAndEnd(videoInput, bgAudioInput, startTimeUs, endTimeUs);
