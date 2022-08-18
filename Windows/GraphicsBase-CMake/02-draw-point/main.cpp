@@ -1,5 +1,9 @@
 #include <tchar.h>
 #include <windows.h>
+#include "raster.h"
+
+#define WINDOW_WIDTH 256
+#define WINDOW_HEIGHT 256
 
 /* 消息处理函数 */
 LRESULT CALLBACK windowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -62,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             //窗口风格
             WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
             //窗口的位置和大小
-            0, 0, 480, 320,
+            0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,
             //parent
             nullptr,
             //菜单
@@ -92,8 +96,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     void *buffer = nullptr; //图片缓冲区
 
     bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = width;
-    bmpInfo.bmiHeader.biHeight = height;
+    bmpInfo.bmiHeader.biWidth = WINDOW_WIDTH;
+    bmpInfo.bmiHeader.biHeight = WINDOW_HEIGHT;
     bmpInfo.bmiHeader.biPlanes = 1;
     bmpInfo.bmiHeader.biBitCount = 32; //一个像素 32 位
     bmpInfo.bmiHeader.biCompression = BI_RGB;
@@ -108,15 +112,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 将画板和纸张关联【Windows 绘图不能直接画在窗口上， 必须先在画板上绘制】
     SelectObject(hMem, hBmp);
 
-    //将 buffer 中的数据都置为 0
-    memset(buffer, 0, width * height * 4);
+    //工具类
+    CELL::Raster raster;
 
     // 4 进入循环，防止窗口退出
     MSG msg = {nullptr};
     while (true) {
+        //处理消息
         if (msg.message == WM_DESTROY || msg.message == WM_CLOSE || msg.message == WM_QUIT) {
             break;
         }
+
         // PeekMessage 用于从消息队列中取出消息
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
@@ -124,11 +130,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             DispatchMessage(&msg);
         }
 
-        //修改缓冲区中的一部分像素点
-        memset(buffer, 0, width * height * 4);
-        unsigned char *rgba = (unsigned char *) buffer;
-        int pitch = width * 4;
-        memset(rgba + pitch * 10, 255, pitch);
+        //绘制 100 个点
+        raster.clear();
+        memset(buffer, 0, WINDOW_WIDTH * WINDOW_HEIGHT * 4);
+        for (int i = 0; i < 100; ++i) {
+            raster.drawPoint(rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, CELL::Rgba(255, 0, 0), 2);
+        }
+        memcpy(buffer, raster._buffer, sizeof(raster._buffer));
 
         // The BitBlt function performs a bit-block transfer of the color data corresponding to a
         // rectangle of pixels from the specified source device context into a destination device
