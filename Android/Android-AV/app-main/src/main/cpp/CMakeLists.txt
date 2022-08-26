@@ -12,16 +12,12 @@ message("CMAKE_CURRENT_LIST_LINE = " ${CMAKE_CURRENT_LIST_LINE}) #当前所在�
 message("cmake running properties end-------------------------------------------------------")
 
 #添加库头文件
-include_directories(include)
-include_directories(include/Glm/core)
-include_directories(include/Glm/gtx)
-include_directories(include/Glm/gtc)
-include_directories(include/Glm/virtrev)
-include_directories(include/Glm)
 include_directories(include/ffmpeg)
 include_directories(include/openssl)
 include_directories(include/fdk-aac)
 include_directories(include/x2h64)
+include_directories(include/lame)
+include_directories(include/glm)
 
 #添加本地头文件
 include_directories(module/common)

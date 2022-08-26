@@ -8,8 +8,8 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <GLES2/gl2platform.h>
-#include <Glm/glm.hpp>
-#include <Glm/ext.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 class GLRenderer {
 public:
