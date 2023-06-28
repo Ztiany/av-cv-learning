@@ -1,15 +1,18 @@
+# 设置 CMake 版本
 cmake_minimum_required(VERSION 3.15)
+# 设置项目名称
 project(FFmpegWindows_Clion)
-
+# 设置 C++ 版本
 set(CMAKE_CXX_STANDARD 14)
 
-#能够在编码的时候使用ffmpeg的函数
+# 设置头文件路径
 include_directories(D:/dev_tools/msys64/usr/local/ffmpeg/include)
-# 设置引导链接库的查找目录
+# 设置 .lib 导入库的查找路径
 link_directories(D:/dev_tools/msys64/usr/local/ffmpeg/lib)
 
-#可执行文件
+# 编译为执行文件
 add_executable(FFmpegWindows_Clion ffmpeg-main.cpp)
 
-#设置编译链接的库 ffmpeg（动态库 avutil avcodec avfilter avdevice avformat postproc swresample 的路径必须添加到环境变量中）
+# 设置编译的时候，链接 FFmpeg 的导入库
+# 另外，选用将动态库：avutil avcodec avfilter avdevice avformat postproc swresample 路径添加到环境变量中，因为运行时需要用到。
 target_link_libraries(FFmpegWindows_Clion avutil avcodec avfilter avdevice avformat postproc swresample)
