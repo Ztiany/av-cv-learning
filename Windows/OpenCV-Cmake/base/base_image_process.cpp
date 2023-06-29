@@ -15,11 +15,11 @@ namespace cv_base {
     using namespace cv;
     using namespace std;
 
-    #define DEFAULT_CARD_WIDTH 640
-    #define DEFAULT_CARD_HEIGHT 400
-    #define FIX_IDCARD_SIZE Size(DEFAULT_CARD_WIDTH,DEFAULT_CARD_HEIGHT)
+#define DEFAULT_CARD_WIDTH 640
+#define DEFAULT_CARD_HEIGHT 400
+#define FIX_IDCARD_SIZE Size(DEFAULT_CARD_WIDTH,DEFAULT_CARD_HEIGHT)
 
-//OpenCV实现最基本的形态学运算之一——腐蚀，即用图像中的暗色部分“腐蚀”掉图像中的高亮部分。
+    //OpenCV 实现最基本的形态学运算之一——腐蚀，即用图像中的暗色部分“腐蚀”掉图像中的高亮部分。
     void erodeImage(std::string &path) {
         //载入原图
         Mat srcImage = imread(path);
@@ -35,7 +35,7 @@ namespace cv_base {
         waitKey(0);
     }
 
-//用OpenCV对图像进行均值滤波操作，模糊一幅图像
+    //用 OpenCV 对图像进行均值滤波操作，模糊一幅图像
     void blurImage(std::string &path) {
         //【1】载入原始图
         Mat srcImage = imread(path);
@@ -50,7 +50,7 @@ namespace cv_base {
         waitKey(0);
     }
 
-//用OpenCV进行canny边缘检测：载入图像，并将其转成灰度图，再用blur函数进行图像模糊以降噪，然后用canny函数进行边缘检测，最后进行显示
+    //用 OpenCV 进行 canny 边缘检测：载入图像，并将其转成灰度图，再用 blur 函数进行图像模糊以降噪，然后用 canny 函数进行边缘检测，最后进行显示
     void cannyImage(std::string &path) {
         //【0】载入原始图
         Mat src_img = imread(path);
@@ -77,7 +77,7 @@ namespace cv_base {
         bool found = false;
 
         //变为 640*400 的size，这是身份证的size。
-        resize(src, src,FIX_IDCARD_SIZE);
+        resize(src, src, FIX_IDCARD_SIZE);
         //灰度化
         cvtColor(src, dest, COLOR_BGR2GRAY);
         //二值化
@@ -91,7 +91,7 @@ namespace cv_base {
         vector<Rect> rects;
         //找到所有相邻的点，存入contours
         findContours(dest, contours, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
-        for (const auto &contour : contours) {
+        for (const auto &contour: contours) {
             //根据轮廓点集合构建矩形
             Rect rect = boundingRect(contour);
             float ratio = rect.width * 1.0F / rect.height;
@@ -112,7 +112,7 @@ namespace cv_base {
         } else {//如果有多个（可能有其他区域或者身份证上有污渍满足这个比例），则认为是最后一个。
             int lowPoint = 0;
             Rect finalRect;
-            for (auto &rect:rects) {
+            for (auto &rect: rects) {
                 if (rect.tl().y > lowPoint) {
                     lowPoint = rect.tl().y;
                     found = true;

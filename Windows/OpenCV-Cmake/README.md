@@ -1,4 +1,3 @@
-# OpenCV（Windows10 + Clion）
+# OpenCV（Windows10/11 + Clion）
 
-- Copy the img folder into the cmake-build-debug folder before running.
-- Toolchain: MINGW( managed by msys2)
+Toolchain: MINGW (managed by msys2)
