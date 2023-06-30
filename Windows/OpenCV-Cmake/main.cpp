@@ -6,8 +6,8 @@ using namespace std;
 
 int main() {
     string path_id1("img/id1.jpg");
-    cv_base::erodeImage(path_id1);
-    //cv_base::blurImage();
+    //cv_base::erodeImage(path_id1);
+    cv_base::blurImage(path_id1);
     //cv_base::cannyImage(path_id1);
     //cv_base::findIdentityCardNumber(path_id1);
     //cv_base::findIdentityCardNumber2(path_id1);

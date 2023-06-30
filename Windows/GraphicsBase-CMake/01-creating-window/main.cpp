@@ -48,9 +48,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     registerWindow(hInstance, winClass);
 
     /*
-     2 创建窗口：
-         CreateWindowEx 对应的宽字符集函数为 CreateWindowExA。
-         可以右键项目-->属性-->字符集-->选择“使用多字符集”，这样就不需要使用 CreateWindowEx 函数了
+     2 创建窗口：CreateWindowEx 对应的宽字符集函数为 CreateWindowExA。
+         如果使用但是 VS，则可以右键项目-->属性-->字符集-->选择“使用多字符集”，这样就不需要使用 CreateWindowEx 函数了。
      */
     HWND hWnd = CreateWindowEx(
             //句柄
@@ -126,7 +125,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         //修改缓冲区中的一部分像素点
         memset(buffer, 0, width * height * 4);
-        unsigned char *rgba = (unsigned char *) buffer;
+        auto *rgba = (unsigned char *) buffer;
         int pitch = width * 4;
         memset(rgba + pitch * 10, 255, pitch);
 

@@ -24,14 +24,14 @@ namespace cv_base {
         //载入原图
         Mat srcImage = imread(path);
         //显示原图
-        imshow("【原图】腐蚀操作", srcImage);
+        imshow("Original", srcImage);
         //进行腐蚀操作
         //getStructuringElement函数的返回值为指定形状和尺寸的结构元素（内核矩阵
         Mat element = getStructuringElement(MORPH_RECT, Size(15, 15));
         Mat dstImage;
         erode(srcImage, dstImage, element);
         //显示效果图
-        imshow("【效果图】腐蚀操作", dstImage);
+        imshow("Processed", dstImage);
         waitKey(0);
     }
 
@@ -40,12 +40,12 @@ namespace cv_base {
         //【1】载入原始图
         Mat srcImage = imread(path);
         //【2】显示原始图
-        imshow("均值滤波【原图】", srcImage);
+        imshow("Original", srcImage);
         //【3】进行均值滤波操作
         Mat dstImage;
         blur(srcImage, dstImage, Size(10, 10));
         //【4】显示效果图
-        imshow("均值滤波【效果图】", dstImage);
+        imshow("Processed", dstImage);
 
         waitKey(0);
     }
@@ -54,7 +54,7 @@ namespace cv_base {
     void cannyImage(std::string &path) {
         //【0】载入原始图
         Mat src_img = imread(path);
-        imshow("【原始图】Canny边缘检测", src_img);  //显示原始图
+        imshow("Original", src_img);  //显示原始图
         Mat dst_image, edge, gray_image; //参数定义
         //【1】创建与src同类型和大小的矩阵(dst)
         dst_image.create(src_img.size(), src_img.type());
@@ -65,7 +65,7 @@ namespace cv_base {
         //【4】运行Canny算子
         Canny(edge, edge, 3, 9, 3);
         //【5】显示效果图
-        imshow("【效果图】Canny边缘检测", edge);
+        imshow("Processed", edge);
 
         waitKey(0);
     }
@@ -148,16 +148,16 @@ namespace cv_base {
         cvtColor(src, dst, COLOR_RGB2GRAY);
         // 高斯模糊，主要用于降噪
         GaussianBlur(dst, dst, Size(3, 3), 0);
-        imshow("GaussianBlur图", dst);
+        imshow("GaussianBlur", dst);
         // 二值化图，主要将灰色部分转成白色，使内容为黑色
         threshold(dst, dst, 165, 255, THRESH_BINARY);
-        imshow("threshold图", dst);
+        imshow("threshold", dst);
         // 中值滤波，同样用于降噪
         medianBlur(dst, dst, 3);
-        imshow("medianBlur图", dst);
+        imshow("medianBlur", dst);
         // 腐蚀操作，主要将内容部分向高亮部分腐蚀，使得内容连接，方便最终区域选取
         erode(dst, dst, Mat(9, 9, CV_8U));
-        imshow("erode图", dst);
+        imshow("erode", dst);
 
         //定义变量
         vector<vector<Point>> contours;
@@ -172,11 +172,12 @@ namespace cv_base {
             // 定义身份证号位置大于图片的一半，并且宽度是高度的6倍以上
             if (rect.y > src.rows / 2 && rect.width / rect.height > 6) {
                 result = src(rect);
-                imshow("身份证号", result);
+                imshow("IdNumber", result);
             }
         }
 
-        imshow("轮廓图", src);
+        //轮廓图
+        imshow("skeleton", src);
 
         waitKey(0);
     }
