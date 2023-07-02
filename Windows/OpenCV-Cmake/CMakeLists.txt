@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(opencv_windows)
+project(OpenCV_WINDOWS)
 
 # 指定 C/C++ 标准
 set(CMAKE_CXX_STANDARD 14)
@@ -24,5 +24,5 @@ message(STATUS "OpenCV found in '${OpenCV_DIR}'")
 # aux_source_directory() 是 CMake 中的一个函数，用于将指定目录中的源文件自动添加到 CMake 构建脚本中。
 aux_source_directory(base dir_base)
 
-add_executable(opencv_windows main.cpp ${dir_base})
-target_link_libraries(opencv_windows ${OpenCV_LIBS})
+add_executable(OpenCV_WINDOWS main.cpp ${dir_base})
+target_link_libraries(OpenCV_WINDOWS ${OpenCV_LIBS})

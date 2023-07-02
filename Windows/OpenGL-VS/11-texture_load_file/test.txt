@@ -1,6 +1,0 @@
-for test LoadFileContent:
-
-123
-123
-123
-123
