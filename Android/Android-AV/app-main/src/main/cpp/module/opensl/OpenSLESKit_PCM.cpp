@@ -35,6 +35,7 @@ static bool createSLEngine() {
     sLResult = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineInterface);
     if (sLResult != SL_RESULT_SUCCESS) {
         LOGE("engineObject GetInterface(SL_IID_ENGINE) error");
+        LOGE("engineObject GetInterface(SL_IID_ENGINE) error");
     }
     LOGD("engineObject GetInterface(SL_IID_ENGINE) success");
     return true;

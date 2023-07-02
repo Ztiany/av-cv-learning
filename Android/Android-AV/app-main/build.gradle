@@ -5,13 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
-    buildToolsVersion "30.0.3"
+    compileSdk AppConfig.compileSdkVersion
 
     defaultConfig {
         applicationId "me.ztiany.androidav"
-        minSdk 21
-        targetSdk 27
+        minSdk AppConfig.minSdkVersion
+        targetSdk AppConfig.targetSdkVersion
         versionCode 1
         versionName "1.0"
         externalNativeBuild {

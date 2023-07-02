@@ -1,36 +1,35 @@
 // Top-level build file where you can add configuration options module.common to all sub-projects/modules.
 buildscript {
+    apply from: './gradle/configuration.gradle'
+
     ext {
-        kotlin_version = '1.5.32'
+        kotlin_version = '1.8.20'
     }
+
     repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
         maven { url "https://maven.aliyun.com/repository/google" }
-        maven { url 'https://dl.google.com/dl/android/maven2/' }
-        maven { url 'https://jitpack.io' }
-        maven { url "https://kotlin.bintray.com/kotlinx" }
+        maven { url "https://dl.google.com/dl/android/maven2/" }
+        maven { url "https://jitpack.io" }
+        mavenCentral()
+        google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31"
+        classpath "com.android.tools.build:gradle:7.3.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
     }
 }
 
-allprojects{
+allprojects {
     repositories {
-        google()
         mavenCentral()
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url "https://maven.aliyun.com/repository/central" }
+        maven { url "https://maven.aliyun.com/repository/public" }
         maven { url "https://maven.aliyun.com/repository/google" }
-        maven { url 'https://dl.google.com/dl/android/maven2/' }
-        maven { url 'https://jitpack.io' }
-        maven { url "https://kotlin.bintray.com/kotlinx" }
+        maven { url "https://dl.google.com/dl/android/maven2/" }
+        maven { url "https://www.jitpack.io" }
+        google()
     }
 }
 

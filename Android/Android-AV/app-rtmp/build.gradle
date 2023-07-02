@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk AppConfig.compileSdkVersion
 
     defaultConfig {
         applicationId "me.ztiany.rtmp"
-        minSdk 21
-        targetSdk 27
+        minSdk AppConfig.minSdkVersion
+        targetSdk AppConfig.targetSdkVersion
         versionCode 1
         versionName "1.0"
         externalNativeBuild {

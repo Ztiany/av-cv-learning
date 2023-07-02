@@ -67,14 +67,17 @@ add_library(
 #链接
 target_link_libraries(
         androidav
+        # FFmpeg
         avcodec
         avfilter
         avformat
         avutil
         swresample
         swscale
+        # openssl
         ssl
         crypto
+        # android api
         log
         android
         GlESv2

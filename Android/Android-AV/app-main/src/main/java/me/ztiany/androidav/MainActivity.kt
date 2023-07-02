@@ -1,10 +1,10 @@
 package me.ztiany.androidav
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.yanzhenjie.permission.AndPermission
-import com.yanzhenjie.permission.runtime.Permission
+import com.permissionx.guolindev.PermissionX
 import me.ztiany.androidav.avapi.MediaApiActivity
 import me.ztiany.androidav.avtest.AvTestActivity
 import me.ztiany.androidav.camera.CameraActivity
@@ -59,17 +59,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestAllPermissions() {
-        AndPermission.with(this)
-            .runtime()
-            .permission(
-                Permission.Group.STORAGE,
-                Permission.Group.CAMERA,
-                Permission.Group.MICROPHONE,
-            )
-            .onDenied {
-                supportFinishAfterTransition()
+        PermissionX.init(this)
+            .permissions(
+                arrayListOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            ).request { _, _, deniedList ->
+                if (deniedList.isNotEmpty()) {
+                    supportFinishAfterTransition()
+                }
             }
-            .start()
     }
 
 }

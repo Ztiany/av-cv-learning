@@ -1,10 +1,10 @@
 package me.ztiany.rtmp
 
+import android.Manifest
 import android.content.Intent
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
-import com.yanzhenjie.permission.AndPermission
-import com.yanzhenjie.permission.runtime.Permission
+import com.permissionx.guolindev.PermissionX
 import me.ztiany.lib.avbase.app.BaseActivity
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.databinding.ActivityMainBinding
@@ -52,17 +52,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun askPermissions() {
-        AndPermission.with(this)
-            .runtime()
-            .permission(
-                Permission.Group.STORAGE,
-                Permission.Group.CAMERA,
-                Permission.Group.MICROPHONE
-            )
-            .onDenied {
-                supportFinishAfterTransition()
+        PermissionX.init(this)
+            .permissions(
+                arrayListOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            ).request { _, _, deniedList ->
+                if (deniedList.isNotEmpty()) {
+                    supportFinishAfterTransition()
+                }
             }
-            .start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

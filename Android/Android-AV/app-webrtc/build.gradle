@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk AppConfig.compileSdkVersion
 
     defaultConfig {
         applicationId "me.ztiany.webrtc"
-        minSdk 21
-        targetSdk 27
+        minSdk AppConfig.minSdkVersion
+        targetSdk AppConfig.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -39,6 +39,6 @@ dependencies {
     implementation project(":lib-avbase")
 
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
-    implementation  'org.webrtc:google-webrtc:1.0.32006'
+    implementation 'org.webrtc:google-webrtc:1.0.32006'
     implementation 'com.alibaba:fastjson:1.2.58'
 }
