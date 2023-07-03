@@ -3,4 +3,6 @@
 
 long long getNowInMillisecond();
 
+float getFrameTime();
+
 #endif //ANDROIDAV_TIMES_H

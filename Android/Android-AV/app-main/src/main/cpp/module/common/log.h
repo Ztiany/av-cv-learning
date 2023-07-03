@@ -8,22 +8,14 @@
 
 void xLog(int priority, const char *tag, const char *format, ...);
 
-void xLogD(const char *tag, const char *format, ...);
+#define LOGD(...) xLog(ANDROID_LOG_DEBUG, DEFAULT_TAG,__VA_ARGS__)
+#define LOGI(...) xLog(ANDROID_LOG_INFO, DEFAULT_TAG,__VA_ARGS__)
+#define LOGW(...) xLog(ANDROID_LOG_WARN, DEFAULT_TAG,__VA_ARGS__)
+#define LOGE(...) xLog(ANDROID_LOG_ERROR, DEFAULT_TAG,__VA_ARGS__)
 
-void xLogI(const char *tag, const char *format, ...);
-
-void xLogW(const char *tag, const char *format, ...);
-
-void xLogE(const char *tag, const char *format, ...);
-
-#define LOGD(...) xLogD(DEFAULT_TAG,__VA_ARGS__)
-#define LOGI(...) xLogI(DEFAULT_TAG,__VA_ARGS__)
-#define LOGW(...) xLogW(DEFAULT_TAG,__VA_ARGS__)
-#define LOGE(...) xLogE(DEFAULT_TAG,__VA_ARGS__)
-
-#define LOGD_TAG(TAG, ...) xLogD(TAG,__VA_ARGS__)
-#define LOGI_TAG(TAG, ...) xLogI(TAG,__VA_ARGS__)
-#define LOGW_TAG(TAG, ...) xLogW(TAG,__VA_ARGS__)
-#define LOGE_TAG(TAG, ...) xLogE(TAG,__VA_ARGS__)
+#define LOGD_TAG(TAG, ...) xLog(ANDROID_LOG_DEBUG, TAG,__VA_ARGS__)
+#define LOGI_TAG(TAG, ...) xLog(ANDROID_LOG_INFO, TAG,__VA_ARGS__)
+#define LOGW_TAG(TAG, ...) xLog(ANDROID_LOG_WARN, TAG,__VA_ARGS__)
+#define LOGE_TAG(TAG, ...) xLog(ANDROID_LOG_ERROR, TAG,__VA_ARGS__)
 
 #endif //ANDROID_AV_LOG_H

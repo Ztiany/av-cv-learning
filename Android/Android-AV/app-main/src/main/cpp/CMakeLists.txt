@@ -49,10 +49,9 @@ file(
         ${CMAKE_SOURCE_DIR}/module/common/*.cpp
         #opengl
         ${CMAKE_SOURCE_DIR}/module/opengl/*.cpp
-        ${CMAKE_SOURCE_DIR}/module/opengl/common/*.cpp
         ${CMAKE_SOURCE_DIR}/module/opengl/egl/*.cpp
-        ${CMAKE_SOURCE_DIR}/module/opengl/eglsample/*.cpp
         ${CMAKE_SOURCE_DIR}/module/opengl/sample/*.cpp
+        ${CMAKE_SOURCE_DIR}/module/opengl/common/*.cpp
         #opensl
         ${CMAKE_SOURCE_DIR}/module/opensl/*.cpp
 )

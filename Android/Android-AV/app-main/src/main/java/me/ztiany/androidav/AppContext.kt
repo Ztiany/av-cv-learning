@@ -12,8 +12,8 @@ class AppContext : Application() {
         super.onCreate()
         appContext = this
 
-        //加载 native
-        System.loadLibrary("androidav")
+        //加载 native 库
+        jniBridge = JNIBridge(this)
 
         //配置调试工具
         Timber.plant(Timber.DebugTree())
@@ -24,9 +24,15 @@ class AppContext : Application() {
 
         private var appContext by Delegates.notNull<AppContext>()
 
+        private var jniBridge by Delegates.notNull<JNIBridge>()
+
         @JvmStatic
         fun get(): Context {
             return appContext
+        }
+
+        fun getJNIBridge(): JNIBridge {
+            return jniBridge
         }
 
     }
