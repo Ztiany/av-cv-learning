@@ -2,12 +2,11 @@ package me.ztiany.lib.avbase.app.activity
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.os.Bundle
 import android.view.View
 import androidx.viewbinding.ViewBinding
 import com.android.base.delegate.State
 import com.android.base.delegate.simpl.DelegateActivity
-import me.ztiany.lib.avbase.utils.inflateBindingWithParameterizedType
+import me.ztiany.lib.avbase.utils.ui.inflateBindingWithParameterizedType
 import timber.log.Timber
 
 abstract class BaseActivity<VB : ViewBinding> : DelegateActivity() {
@@ -27,7 +26,7 @@ abstract class BaseActivity<VB : ViewBinding> : DelegateActivity() {
         return if (Build.VERSION.SDK_INT >= 17) {
             super.isDestroyed()
         } else {
-            getStatus() === State.DESTROY
+            getCurrentState() === State.DESTROY
         }
     }
 

@@ -63,7 +63,7 @@ dependencies {
     api 'com.jakewharton.timber:timber:4.7.1'
 
     api 'io.github.ztiany:android-media-selector:1.1.0'
-    api 'io.github.ztiany:android-arch-delegate:1.0.3'
+    api 'io.github.ztiany:android-arch-delegate:1.0.4'
 
     //di
     api "io.insert-koin:koin-core:3.4.2"
