@@ -2,14 +2,14 @@ package me.ztiany.androidav.avapi.audio.autiotrack
 
 import android.net.Uri
 import android.os.Bundle
-import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import me.ztiany.androidav.databinding.AudioActivityMeAtBinding
-import me.ztiany.lib.avbase.utils.printMediaTrackInfo
+import me.ztiany.lib.avbase.app.activity.BaseActivity
+import me.ztiany.lib.avbase.utils.av.printMediaTrackInfo
 import timber.log.Timber
 
-class MediaExtractorAudioTrackActivity : DelegateActivity() {
+class MediaExtractorAudioTrackActivity : BaseActivity<AudioActivityMeAtBinding>() {
 
     private var selectedFile: Uri? = null
 
@@ -27,20 +27,11 @@ class MediaExtractorAudioTrackActivity : DelegateActivity() {
         binding.audioSelectedFile.text = "已经选择：${selectedFile.toString()}"
     }
 
-    private lateinit var binding: AudioActivityMeAtBinding
-
     private val mediaExtractorAudioTrackKit by lazy {
         MediaExtractorAudioTrackKit(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = AudioActivityMeAtBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpViews()
-    }
-
-    private fun setUpViews() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         binding.audioSelectAudio.setOnClickListener {
             systemMediaSelector.takeFileFromSystem().mimeType("audio/*").start()
         }

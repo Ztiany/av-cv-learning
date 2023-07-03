@@ -2,15 +2,15 @@ package me.ztiany.androidav.avapi.audio.opensles
 
 import android.net.Uri
 import android.os.Bundle
-import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import com.blankj.utilcode.util.UriUtils
 import me.ztiany.androidav.databinding.AudioActivityOpenslesBinding
-import me.ztiany.lib.avbase.utils.printMediaTrackInfo
+import me.ztiany.lib.avbase.app.activity.BaseActivity
+import me.ztiany.lib.avbase.utils.av.printMediaTrackInfo
 import timber.log.Timber
 
-class OpenSLESActivity : DelegateActivity() {
+class OpenSLESActivity : BaseActivity<AudioActivityOpenslesBinding>() {
 
     private var selectedFile: Uri? = null
 
@@ -30,16 +30,7 @@ class OpenSLESActivity : DelegateActivity() {
         binding.audioSelectedFile.text = "已经选择：${selectedFile.toString()}"
     }
 
-    private lateinit var binding: AudioActivityOpenslesBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = AudioActivityOpenslesBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpViews()
-    }
-
-    private fun setUpViews() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         binding.audioSelectAudio.setOnClickListener {
             systemMediaSelector.takeFileFromSystem().mimeType("*/*").start()
         }

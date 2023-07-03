@@ -2,8 +2,8 @@ package me.ztiany.androidav.opengl.nwopengl
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.lib.avbase.utils.IEntrance
-import me.ztiany.lib.avbase.utils.buildLayoutEntrance
+import me.ztiany.lib.avbase.utils.ui.IEntrance
+import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
 private const val RENDER_TYPE_BACKGROUND = 0
 

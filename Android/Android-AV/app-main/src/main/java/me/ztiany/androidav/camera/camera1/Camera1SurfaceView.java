@@ -16,7 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import me.ztiany.lib.avbase.utils.Directory;
-import me.ztiany.lib.avbase.utils.YUVUtils;
+import me.ztiany.lib.avbase.utils.av.YUVUtils;
 import timber.log.Timber;
 
 /**

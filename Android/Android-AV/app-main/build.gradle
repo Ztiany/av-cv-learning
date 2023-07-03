@@ -65,7 +65,7 @@ android {
 
 dependencies {
     implementation project(":lib-avbase")
-    implementation "org.java-websocket:Java-WebSocket:1.5.2"
-    implementation 'com.github.Jay-Goo:RangeSeekBar:v1.1.0'
-    implementation  "com.github.bumptech.glide:glide:4.13.0"
+    implementation ThirdLibraries.webSocket
+    implementation ThirdLibraries.glide
+    implementation UILibraries.rangeSeekBar
 }

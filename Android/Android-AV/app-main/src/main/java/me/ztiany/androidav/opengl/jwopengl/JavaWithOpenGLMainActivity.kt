@@ -12,8 +12,8 @@ import me.ztiany.androidav.opengl.jwopengl.usecase.JavaWithOpenGLCommonActivity
 import me.ztiany.androidav.opengl.jwopengl.usecase.camera.EGLCameraPreviewWithActivity
 import me.ztiany.androidav.opengl.jwopengl.usecase.camera.OpenGLCameraPreviewActivity
 import me.ztiany.androidav.opengl.jwopengl.usecase.recorder.OpenGLRecorderActivity
-import me.ztiany.lib.avbase.utils.IEntrance
-import me.ztiany.lib.avbase.utils.buildLayoutEntrance
+import me.ztiany.lib.avbase.utils.ui.IEntrance
+import me.ztiany.lib.avbase.utils.ui.buildLayoutEntrance
 
 class JavaWithOpenGLMainActivity : AppCompatActivity() {
 

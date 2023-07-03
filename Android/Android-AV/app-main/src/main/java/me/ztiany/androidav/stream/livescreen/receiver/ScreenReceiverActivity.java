@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 
 import me.ztiany.androidav.R;
 import me.ztiany.androidav.stream.livescreen.Constants;
-import me.ztiany.lib.avbase.utils.Views;
+import me.ztiany.lib.avbase.utils.ui.Views;
 import timber.log.Timber;
 
 public class ScreenReceiverActivity extends AppCompatActivity implements SocketLiveClient.SocketCallback {

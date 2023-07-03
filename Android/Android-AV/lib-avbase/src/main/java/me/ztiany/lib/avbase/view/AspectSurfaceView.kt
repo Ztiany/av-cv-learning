@@ -28,7 +28,7 @@ class AspectSurfaceView : SurfaceView {
         if (aspectRatio < 0) {
             throw IllegalArgumentException()
         }
-        Log.w(TAG, "Setting aspect ratio to $aspectRatio (was $mTargetAspect)")
+        Timber.d("Setting aspect ratio to $aspectRatio (was $mTargetAspect)")
         if (mTargetAspect != aspectRatio) {
             mTargetAspect = aspectRatio
             requestLayout()
@@ -60,7 +60,7 @@ class AspectSurfaceView : SurfaceView {
             val aspectDiff = mTargetAspect / viewAspectRatio - 1
 
             if (abs(aspectDiff) < 0.01) {
-                Timber.w("aspect ratio is good (target=" + mTargetAspect + ", view=" + initialWidth + "x" + initialHeight + ")")
+                Timber.w("aspect ratio is good (target= $mTargetAspect, view= $initialWidth x $initialHeight")
             } else {
                 if (aspectDiff > 0) {
                     initialHeight = (initialWidth / mTargetAspect).toInt()
@@ -75,10 +75,6 @@ class AspectSurfaceView : SurfaceView {
         }
 
         super.onMeasure(widthMeasure, heightMeasure)
-    }
-
-    companion object {
-        private const val TAG = "AspectFrameLayout"
     }
 
 }

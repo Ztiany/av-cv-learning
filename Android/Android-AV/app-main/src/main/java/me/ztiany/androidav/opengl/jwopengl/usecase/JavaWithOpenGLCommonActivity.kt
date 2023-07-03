@@ -3,12 +3,13 @@ package me.ztiany.androidav.opengl.jwopengl.usecase
 import android.content.Context
 import android.content.Intent
 import android.opengl.GLSurfaceView
+import android.os.Bundle
 import me.ztiany.androidav.databinding.OpenglActivityCommonBinding
 import me.ztiany.androidav.opengl.jwopengl.common.GLController
 import me.ztiany.androidav.opengl.jwopengl.common.GLParams
 import me.ztiany.androidav.opengl.jwopengl.common.GLRenderer
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
-import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 import timber.log.Timber
 
 class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>() {
@@ -39,7 +40,7 @@ class JavaWithOpenGLCommonActivity : BaseActivity<OpenglActivityCommonBinding>()
 
     }
 
-    override fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         showTitle()
         initGlSurfaceView()
         setUpGlSurfaceView()

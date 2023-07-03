@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
-import me.ztiany.lib.avbase.utils.loadMediaMetadata
+import me.ztiany.lib.avbase.utils.av.loadMediaMetadata
 import timber.log.Timber
 import java.nio.ByteBuffer
 

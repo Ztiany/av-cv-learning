@@ -6,36 +6,24 @@
 
 #define DEFAULT_TAG "Native"
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,DEFAULT_TAG,__VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,DEFAULT_TAG,__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,DEFAULT_TAG,__VA_ARGS__)
+void xLog(int priority, const char *tag, const char *format, ...);
 
-#define LOGD_TAG(TAG, ...) __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__)
-#define LOGI_TAG(TAG, ...) __android_log_print(ANDROID_LOG_INFO,TAG,__VA_ARGS__)
-#define LOGE_TAG(TAG, ...) __android_log_print(ANDROID_LOG_ERROR,TAG,__VA_ARGS__)
+void xLogD(const char *tag, const char *format, ...);
 
-void xLogD(std::string &msg);
+void xLogI(const char *tag, const char *format, ...);
 
-void xLogD(std::string &tag, std::string &msg);
+void xLogW(const char *tag, const char *format, ...);
 
-void xLogD(const char *msg);
+void xLogE(const char *tag, const char *format, ...);
 
-void xLogD(const char *tag, const char *msg);
+#define LOGD(...) xLogD(DEFAULT_TAG,__VA_ARGS__)
+#define LOGI(...) xLogI(DEFAULT_TAG,__VA_ARGS__)
+#define LOGW(...) xLogW(DEFAULT_TAG,__VA_ARGS__)
+#define LOGE(...) xLogE(DEFAULT_TAG,__VA_ARGS__)
 
-void xLogE(std::string &msg);
-
-void xLogE(std::string &tag, std::string &msg);
-
-void xLogE(const char *msg);
-
-void xLogE(const char *tag, const char *msg);
-
-void xLogI(std::string &msg);
-
-void xLogI(std::string &tag, std::string &msg);
-
-void xLogI(const char *msg);
-
-void xLogI(const char *tag, const char *msg);
+#define LOGD_TAG(TAG, ...) xLogD(TAG,__VA_ARGS__)
+#define LOGI_TAG(TAG, ...) xLogI(TAG,__VA_ARGS__)
+#define LOGW_TAG(TAG, ...) xLogW(TAG,__VA_ARGS__)
+#define LOGE_TAG(TAG, ...) xLogE(TAG,__VA_ARGS__)
 
 #endif //ANDROID_AV_LOG_H

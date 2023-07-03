@@ -1,4 +1,4 @@
-package me.ztiany.lib.avbase.utils
+package me.ztiany.lib.avbase.utils.av
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.ztiany.lib.avbase.utils.toIntOr0
 
 @WorkerThread
 fun loadMediaMetadata(context: Context, uri: Uri): MediaMetadata {

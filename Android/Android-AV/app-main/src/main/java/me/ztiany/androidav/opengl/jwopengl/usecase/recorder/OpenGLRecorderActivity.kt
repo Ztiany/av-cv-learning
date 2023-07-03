@@ -1,6 +1,7 @@
 package me.ztiany.androidav.opengl.jwopengl.usecase.recorder
 
 import android.graphics.Point
+import android.os.Bundle
 import android.util.Size
 import android.widget.Toast
 import androidx.core.view.doOnLayout
@@ -12,7 +13,7 @@ import me.ztiany.androidav.opengl.jwopengl.recorder.getSpeedName
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
-import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 import me.ztiany.lib.avbase.utils.Directory
 
 /**RENDERMODE_WHEN_DIRTY 不需要调用 surface 的 onResume/onPause */
@@ -48,7 +49,7 @@ class OpenGLRecorderActivity : BaseActivity<OpenglActivityRecorderBinding>() {
         }
     }
 
-    override fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         recorderManager.init(binding.openglCameraView)
         setUpRecordBtnLogic()
         setUpSpeedBtnLogic()

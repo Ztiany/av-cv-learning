@@ -1,7 +1,7 @@
 package me.ztiany.androidav.player.mediacodec
 
 import android.media.*
-import me.ztiany.lib.avbase.utils.getChannelOutConfig
+import me.ztiany.lib.avbase.utils.av.getChannelOutConfig
 import timber.log.Timber
 import java.nio.ByteBuffer
 

@@ -4,7 +4,7 @@ import android.hardware.camera2.CameraDevice
 import android.util.Size
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
-import me.ztiany.lib.avbase.utils.YUVUtils
+import me.ztiany.lib.avbase.utils.av.YUVUtils
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.common.RtmpPusher
 import me.ztiany.rtmp.common.RtmpPusher.VIDEO_TYPE_YUV

@@ -13,7 +13,7 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import me.ztiany.androidav.R;
-import me.ztiany.lib.avbase.utils.YUVUtils;
+import me.ztiany.lib.avbase.utils.av.YUVUtils;
 import timber.log.Timber;
 
 

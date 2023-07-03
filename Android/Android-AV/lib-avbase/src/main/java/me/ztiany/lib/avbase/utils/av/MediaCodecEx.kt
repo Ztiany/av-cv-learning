@@ -1,6 +1,6 @@
 @file:JvmName("MediaCodecEx")
 
-package me.ztiany.lib.avbase.utils
+package me.ztiany.lib.avbase.utils.av
 
 import android.media.MediaCodecList
 import timber.log.Timber

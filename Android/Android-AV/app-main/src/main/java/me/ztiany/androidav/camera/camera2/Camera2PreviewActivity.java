@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import me.ztiany.androidav.R;
-import me.ztiany.lib.avbase.utils.YUVUtils;
+import me.ztiany.lib.avbase.utils.av.YUVUtils;
 import timber.log.Timber;
 
 /**

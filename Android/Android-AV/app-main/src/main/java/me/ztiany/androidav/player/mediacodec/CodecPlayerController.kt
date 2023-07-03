@@ -6,7 +6,7 @@ import android.net.Uri
 import android.view.Surface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import me.ztiany.lib.avbase.utils.MediaMetadata
+import me.ztiany.lib.avbase.utils.av.MediaMetadata
 import timber.log.Timber
 import java.nio.ByteBuffer
 

@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import me.ztiany.lib.avbase.utils.Directory;
 import me.ztiany.lib.avbase.utils.FileUtils;
 import me.ztiany.lib.avbase.utils.IOUtils;
-import me.ztiany.lib.avbase.utils.YUVUtils;
+import me.ztiany.lib.avbase.utils.av.YUVUtils;
 import timber.log.Timber;
 
 class H264Encoder {

@@ -2,6 +2,7 @@ package me.ztiany.androidav.opengl.jwopengl.usecase.camera
 
 import android.graphics.Point
 import android.opengl.GLSurfaceView
+import android.os.Bundle
 import android.util.Size
 import androidx.core.view.doOnLayout
 import me.ztiany.androidav.databinding.OpenglActivityCameraPreviewBinding
@@ -11,7 +12,7 @@ import me.ztiany.androidav.opengl.jwopengl.renderer.CameraRenderer
 import me.ztiany.androidav.opengl.oglcamera.CameraBuilder
 import me.ztiany.androidav.opengl.oglcamera.CameraListener
 import me.ztiany.androidav.opengl.oglcamera.CameraOperator
-import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 
 class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBinding>() {
 
@@ -29,7 +30,7 @@ class OpenGLCameraPreviewActivity : BaseActivity<OpenglActivityCameraPreviewBind
         }
     }
 
-    override fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         window.decorView.doOnLayout {
             setUpGlSurfaceView()
             setUpCamera()

@@ -5,7 +5,7 @@ import android.media.*
 import android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM
 import android.net.Uri
 import me.ztiany.androidav.player.mediacodec.AUDIO_SELECTOR
-import me.ztiany.lib.avbase.utils.getChannelOutConfig
+import me.ztiany.lib.avbase.utils.av.getChannelOutConfig
 import timber.log.Timber
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean

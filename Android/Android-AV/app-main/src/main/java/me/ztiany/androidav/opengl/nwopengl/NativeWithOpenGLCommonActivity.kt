@@ -2,14 +2,15 @@ package me.ztiany.androidav.opengl.nwopengl
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import me.ztiany.androidav.databinding.OpenglActivityNativeCommonBinding
-import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 
 class NativeWithOpenGLCommonActivity : BaseActivity<OpenglActivityNativeCommonBinding>() {
 
     private lateinit var nativeRenderer: NativeRenderer
 
-    override fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         showTitle()
         initGlSurfaceView()
     }
@@ -45,7 +46,7 @@ class NativeWithOpenGLCommonActivity : BaseActivity<OpenglActivityNativeCommonBi
         fun start(
             context: Context,
             title: String,
-            type: Int
+            type: Int,
         ) {
             with(Intent(context, NativeWithOpenGLCommonActivity::class.java)) {
                 putExtra(KEY_TITLE, title)

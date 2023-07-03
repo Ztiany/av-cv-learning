@@ -37,8 +37,6 @@ android {
 
 dependencies {
     implementation project(":lib-avbase")
-
-    implementation 'org.java-websocket:Java-WebSocket:1.5.2'
-    implementation 'org.webrtc:google-webrtc:1.0.32006'
-    implementation 'com.alibaba:fastjson:1.2.58'
+    implementation ThirdLibraries.webSocket
+    implementation ThirdLibraries.webRTC
 }

@@ -1,6 +1,6 @@
 @file:JvmName("AudioFormatEx")
 
-package me.ztiany.lib.avbase.utils
+package me.ztiany.lib.avbase.utils.av
 
 import android.media.AudioFormat
 

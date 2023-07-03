@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import me.ztiany.lib.avbase.utils.loadMediaMetadataSuspend
+import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
 import timber.log.Timber
 
 class MediaMetadataRetrieveCase(

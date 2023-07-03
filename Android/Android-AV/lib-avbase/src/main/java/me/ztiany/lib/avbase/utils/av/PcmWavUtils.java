@@ -1,4 +1,4 @@
-package me.ztiany.lib.avbase.utils;
+package me.ztiany.lib.avbase.utils.av;
 
 import android.media.AudioRecord;
 
@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import me.ztiany.lib.avbase.utils.IOUtils;
 import timber.log.Timber;
 
 /**

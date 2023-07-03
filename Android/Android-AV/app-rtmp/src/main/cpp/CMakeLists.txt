@@ -5,7 +5,7 @@ project("android_rtmp")
 include_directories(include)
 include_directories(librtmp)
 
-#添加 LibRTC 子模块
+#添加 LibRTMP 子模块
 add_subdirectory(librtmp)
 
 #引入预编译库

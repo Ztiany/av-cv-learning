@@ -2,10 +2,11 @@ package me.ztiany.rtmp
 
 import android.Manifest
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.permissionx.guolindev.PermissionX
-import me.ztiany.lib.avbase.app.BaseActivity
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 import me.ztiany.rtmp.common.Pusher
 import me.ztiany.rtmp.databinding.ActivityMainBinding
 import me.ztiany.rtmp.practice.camera.Camera2Helper
@@ -18,19 +19,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private var pusher: Pusher? = null
 
-    override fun setUpView() {
-        super.setUpView()
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         askPermissions()
+
         binding.rtmpBtnScreenHard.setOnClickListener {
             liveScreenHard()
         }
+
         binding.rtmpBtnCameraBack.setOnClickListener {
             liveCameraSoft(Camera2Helper.CAMERA_ID_BACK)
         }
+
         binding.rtmpBtnCameraFront.setOnClickListener {
             ToastUtils.showLong("TODO")
             //liveCameraSoft(Camera2Helper.CAMERA_ID_FRONT)
         }
+
         binding.rtmpBtnStop.setOnClickListener {
             pusher?.stop()
             showFunctions()

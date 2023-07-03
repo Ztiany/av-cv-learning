@@ -7,14 +7,13 @@ import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import me.ztiany.androidav.databinding.AudioActivityMpBinding
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 import timber.log.Timber
 import java.io.IOException
 
-class AudioMediaPlayerActivity : DelegateActivity() {
+class AudioMediaPlayerActivity : BaseActivity<AudioActivityMpBinding>() {
 
     private var selectedFile: Uri? = null
-
-    private lateinit var binding: AudioActivityMpBinding
 
     private val systemMediaSelector by lazy {
         newSystemMediaSelector(this, object : ResultListener {
@@ -32,14 +31,7 @@ class AudioMediaPlayerActivity : DelegateActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = AudioActivityMpBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpView()
-    }
-
-    private fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         binding.audioSelect.setOnClickListener {
             systemMediaSelector.takeFileFromSystem().mimeType("audio/*").start()
         }

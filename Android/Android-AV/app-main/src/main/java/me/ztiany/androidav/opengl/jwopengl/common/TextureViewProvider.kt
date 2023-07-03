@@ -19,11 +19,11 @@ class TextureViewProvider(private val textureView: TextureView) : SurfaceProvide
 
         textureView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
 
-            override fun onViewAttachedToWindow(v: View?) {
+            override fun onViewAttachedToWindow(v: View) {
                 Timber.d("onViewAttachedToWindow")
             }
 
-            override fun onViewDetachedFromWindow(v: View?) {
+            override fun onViewDetachedFromWindow(v: View) {
                 Timber.d("onViewDetachedFromWindow")
             }
         })

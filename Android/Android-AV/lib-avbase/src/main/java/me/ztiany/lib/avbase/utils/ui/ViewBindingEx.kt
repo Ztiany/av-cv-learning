@@ -1,4 +1,4 @@
-package me.ztiany.lib.avbase.utils
+package me.ztiany.lib.avbase.utils.ui
 
 import android.view.LayoutInflater
 import android.view.View

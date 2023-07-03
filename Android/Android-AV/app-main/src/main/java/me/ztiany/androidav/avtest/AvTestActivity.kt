@@ -2,14 +2,14 @@ package me.ztiany.androidav.avtest
 
 import android.net.Uri
 import android.os.Bundle
-import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import me.ztiany.androidav.databinding.ToolsActivityBinding
-import me.ztiany.lib.avbase.utils.printMediaCodecInfo
+import me.ztiany.lib.avbase.app.activity.BaseActivity
+import me.ztiany.lib.avbase.utils.av.printMediaCodecInfo
 import timber.log.Timber
 
-class AvTestActivity : DelegateActivity() {
+class AvTestActivity : BaseActivity<ToolsActivityBinding>() {
 
     private val systemMediaSelector by lazy {
         newSystemMediaSelector(this, object : ResultListener {
@@ -22,20 +22,11 @@ class AvTestActivity : DelegateActivity() {
         })
     }
 
-    private lateinit var binding: ToolsActivityBinding
-
     private var testCase: TestCase? = null
 
     private var onMediaFileTaken: ((Uri) -> Unit)? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ToolsActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpViews()
-    }
-
-    private fun setUpViews() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         binding.btnCodecAbility.setOnClickListener {
             printCodecAbilities()
         }

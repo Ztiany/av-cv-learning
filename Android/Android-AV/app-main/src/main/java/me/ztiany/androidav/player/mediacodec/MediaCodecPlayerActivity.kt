@@ -4,19 +4,17 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.SurfaceHolder
 import androidx.lifecycle.lifecycleScope
-import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlayerActivityMediaCodecBinding
-import me.ztiany.lib.avbase.utils.loadMediaMetadataSuspend
+import me.ztiany.lib.avbase.app.activity.BaseActivity
+import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
 import timber.log.Timber
 
-class MediaCodecPlayerActivity : DelegateActivity() {
+class MediaCodecPlayerActivity : BaseActivity<PlayerActivityMediaCodecBinding>() {
 
     private var selectedFile: Uri? = null
-
-    private lateinit var binding: PlayerActivityMediaCodecBinding
 
     private val videoPlayer by lazy { CodecPlayerController(this) }
 
@@ -42,9 +40,7 @@ class MediaCodecPlayerActivity : DelegateActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = PlayerActivityMediaCodecBinding.inflate(layoutInflater)
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         setContentView(binding.root)
         setUpButtons()
         setUpSurfaceView()

@@ -10,9 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ztiany.androidav.databinding.AudioActivityAtBinding
+import me.ztiany.lib.avbase.app.activity.BaseActivity
 import timber.log.Timber
 
-class AudioTrackActivity : DelegateActivity() {
+class AudioTrackActivity : BaseActivity<AudioActivityAtBinding>() {
 
     private var selectedFile: Uri? = null
 
@@ -32,16 +33,7 @@ class AudioTrackActivity : DelegateActivity() {
 
     private val audioTracker by lazy { AudioTracker(this) }
 
-    private lateinit var binding: AudioActivityAtBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = AudioActivityAtBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setUpView()
-    }
-
-    private fun setUpView() {
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         binding.audioSelect.setOnClickListener {
             systemMediaSelector.takeFileFromSystem().mimeType("audio/*").start()
         }

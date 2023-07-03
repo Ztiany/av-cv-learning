@@ -1,9 +1,9 @@
+//使用 samplerExternalOES 需要添加下面标识
+#extension GL_OES_EGL_image_external : require
+
 #ifdef GL_ES
 precision mediump float;
 #endif
-
-//使用 samplerExternalOES 需要添加下面标识
-#extension GL_OES_EGL_image_external : require
 
 //纹理坐标
 varying vec2 vTextureCoordinate;

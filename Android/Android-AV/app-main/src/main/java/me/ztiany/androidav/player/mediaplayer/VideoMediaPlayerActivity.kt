@@ -6,22 +6,20 @@ import android.os.Bundle
 import android.view.Surface
 import android.widget.SeekBar
 import androidx.lifecycle.lifecycleScope
-import com.android.base.delegate.simpl.DelegateActivity
 import com.android.sdk.mediaselector.common.ResultListener
 import com.android.sdk.mediaselector.system.newSystemMediaSelector
 import kotlinx.coroutines.launch
 import me.ztiany.androidav.databinding.PlyaerActivityMediaPlayerBinding
 import me.ztiany.androidav.opengl.jwopengl.common.EGLBridger
 import me.ztiany.androidav.opengl.jwopengl.common.setGLRenderer
-import me.ztiany.lib.avbase.utils.loadMediaMetadataSuspend
+import me.ztiany.lib.avbase.app.activity.BaseActivity
+import me.ztiany.lib.avbase.utils.av.loadMediaMetadataSuspend
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class VideoMediaPlayerActivity : DelegateActivity() {
+class VideoMediaPlayerActivity : BaseActivity<PlyaerActivityMediaPlayerBinding>() {
 
     private var selectedFile: Uri? = null
-
-    private lateinit var binding: PlyaerActivityMediaPlayerBinding
 
     private val videoPlayer = VideoPlayer()
 
@@ -49,9 +47,7 @@ class VideoMediaPlayerActivity : DelegateActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = PlyaerActivityMediaPlayerBinding.inflate(layoutInflater)
+    override fun setUpLayout(savedInstanceState: Bundle?) {
         setContentView(binding.root)
         setUpGLSurfaceView()
         setUpButtons()

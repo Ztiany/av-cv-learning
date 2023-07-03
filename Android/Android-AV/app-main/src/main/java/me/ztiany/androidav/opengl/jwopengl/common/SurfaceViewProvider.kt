@@ -17,11 +17,11 @@ class SurfaceViewProvider(private val surfaceView: SurfaceView) : SurfaceProvide
 
         surfaceView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
 
-            override fun onViewAttachedToWindow(v: View?) {
+            override fun onViewAttachedToWindow(v: View) {
                 Timber.d("onViewAttachedToWindow")
             }
 
-            override fun onViewDetachedFromWindow(v: View?) {
+            override fun onViewDetachedFromWindow(v: View) {
                 Timber.d("onViewDetachedFromWindow")
             }
         })

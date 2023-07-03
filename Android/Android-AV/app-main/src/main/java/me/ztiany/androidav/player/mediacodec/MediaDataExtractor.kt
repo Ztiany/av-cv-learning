@@ -2,7 +2,7 @@ package me.ztiany.androidav.player.mediacodec
 
 import android.media.MediaFormat
 import android.net.Uri
-import me.ztiany.lib.avbase.utils.MediaMetadata
+import me.ztiany.lib.avbase.utils.av.MediaMetadata
 import java.io.IOException
 import java.nio.ByteBuffer
 
