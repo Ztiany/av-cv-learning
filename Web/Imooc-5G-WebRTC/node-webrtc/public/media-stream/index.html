@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC ：获取音视频设备</title>
+    <!-- WebRTC API 适配（有一些 API，每个浏览器的方法名称不同，于是 Googol 出了一个适配层。）-->
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="./client.js"></script>
+
+    <style>
+        /* webrtc 视频特效：使用 css 属性来定义。*/
+        .none {
+            -webkit-filter: none;
+        }
+
+        .blur {
+            -webkit-filter: blur(3px);
+        }
+
+        .grayscale {
+            -webkit-filter: grayscale(1);
+        }
+
+        .invert {
+            -webkit-filter: invert(1);
+        }
+
+        .sepia {
+            -webkit-filter: sepia(1);
+        }
+    </style>
+</head>
+
+
+<body>
+<section>
+    <div>安全设置</div>
+    <ol>
+        <li><a href="chrome://flags">Chrome</a></li>
+        <li><a href="edge://flags">Edge</a></li>
+    </ol>
+</section>
+
+<!-- 控制输出 -->
+<section>
+    <div>
+        <label for="outputMode">output mode:</label>
+        <select id="outputMode">
+            <option value="video">video</option>
+            <option value="audio">audio</option>
+            <option value="both">both</option>
+        </select>
+    </div>
+</section>
+
+<section>
+    <!-- 所有设备 -->
+    <div>
+        <div>
+            <label for="audioSource">Audio input device:</label>
+            <select id="audioSource"></select>
+        </div>
+        <div>
+            <label for="audioOutput">Audio output device:</label>
+            <select id="audioOutput"></select>
+        </div>
+        <div>
+            <label for="videoSource">video input device:</label>
+            <select id="videoSource"></select>
+        </div>
+    </div>
+</section>
+
+<!-- 播放区 -->
+<section>
+    <div>
+        <div>
+            <!-- 视频特效 -->
+            <label for="videoFilter">Filter:</label>
+            <select id="videoFilter">
+                <option value="none">None</option>
+                <option value="blur">blur</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="invert">Invert</option>
+                <option value="sepia">sepia</option>
+            </select>
+        </div>
+        <!--
+            - autoplay: 自动播放
+            - playsinline: 内联播放
+        -->
+        <table>
+            <tr>
+                <td>
+                    <video id="videoPlayer" autoplay playsinline></video>
+                </td>
+                <td>
+                    <div id="videoConstraints"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <audio id="audioPlayer" autoplay controls></audio>
+                </td>
+                <td>
+                    <div id="audioConstraints"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</section>
+
+<!-- 截屏区域 -->
+<section>
+    <div>
+        <button id="snapshotBtn">Take snapshot</button>
+    </div>
+    <div>
+        <canvas id="snapshotCanvas"></canvas>
+    </div>
+</section>
+
+</body>
+</html>
