@@ -14,11 +14,21 @@ const elements = {
     videoConstraintsDiv: undefined,
     videoFilterSelect: undefined,
     snapshotButton: undefined,
+    recordingButton: undefined,
+    playRecordingButton: undefined,
+    downloadRecordingButton: undefined,
     snapshotCanvas: undefined,
 
-    // audio player
-    audioPlayer: undefined,
-    audioConstraintsDiv: undefined,
+    // recoding video
+    recordingVideoPlayer: undefined,
+    recordingVideoConstraintsDiv: undefined,
+}
+
+const globalState = {
+    isRecording: false,
+    stream: undefined,
+    mediaRecorder: undefined,
+    buffer: [],
 }
 
 const avConstraints = {
@@ -56,9 +66,12 @@ function findElements() {
     elements.videoConstraintsDiv = document.querySelector("div#videoConstraints")
     elements.snapshotCanvas = document.querySelector("canvas#snapshotCanvas")
     elements.snapshotButton = document.querySelector("button#snapshotBtn")
+    elements.recordingButton = document.querySelector("button#recordBtn")
+    elements.playRecordingButton = document.querySelector("button#playRecordingBtn")
+    elements.downloadRecordingButton = document.querySelector("button#downloadRecordingBtn")
 
-    elements.audioPlayer = document.querySelector("audio#audioPlayer")
-    elements.audioConstraintsDiv = document.querySelector("div#audioConstraints")
+    elements.recordingVideoPlayer = document.querySelector("video#recordingVideoPlayer")
+    elements.recordingVideoConstraintsDiv = document.querySelector("div#recordingVideoConstraints")
 }
 
 function setUpListeners() {
@@ -82,15 +95,18 @@ function setUpListeners() {
     elements.outputModeSelect.onchange = function () {
         getAVDevices();
     }
+    elements.recordingButton.onclick = function () {
+        startRecording()
+    };
+    elements.playRecordingButton.onclick = function () {
+        playRecordingVideo()
+    };
+    elements.downloadRecordingButton.onclick = function () {
+        downloadRecordingVideo()
+    };
 }
 
 function buildAvConstraints() {
-    if (elements.outputModeSelect.value === "audio") {
-        avConstraints.video = false;
-        avConstraints.audio = true;
-        return
-    }
-
     avConstraints.audio = false;
     avConstraints.video = {
         width: 640,
@@ -99,6 +115,7 @@ function buildAvConstraints() {
         facingMode: "environment",
         deviceId: undefined
     };
+
     if (elements.outputModeSelect.value === "both") {
         avConstraints.audio = true;
     }
@@ -109,28 +126,10 @@ function buildAvConstraints() {
 }
 
 function onGetMediaStream(stream) {
-    elements.audioPlayer.srcObject = null;
+    globalState.stream = stream;
+
     elements.videoPlayer.srcObject = null;
     elements.videoConstraintsDiv.textContent = "";
-    elements.audioConstraintsDiv.textContent = "";
-
-    const videoDisplay = elements.outputModeSelect.value === "audio" ? "none" : "block";
-    const audioDisplay = elements.outputModeSelect.value === "audio" ? "block" : "none";
-
-    elements.audioPlayer.style.display = audioDisplay;
-    elements.audioConstraintsDiv.style.display = audioDisplay;
-    elements.videoPlayer.style.display = videoDisplay;
-    elements.videoConstraintsDiv.style.display = videoDisplay;
-    elements.snapshotButton.style.display = videoDisplay;
-    elements.snapshotCanvas.style.display = videoDisplay;
-
-    // audio only
-    if (elements.outputModeSelect.value === "audio") {
-        let audioTrack = stream.getAudioTracks()[0];
-        elements.audioConstraintsDiv.textContent = JSON.stringify(audioTrack.getSettings(), null, 2);
-        elements.audioPlayer.srcObject = stream;
-        return navigator.mediaDevices.enumerateDevices();
-    }
 
     // video only
     if (elements.outputModeSelect.value === "video") {
@@ -207,4 +206,87 @@ function getAVDevices() {
         .then(onGetMediaStream)
         .then(onGetDevices)
         .catch(onGetDevicesError)
+}
+
+function startRecording() {
+    if (globalState.isRecording) {
+        globalState.isRecording = false
+        elements.recordingButton.textContent = "Start recording"
+        elements.playRecordingButton.disabled = false
+        elements.downloadRecordingButton.disabled = false
+        stopRecording()
+        return
+    }
+
+    globalState.isRecording = true
+    elements.recordingButton.textContent = "Stop recording"
+    elements.playRecordingButton.disabled = true
+    elements.downloadRecordingButton.disabled = true
+    doRealRecoding()
+}
+
+function stopRecording() {
+    if (globalState.mediaRecorder) {
+        globalState.mediaRecorder.stop();
+    }
+}
+
+function doRealRecoding() {
+    if (!globalState.stream) {
+        console.error("not stream assigned.")
+        return;
+    }
+
+    globalState.buffer = [];
+    const options = {
+        mimeType: 'video/webm;codecs=vp8'
+    };
+
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.error(`${options.mimeType} is not supported!`);
+        return;
+    }
+
+    try {
+        globalState.mediaRecorder = new MediaRecorder(globalState.stream, options);
+    } catch (e) {
+        console.error('Failed to create MediaRecorder:', e);
+        return;
+    }
+    globalState.mediaRecorder.ondataavailable = handleRecordedData
+    globalState.mediaRecorder.start(10/*多长时间回调一次数据*/);
+}
+
+function handleRecordedData(recordedData) {
+    if (recordedData && recordedData.data && recordedData.data.size > 0) {
+        globalState.buffer.push(recordedData.data)
+    }
+}
+
+function downloadRecordingVideo() {
+    if (!globalState.buffer || globalState.buffer.length <= 0) {
+        console.error('No video has been recorded.');
+        return;
+    }
+
+    const blob = new Blob(globalState.buffer, {type: 'video/webm'});
+    const url = window.URL.createObjectURL(blob);
+    const aElement = document.createElement('a');
+    aElement.href = url;
+    aElement.style.display = 'none';
+    aElement.download = 'recodedVideo.webm';
+    aElement.click();
+}
+
+function playRecordingVideo() {
+    if (!globalState.buffer || globalState.buffer.length <= 0) {
+        console.error('No video has been recorded.');
+        return;
+    }
+
+    const blob = new Blob(globalState.buffer, {type: 'video/webm'});
+    elements.recordingVideoPlayer.src = window.URL.createObjectURL(blob);
+    elements.recordingVideoPlayer.srcObject = null;
+    elements.recordingVideoPlayer.controls = true;
+    elements.recordingVideoPlayer.play();
 }
