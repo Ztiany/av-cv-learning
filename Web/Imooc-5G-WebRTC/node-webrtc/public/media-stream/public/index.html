@@ -5,7 +5,7 @@
     <title>WebRTC ：获取音视频设备</title>
     <!-- WebRTC API 适配（有一些 API，每个浏览器的方法名称不同，于是 Googol 出了一个适配层。）-->
     <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-    <script src="./client.js"></script>
+    <script src="client.js"></script>
 
     <style>
         /* webrtc 视频特效：使用 css 属性来定义。*/
@@ -47,6 +47,7 @@
         <label for="outputMode">output mode:</label>
         <select id="outputMode">
             <option value="video">video</option>
+            <option value="audio">audio</option>
             <option value="both">both</option>
         </select>
     </div>
@@ -99,10 +100,10 @@
             </tr>
             <tr>
                 <td>
-                    <video id="recordingVideoPlayer" playsinline></video>
+                    <audio id="audioPlayer" autoplay controls></audio>
                 </td>
                 <td>
-                    <div id="recordingVideoConstraints"></div>
+                    <div id="audioConstraints"></div>
                 </td>
             </tr>
         </table>
@@ -113,15 +114,6 @@
 <section>
     <div>
         <button id="snapshotBtn">Take snapshot</button>
-    </div>
-    <div>
-        <button id="recordBtn">Start recording</button>
-    </div>
-    <div>
-        <button id="playRecordingBtn">Play recording</button>
-    </div>
-    <div>
-        <button id="downloadRecordingBtn">Download recording</button>
     </div>
     <div>
         <canvas id="snapshotCanvas"></canvas>

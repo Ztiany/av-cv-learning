@@ -170,7 +170,7 @@ function onGetDevices(devices) {
             # edge
             edge://flags/#unsafely-treat-insecure-origin-as-secure
 
-            将上述地址打开，将 Insecure origins treated as secure 添加 http://localhost:8080，然后重启浏览器。具体参考
+            将上述地址打开，在 Insecure origins treated as secure 添加 http://localhost:8080，然后重启浏览器。具体参考
                     <https://blog.csdn.net/qq_35385687/article/details/120736610>。
                     <https://stackoverflow.com/questions/34878749/in-androids-google-chrome-how-to-set-unsafely-treat-insecure-origin-as-secure>
          */
