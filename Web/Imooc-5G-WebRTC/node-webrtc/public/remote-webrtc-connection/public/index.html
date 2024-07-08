@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Webrtc Remote Connection</title>
+    <link rel="stylesheet" href="style.css">
+    <script language="javascript" type="text/javascript">
+        function gotoNextPage() {
+            const roomId = document.querySelector('input#room');
+            if (roomId.value === null || roomId.value === '') {
+                alert('Room id is null!');
+            } else {
+                window.location.href = "room.html?room=" + roomId.value;
+            }
+        }
+    </script>
+</head>
+
+<body>
+<table align="center">
+    <tr>
+        <td>
+            <div>
+                <label for="room">roomId:</label>
+                <input type="text" id="room">
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div>
+                <button id="join" onclick="gotoNextPage()">Join</button>
+            </div>
+        </td>
+    </tr>
+</table>
+</body>
+
+</html>

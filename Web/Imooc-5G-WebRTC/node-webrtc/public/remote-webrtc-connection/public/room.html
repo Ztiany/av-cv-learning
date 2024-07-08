@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Webrtc Connection</title>
+    <link href="../../local-webrtc-connection/public/style.css" rel="stylesheet"/>
+    <style>
+        .vertical-center {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+<div>
+
+    <div style="margin-top: 20px">
+        <button id="connect">connect</button>
+        <button id="leave" disabled>leave</button>
+    </div>
+
+    <div class="vertical-center" style="margin-top: 20px">
+        <input id="shareDesk" type="checkbox"/>
+        <label for="shareDesk">Share Desktop</label>
+    </div>
+
+    <div id="preview" style="margin-top: 20px">
+        <div>
+            <h2>Local:</h2>
+            <video id="localVideo" autoplay playsinline muted></video>
+            <h2>Offer SDP:</h2>
+            <label for="offer"></label>
+            <textarea id="offer"></textarea>
+        </div>
+
+        <div style="margin-top: 20px">
+            <h2>Remote:</h2>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <h2>Answer SDP:</h2>
+            <label for="answer"></label><textarea id="answer"></textarea>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="../../local-webrtc-connection/public/client.js"></script>
+</body>
+
+</html>

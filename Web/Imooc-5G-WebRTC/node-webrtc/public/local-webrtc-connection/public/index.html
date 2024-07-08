@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Webrtc Local Connection</title>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+
+<body>
+<div>
+    <div>
+        <button id="start">start</button>
+        <button id="call">call</button>
+        <button id="hangup">hang up</button>
+    </div>
+
+    <div id="preview">
+        <div>
+            <h2>Local:</h2>
+            <video id="localVideo" autoplay playsinline></video>
+            <h2>Local SDP:</h2>
+            <label for="offer"></label>
+            <textarea id="offer"></textarea>
+        </div>
+        <div>
+            <h2>Remote:</h2>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <h2>Remote SDP:</h2>
+            <label for="answer"></label>
+            <textarea id="answer"></textarea>
+        </div>
+    </div>
+
+</div>
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script src="client.js"></script>
+</body>
+
+</html>
