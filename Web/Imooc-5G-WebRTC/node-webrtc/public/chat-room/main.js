@@ -76,14 +76,14 @@ httpServerIO.sockets.on('connection', (socket) => {
             return;
         }
         const sockets = createdRoom[1]
-        const users = sockets.size
-        logger.log('the number of user in room is: ' + users);
+        const userCount = sockets.size
+        logger.log('the number of user in room is: ' + userCount);
 
         // 在这里可以控制进入房间的人数，现在一个房间最多 2个人，为了便于客户端控制，如果是多人的话，应该将目前房间里人的个数当做数据下发下去。
-        if (users < 3) {
+        if (userCount < 3) {
             logger.log(socket.id + ' joined room: ' + room);
             socket.emit('joined', room, socket.id);
-            if (users > 1) {
+            if (userCount > 1) {
                 socket.to(room).emit('other_join', room);
             }
         } else {
@@ -98,12 +98,12 @@ httpServerIO.sockets.on('connection', (socket) => {
     socket.on('leave', (room) => {
         const createdRoom = Array.from(httpServerIO.sockets.adapter.rooms).find(([key, value]) => key === room)
         const sockets = createdRoom[1]
-        const usersCount = sockets.size
-        logger.log(socket.id + 'leaved room: ' + room);
-        logger.log('the number of user in room is: ' + (usersCount - 1));
+        const userCount = sockets.size
+        logger.log(socket.id + 'left room: ' + room);
+        logger.log('the number of user in room is: ' + (userCount - 1));
         socket.leave(room);
         socket.to(room).emit('bye', room, socket.id)
-        socket.emit('leaved', room, socket.id);
+        socket.emit('left', room, socket.id);
     });
 });
 

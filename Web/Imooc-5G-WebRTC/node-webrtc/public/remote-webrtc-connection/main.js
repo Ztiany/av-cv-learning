@@ -53,18 +53,32 @@ const httpServerIO = new Server(httpServer, {
 });
 
 // connection
+const Command = {
+    JOIN: "join",
+    ON_JOINED: "on_joined",
+    ON_FULL: "on_full",
+    ON_PEER_JOINED: "on_peer_joined",
+
+    LEAVE: "leave",
+    ON_LEAVE: "on_leave",
+    ON_PEER_LEAVE: "on_peer_leave",
+
+    OFFER: "offer",
+    ANSWER: "answer",
+    CANDIDATE: "candidate",
+}
+
 httpServerIO.sockets.on('connection', (socket) => {
     logger.log('a user connected: ', socket.id);
 
     socket.on('message', (room, data) => {
         logger.log(socket.id + ' sent a message [' + data + '] to room [' + room + ']');
         // all the members but excepting yourself in the room will receive the message
-        // socket.to(room).emit('message', room, data)
-        httpServerIO.in(room).emit('message', room, socket.id, data)
+        httpServerIO.to(room).emit('message', room, data)
     });
 
     // 该函数应该加锁
-    socket.on('join', (room) => {
+    socket.on(Command.JOIN, (room) => {
         logger.log(socket.id + ' wants to join the room: ' + room);
         socket.join(room)
 
@@ -76,34 +90,34 @@ httpServerIO.sockets.on('connection', (socket) => {
             return;
         }
         const sockets = createdRoom[1]
-        const users = sockets.size
-        logger.log('the number of user in room is: ' + users);
+        const userCount = sockets.size
+        logger.log('the number of user in room is: ' + userCount);
 
         // 在这里可以控制进入房间的人数，现在一个房间最多 2个人，为了便于客户端控制，如果是多人的话，应该将目前房间里人的个数当做数据下发下去。
-        if (users < 3) {
+        if (userCount < 3) {
             logger.log(socket.id + ' joined room: ' + room);
-            socket.emit('joined', room, socket.id);
-            if (users > 1) {
-                socket.to(room).emit('other_join', room);
+            socket.emit(Command.ON_JOINED, room, socket.id);
+            if (userCount > 1) {
+                socket.to(room).emit(Command.ON_PEER_JOINED, room);
             }
         } else {
             socket.leave(room);
-            socket.emit('full', room, socket.id);
+            socket.emit(Command.ON_FULL, room, socket.id);
         }
         //socket.to(room).emit('joined', room, socket.id); // 发给房间内的所有人（除自己外）。
         //httpServerIO.in(room).emit('joined', room, socket.id) // 发给房间内的所有人（包括自己）。
         //socket.broadcast.emit('joined', room, socket.id); / / 发给全部站点内的所有人（除自己外）。
     });
 
-    socket.on('leave', (room) => {
+    socket.on(Command.LEAVE, (room) => {
         const createdRoom = Array.from(httpServerIO.sockets.adapter.rooms).find(([key, value]) => key === room)
         const sockets = createdRoom[1]
         const usersCount = sockets.size
-        logger.log(socket.id + 'leaved room: ' + room);
+        logger.log(socket.id + 'left room: ' + room);
         logger.log('the number of user in room is: ' + (usersCount - 1));
         socket.leave(room);
-        socket.to(room).emit('bye', room, socket.id)
-        socket.emit('leaved', room, socket.id);
+        socket.to(room).emit(Command.ON_PEER_LEAVE, room, socket.id)
+        socket.emit(Command.ON_LEAVE, room, socket.id);
     });
 });
 

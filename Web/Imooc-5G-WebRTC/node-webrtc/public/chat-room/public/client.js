@@ -23,7 +23,7 @@ btnConnect.onclick = () => {
         btnSend.disabled = false;
     });
 
-    socket.on('leaved', (room, id) => {
+    socket.on('left', (room, id) => {
         btnConnect.disabled = false;
         btnLeave.disabled = true;
         inputArea.disabled = true;
