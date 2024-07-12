@@ -15,26 +15,38 @@
             }
         }
     </script>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
-<table align="center">
-    <tr>
-        <td>
-            <div>
-                <label for="room">roomId:</label>
-                <input type="text" id="room">
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <div>
-                <button id="join" onclick="gotoNextPage()">Join</button>
-            </div>
-        </td>
-    </tr>
-</table>
+
+<div class="container">
+    <div>
+        <div>
+            <label for="room">roomId:</label>
+            <input type="text" id="room">
+        </div>
+        <div>
+            <button id="join" class="button" onclick="gotoNextPage()">Join</button>
+        </div>
+    </div>
+</div>
 
 </body>
 

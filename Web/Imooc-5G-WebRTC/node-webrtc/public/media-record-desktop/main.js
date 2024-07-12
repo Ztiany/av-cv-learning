@@ -17,10 +17,10 @@ httpServer.listen(8080, "0.0.0.0", () => {
 });
 
 // start https server
-if (fs.existsSync('./cert/server.key') && fs.existsSync('./cert/server.cert')) {
+if (fs.existsSync('../../cert/server.key') && fs.existsSync('../../cert/server.cert')) {
     const httpsServer = https.createServer({
-        key: fs.readFileSync('server.key'),
-        cert: fs.readFileSync('server.cert')
+        key: fs.readFileSync('../../cert/server.key'),
+        cert: fs.readFileSync('../../cert/server.cert')
     }, app);
     httpsServer.listen(8443, "0.0.0.0", () => {
         console.log('HTTPS Server running on port 8443');

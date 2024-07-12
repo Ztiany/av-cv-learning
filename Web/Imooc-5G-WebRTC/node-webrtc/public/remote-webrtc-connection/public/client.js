@@ -75,16 +75,21 @@ const Elements = {
     btnLeave: Element,
     taOffer: Element,
     taAnswer: Element,
-    taInformation: Element,
+    divInformation: Element,
     cbShareDesk: Element,
 }
 
-Elements.appendInformation = function (information) {
-    if (!Elements.taInformation) {
+Elements.appendInformation = function (color, information) {
+    if (!Elements.divInformation) {
         return;
     }
-    Elements.taInformation.scrollTop = Elements.taInformation.scrollHeight;
-    Elements.taInformation.value = Elements.taInformation.value + information + '\r';
+    Elements.divInformation.scrollTop = Elements.divInformation.scrollHeight;
+    const div = document.createElement('p');
+    div.style.color = color;
+    div.style.fontSize = '12px';
+    div.innerHTML = information;
+    Elements.divInformation.appendChild(div);
+    Elements.divInformation.appendChild(document.createElement('br'));
 }
 
 const MediaHolder = {
@@ -97,8 +102,23 @@ const MediaHolder = {
 const ConnectionState = {
     Initialized: 0,
     Joined: 1,
-    Joined_Unbound: 2,
+    PeerLeft: 2,
     PeerJoined: 3,
+}
+
+ConnectionState.name = function (state) {
+    switch (state) {
+        case ConnectionState.Initialized:
+            return "Initialized";
+        case ConnectionState.Joined:
+            return "Joined";
+        case ConnectionState.PeerLeft:
+            return "PeerLeft";
+        case ConnectionState.PeerJoined:
+            return "PeerJoined";
+        default:
+            return "Unknown";
+    }
 }
 
 const Command = {
@@ -110,10 +130,6 @@ const Command = {
     LEAVE: "leave",
     ON_LEAVE: "on_leave",
     ON_PEER_LEAVE: "on_peer_leave",
-
-    OFFER: "offer",
-    ANSWER: "answer",
-    CANDIDATE: "candidate",
 }
 
 const Context = {
@@ -123,7 +139,7 @@ const Context = {
 }
 
 Context.updateConnectionState = function (state) {
-    Context.log("New Connection state: " + state);
+    Context.logDebug("New Connection state: " + ConnectionState.name(state));
     Context.connectionState = state;
     if (state === ConnectionState.Initialized) {
         Elements.btnConnect.disabled = false;
@@ -134,17 +150,45 @@ Context.updateConnectionState = function (state) {
     }
 }
 
-Context.log = function (message) {
+Context.logDebug = function (message) {
     console.log(message);
-    Elements.appendInformation(message);
+    Elements.appendInformation("blue", message);
+}
+
+Context.logError = function (message) {
+    console.error(message);
+    Elements.appendInformation("red", message);
 }
 
 Context.sendMessage = function (data) {
-    Context.log(`Send message to room: ${Context.roomId}, data: ${JSON.stringify(data)}`);
+    Context.logDebug(`Send message to room: ${Context.roomId}, data: ${JSON.stringify(data)}`);
     if (!Context.socket) {
-        console.error('socket is null');
+        Context.logError('socket is null');
     }
     Context.socket.emit('message', Context.roomId, data);
+}
+
+Context.sendCommand = function (command) {
+    Context.logDebug(`Send command to room: ${Context.roomId}, command: ${command}`);
+    if (!Context.socket) {
+        Context.logError('socket is null');
+    }
+    Context.socket.emit(command, Context.roomId);
+}
+
+Context.closeSocket = function () {
+    if (!Context.socket) {
+        return;
+    }
+    Context.socket.disconnect();
+    Context.socket = null;
+}
+
+Context.initSocket = function () {
+    if (Context.socket) {
+        return;
+    }
+    Context.socket = io();
 }
 
 // ============================================================
@@ -158,82 +202,103 @@ function init() {
     Elements.btnLeave = document.querySelector('button#leave');
     Elements.taOffer = document.querySelector('textarea#offer');
     Elements.taAnswer = document.querySelector('textarea#answer');
-    Elements.taInformation = document.querySelector('textarea#stateInformation');
+    Elements.divInformation = document.querySelector('div#stateInformation');
     Elements.cbShareDesk = document.querySelector('input#shareDesk');
     Elements.btnConnect.onclick = initLocalMediaStream
     Elements.btnLeave.onclick = disconnectAndLeave;
 
     if (!isWebRTCSupported()) {
-        console.error("WebRTC is not supported in your browser.");
+        Context.logError("WebRTC is not supported in your browser.");
         alert("WebRTC is not supported in your browser.")
         return;
     }
 
-    // init network
-    Context.socket = io();
+    // init state
     Context.updateConnectionState(ConnectionState.Initialized);
     Context.roomId = getQueryVariable("room");
-    Context.log("roomId: " + Context.roomId)
+    Context.logDebug("roomId: " + Context.roomId)
 }
 
 function initLocalMediaStream() {
-    if (!Context.roomId) {
-        alert("Please input the room id.")
+    if (!isWebRTCSupported()) {
+        alert("WebRTC is not supported in your browser.")
         return
     }
-
-    let constraints;
-    if (Elements.cbShareDesk.checked && shareDesk()) {
-        constraints = {
-            video: false,
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
-        }
-    } else {
-        constraints = {
-            video: true,
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
-        }
+    if (!Context.roomId) {
+        alert("Please input the room id.");
+        return;
     }
 
-    navigator.mediaDevices.getUserMedia(constraints)
+    Context.initSocket();
+
+    assembleLocalMediaStream()
         .then((stream) => {
-            if (MediaHolder.localStream) {
-                stream.getTracks().forEach((track) => {
-                    // 将原来的流中的 track 移除，然后添加到新的流中。
-                    MediaHolder.localStream.addTrack(track);
-                    stream.removeTrack(track);
-                })
-            } else {
+            if (stream) {
+                Context.logDebug("assembleLocalMediaStream success. stream: " + JSON.stringify(stream));
                 MediaHolder.localStream = stream;
+                Elements.videoLocal.srcObject = MediaHolder.localStream;
+                // 一定要放到 getMediaStream 之后再调用，否则就会出现绑定失败的情况。
+                startConnection();
+            } else {
+                Context.logError("assembleLocalMediaStream: stream is null.")
             }
-            Elements.videoLocal.srcObject = MediaHolder.localStream;
-            // 一定要放到 getMediaStream 之后再调用，否则就会出现绑定失败的情况。
-            startConnection();
-        }).catch((error) => {
-        console.error("getUserMedia: " + error);
-    })
+        })
+        .catch((error) => {
+            Context.logError("assembleLocalMediaStream: " + error)
+        })
 }
 
-function shareDesk() {
+function isDeskSharable() {
+
+
     if (isDesktopDevice()) {
         navigator.mediaDevices.getDisplayMedia({video: true})
             .then((stream) => {
                 MediaHolder.localStream = stream;
+                Context.logDebug("getDisplayMedia: get desktop stream success.");
             })
             .catch((error) => {
-                console.error("getDisplayMedia: " + error);
+                Context.logError("getDisplayMedia: " + error);
             });
         return true;
     }
     return false;
+}
+
+async function assembleLocalMediaStream() {
+    const constraints = {
+        video: true,
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
+    }
+
+    // If the user ask to share the desktop and the device is desktop, then share the desktop. When sharing the desktop, the video should be disabled.
+    if (Elements.cbShareDesk.checked && isDesktopDevice()) {
+        try {
+            constraints.video = false;
+            const desktopStream = await navigator.mediaDevices.getDisplayMedia({video: true})
+            const mediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+            // 将用户媒体流中的 track 移动到桌面流中。
+            mediaStream.getTracks().forEach(track => {
+                desktopStream.addTrack(track);
+                mediaStream.removeTrack(track);
+            });
+            return desktopStream;
+        } catch (error) {
+            Context.logError("getDisplayMedia + getMediaStream: " + error);
+            throw error;
+        }
+    }
+
+    try {
+        return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (error) {
+        Context.logError("getUserMedia: " + error);
+        throw error;
+    }
 }
 
 // ============================================================
@@ -241,15 +306,15 @@ function shareDesk() {
 // ============================================================
 
 function startConnection() {
-    Elements.appendInformation("Start connection.");
+    Context.logDebug("Start connection.");
     setUpMessageHandlers();
-    Context.socket.emit(Command.JOIN, Context.roomId);
+    Context.sendCommand(Command.JOIN);
 }
 
 function setUpMessageHandlers() {
-    // Joined
+    // Self joined
     Context.socket.on(Command.ON_JOINED, (roomId, userId) => {
-        Context.log("Joined room: " + roomId + " as user: " + userId);
+        Context.logDebug("Joined room: " + roomId + " as user: " + userId);
         Context.updateConnectionState(ConnectionState.Joined);
         /*
         如果是多人的话，第一个人不该在这里创建 peerConnection，而是等到收到一个 other_join 时再创建，并且在这个消息里应该带当前房间的用户数。
@@ -258,11 +323,11 @@ function setUpMessageHandlers() {
         initLocalPeerConnection();
     })
 
-    // PeerJoined
+    // Peer joined
     Context.socket.on(Command.ON_PEER_JOINED, (roomId, userId) => {
-        Context.log("User: " + userId + " joined the room: " + roomId);
+        Context.logDebug("User: " + userId + " joined the room: " + roomId);
         // 如果是多人的话，每上来一个人都要创建一个新的 peerConnection。
-        if (Context.connectionState === ConnectionState.Joined_Unbound) {
+        if (Context.connectionState === ConnectionState.PeerLeft) {
             initLocalPeerConnection();
         }
         Context.updateConnectionState(ConnectionState.PeerJoined);
@@ -272,29 +337,107 @@ function setUpMessageHandlers() {
     // Room is full
     Context.socket.on(Command.ON_FULL, (roomId, userId) => {
         alert('The room is full!');
-        Context.log("Room is full: " + roomId + " as user: " + userId);
+        Context.logDebug("Room is full: " + roomId);
         Context.updateConnectionState(ConnectionState.Initialized);
         closeLocalPeerConnection();
         closeLocalMediaStream();
     })
 
-    // Self Leave
+    // Self left
     Context.socket.on(Command.ON_LEAVE, (roomId, userId) => {
-        Context.log("Left the room: " + roomId + " as user: " + userId);
+        Context.logDebug("Left the room: " + roomId + " as user: " + userId);
+        Context.updateConnectionState(ConnectionState.Initialized);
+        closeLocalPeerConnection();
+        closeLocalMediaStream();
+        Context.closeSocket();
+    })
+
+    // Disconnect
+    Context.socket.on('disconnect', () => {
+        Context.logDebug("Disconnected.");
+        // The logic is the same as the user left the room. It is necessary to close the connection and release the resources.
+        // For example, if the user closes the browser or the connection closes accidentally.
         Context.updateConnectionState(ConnectionState.Initialized);
         closeLocalPeerConnection();
         closeLocalMediaStream();
     })
 
-    // Peer Leave
+    // Peer left
+    Context.socket.on(Command.ON_PEER_LEAVE, (roomId, userId) => {
+        Context.logDebug("User: " + userId + " left the room: " + roomId);
+        Context.updateConnectionState(ConnectionState.PeerLeft);
+        closeLocalPeerConnection();
+        Elements.taAnswer.value = "";
+        Elements.taOffer.value = "";
+    })
 
     // Message
+    Context.socket.on('message', (roomId, data) => {
+        Context.logDebug('Receive message: ' + (data ? JSON.stringify(data) : 'null'));
+        if (data === null || data === undefined) {
+            Context.logDebug('the message is invalid!');
+            return;
+        }
 
-    // Disconnected
+        if (data.hasOwnProperty('type') && data.type === 'offer') {
+            Elements.taOffer.value = data.sdp;
+            // peer sets remote description
+            MediaHolder.rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data))
+                .catch((error) => {
+                    Context.logError('Peer setting remote description: ' + error);
+                });
+
+            // peer creates answer
+            MediaHolder.rtcPeerConnection.createAnswer()
+                .then((answer) => {
+                    MediaHolder.rtcPeerConnection.setLocalDescription(answer)
+                        .then(() => {
+                            Elements.taAnswer.value = answer.sdp;
+                            Context.sendMessage(answer);
+                        })
+                        .catch((error) => {
+                            Context.logError('Peer setting local description: ' + error)
+                        })
+                })
+                .catch((error) => {
+                    Context.logError('Error creating answer', error);
+                });
+            return;
+        }
+
+        if (data.hasOwnProperty('type') && data.type === 'answer') {
+            // self sets remote description
+            Elements.taAnswer.value = data.sdp;
+            // answer 对象的格式默认就是：{type: "answer", sdp: "xxxxx"}
+            MediaHolder.rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data)).catch((error) => {
+                Context.logError('Self setting remote description: ' + error);
+            });
+            return;
+        }
+
+        if (data.hasOwnProperty('type') && data.type === 'candidate') {
+            // self and peer add ice candidate
+            const candidate = new RTCIceCandidate({
+                sdpMLineIndex: data.label,
+                candidate: data.candidate
+            });
+            MediaHolder.rtcPeerConnection.addIceCandidate(candidate).catch((error) => {
+                Context.logError('Error adding received ice candidate', error);
+            });
+            return;
+        }
+
+        Context.logError('The message is invalid!');
+    });
 }
 
 function disconnectAndLeave() {
-
+    Context.sendCommand(Command.LEAVE);
+    Context.updateConnectionState(ConnectionState.Initialized);
+    closeLocalPeerConnection();
+    closeLocalMediaStream();
+    Elements.taOffer.value = "";
+    Elements.taAnswer.value = "";
 }
 
 // ============================================================
@@ -303,7 +446,7 @@ function disconnectAndLeave() {
 function initLocalPeerConnection() {
     // 如果是多人的话，在这里要创建一个新的连接，新创建好的要放到一个 map 表中：key=userid, value=peerConnection。
     if (MediaHolder.rtcPeerConnection) {
-        console.error("rtcPeerConnection has been created.")
+        Context.logError("rtcPeerConnection has already been created.")
         return
     }
     MediaHolder.rtcPeerConnection = new RTCPeerConnection(MediaHolder.peerConnectionConfig);
@@ -311,20 +454,20 @@ function initLocalPeerConnection() {
     MediaHolder.rtcPeerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             Context.sendMessage({
-                type: 'candidate',
+                type: "candidate",
                 label: event.candidate.sdpMLineIndex,
                 id: event.candidate.sdpMid,
                 candidate: event.candidate.candidate
             })
-            Context.log('Local ICE candidate: ' + event.candidate.candidate)
+            Context.logDebug('Local ICE candidate: ' + event.candidate.candidate)
         } else {
-            Context.log('End of candidates.')
+            Context.logDebug('End of candidates.')
         }
     }
 
     // 当收到远程流的时候，会触发这个事件。
     MediaHolder.rtcPeerConnection.ontrack = (event) => {
-
+        Elements.videoRemote.srcObject = event.streams[0];
     }
 
     // 绑定本地流
@@ -335,7 +478,7 @@ function initLocalPeerConnection() {
 
 function sendMediaOffer() {
     if (Context.connectionState !== ConnectionState.PeerJoined) {
-        console.error("Connection state is not PeerConnected.")
+        Context.logError("Connection state is not PeerConnected.")
         return
     }
 
@@ -348,23 +491,26 @@ function sendMediaOffer() {
         .then((offer) => {
             MediaHolder.rtcPeerConnection.setLocalDescription(offer)
                 .then(() => {
-                    Context.log("Set local description success. offer: " + offer);
+                    Context.logDebug("Set local description success.");
                     Elements.taOffer.value = offer.sdp;
+                    // offer 对象的格式默认就是：{type: "offer", sdp: "xxxxx"}
                     Context.sendMessage(offer);
                 })
                 .catch((error) => {
-                    Context.log("Set local description error: " + error);
+                    Context.logDebug("Set local description error: " + error);
                 });
         })
         .catch((error) => {
-            Context.log("Create offer: " + error);
+            Context.logDebug("Create offer: " + error);
         })
 }
 
 function closeLocalPeerConnection() {
     if (!MediaHolder.rtcPeerConnection) {
+        Context.logDebug("closeLocalPeerConnection: rtcPeerConnection is null.")
         return
     }
+    Context.logDebug("closeLocalPeerConnection: rtcPeerConnection is closed.")
     MediaHolder.rtcPeerConnection.close();
     MediaHolder.rtcPeerConnection = null;
 }

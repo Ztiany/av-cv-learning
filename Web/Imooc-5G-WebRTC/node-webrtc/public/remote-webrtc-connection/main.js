@@ -48,11 +48,11 @@ app.use(express.static('public'));
 // ===============================================================================
 const httpServer = http.createServer(app);
 // bind socket.io to http server
-const httpServerIO = new Server(httpServer, {
+const socketIo = new Server(httpServer, {
     // options
 });
 
-// connection
+// Commands (Shared between server and client)
 const Command = {
     JOIN: "join",
     ON_JOINED: "on_joined",
@@ -62,19 +62,21 @@ const Command = {
     LEAVE: "leave",
     ON_LEAVE: "on_leave",
     ON_PEER_LEAVE: "on_peer_leave",
-
-    OFFER: "offer",
-    ANSWER: "answer",
-    CANDIDATE: "candidate",
 }
 
-httpServerIO.sockets.on('connection', (socket) => {
+/*
+connection:
+    socket.to(room).emit('joined', room, socket.id); // 发给房间内的所有人（除自己外）。
+    socket.broadcast.emit('joined', room, socket.id); / / 发给全部站点内的所有人（除自己外）。
+    socketIo.in(room).emit('joined', room, socket.id) // 发给房间内的所有人（包括自己）。
+ */
+socketIo.sockets.on('connection', (socket) => {
     logger.log('a user connected: ', socket.id);
 
     socket.on('message', (room, data) => {
-        logger.log(socket.id + ' sent a message [' + data + '] to room [' + room + ']');
+        logger.log(socket.id + ' sent a message [' + JSON.stringify(data) + '] to room [' + room + ']');
         // all the members but excepting yourself in the room will receive the message
-        httpServerIO.to(room).emit('message', room, data)
+        socket.to(room).emit('message', room, data)
     });
 
     // 该函数应该加锁
@@ -83,7 +85,7 @@ httpServerIO.sockets.on('connection', (socket) => {
         socket.join(room)
 
         // After the socket joins the room, log the rooms
-        const rooms = httpServerIO.sockets.adapter.rooms;
+        const rooms = socketIo.sockets.adapter.rooms;
         const createdRoom = Array.from(rooms).find(([key, value]) => key === room)
         logger.log('got or created the room: ', createdRoom);
         if (!createdRoom) {
@@ -98,19 +100,16 @@ httpServerIO.sockets.on('connection', (socket) => {
             logger.log(socket.id + ' joined room: ' + room);
             socket.emit(Command.ON_JOINED, room, socket.id);
             if (userCount > 1) {
-                socket.to(room).emit(Command.ON_PEER_JOINED, room);
+                socket.to(room).emit(Command.ON_PEER_JOINED, room, socket.id);
             }
         } else {
             socket.leave(room);
             socket.emit(Command.ON_FULL, room, socket.id);
         }
-        //socket.to(room).emit('joined', room, socket.id); // 发给房间内的所有人（除自己外）。
-        //httpServerIO.in(room).emit('joined', room, socket.id) // 发给房间内的所有人（包括自己）。
-        //socket.broadcast.emit('joined', room, socket.id); / / 发给全部站点内的所有人（除自己外）。
     });
 
     socket.on(Command.LEAVE, (room) => {
-        const createdRoom = Array.from(httpServerIO.sockets.adapter.rooms).find(([key, value]) => key === room)
+        const createdRoom = Array.from(socketIo.sockets.adapter.rooms).find(([key, value]) => key === room)
         const sockets = createdRoom[1]
         const usersCount = sockets.size
         logger.log(socket.id + 'left room: ' + room);
@@ -127,10 +126,10 @@ logger.log('HTTP Server is running on: http://localhost:8080');
 // ===============================================================================
 // start https server
 // ===============================================================================
-if (fs.existsSync('./cert/server.key') && fs.existsSync('./cert/server.cert')) {
+if (fs.existsSync('../../cert/server.key') && fs.existsSync('../../cert/server.cert')) {
     const httpsServer = https.createServer({
-        key: fs.readFileSync('server.key'),
-        cert: fs.readFileSync('server.cert')
+        key: fs.readFileSync('../../cert/server.key'),
+        cert: fs.readFileSync('../../cert/server.cert')
     }, app);
     httpsServer.listen(8443, "0.0.0.0");
     logger.log('HTTPS Server is running on: https://localhost:8443');

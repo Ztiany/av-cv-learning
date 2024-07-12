@@ -17,6 +17,7 @@ btnConnect.onclick = () => {
 
     // receive message
     socket.on('joined', (room, id) => {
+        console.log("joined room [" + room + "] with id [" + id + "]")
         btnConnect.disabled = true;
         btnLeave.disabled = false;
         inputArea.disabled = false;
@@ -24,6 +25,7 @@ btnConnect.onclick = () => {
     });
 
     socket.on('left', (room, id) => {
+        console.log("left room [" + room + "] with id [" + id + "]")
         btnConnect.disabled = false;
         btnLeave.disabled = true;
         inputArea.disabled = true;
@@ -33,12 +35,14 @@ btnConnect.onclick = () => {
     });
 
     socket.on('message', (room, id, data) => {
+        console.log("received message [" + data + "] from [" + id + "]");
         outputArea.scrollTop = outputArea.scrollHeight;// 窗口总是显示最后的内容
         console.log("received message [" + data + "] from [" + id + "]");
         outputArea.value = outputArea.value + data + '\r';
     });
 
     socket.on('disconnect', (socket) => {
+        console.log("disconnected");
         btnConnect.disabled = false;
         btnLeave.disabled = true;
         inputArea.disabled = true;
