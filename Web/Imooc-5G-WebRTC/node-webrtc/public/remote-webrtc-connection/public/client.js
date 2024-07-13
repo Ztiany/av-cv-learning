@@ -69,14 +69,30 @@ function isWebRTCSupported() {
 // ============================================================
 
 const Elements = {
-    videoLocal: Element,
-    videoRemote: Element,
-    btnConnect: Element,
-    btnLeave: Element,
-    taOffer: Element,
-    taAnswer: Element,
-    divInformation: Element,
-    cbShareDesk: Element,
+    videoLocal: undefined,
+    videoRemote: undefined,
+
+    taOffer: undefined,
+    taAnswer: undefined,
+
+    btnConnect: undefined,
+    btnLeave: undefined,
+    divInformation: undefined,
+    cbShareDesk: undefined,
+    selectBandwidth: undefined,
+
+    taChatPanel: undefined,
+    taChatInput: undefined,
+    btnSendText: undefined,
+
+    divFileBitrate: undefined,
+    inputFile: undefined,
+    spanFileStatus: undefined,
+    aDownloadFile: undefined,
+    progressSending: undefined,
+    progressReceiving: undefined,
+    btnSendFile: undefined,
+    btnAbortFileSending: undefined,
 }
 
 Elements.appendInformation = function (color, information) {
@@ -97,45 +113,93 @@ const MediaHolder = {
     localStream: undefined,
     remoteStream: undefined,
     rtcPeerConnection: undefined,
+    chatDataChannel: undefined,
+    fileDataChannel: undefined,
 }
 
-const ConnectionState = {
-    Initialized: 0,
-    Joined: 1,
-    PeerLeft: 2,
-    PeerJoined: 3,
+const FileHolder = {
+    // sending
+    fileReader: undefined,
+
+    // receiving
+    receiveBuffer: undefined,
+    receivedSize: 0,
+    fileName: "",
+    fileSize: 0,
+    lastModifyTime: 0,
+    fileType: ""
 }
 
-ConnectionState.name = function (state) {
-    switch (state) {
-        case ConnectionState.Initialized:
-            return "Initialized";
-        case ConnectionState.Joined:
-            return "Joined";
-        case ConnectionState.PeerLeft:
-            return "PeerLeft";
-        case ConnectionState.PeerJoined:
-            return "PeerJoined";
-        default:
-            return "Unknown";
+const Statistics = {
+    bitrateGraph: undefined,
+    bitrateSeries: undefined,
+    packetGraph: undefined,
+    packetSeries: undefined,
+    lastResult: undefined,
+}
+
+Statistics.init = function () {
+    Statistics.bitrateSeries = new TimelineDataSeries();
+    Statistics.bitrateGraph = new TimelineGraphView('bitrateGraph', 'bitrateCanvas');
+    Statistics.bitrateGraph.updateEndDate();
+
+    Statistics.packetSeries = new TimelineDataSeries();
+    Statistics.packetGraph = new TimelineGraphView('packetGraph', 'packetCanvas');
+    Statistics.packetGraph.updateEndDate();
+
+    setInterval(Statistics.updateStats, 1000);
+}
+
+Statistics.updateStats = function () {
+    if (Context.connectionState === ConnectionState.Initialized) {
+        Statistics.lastResult = undefined;
+        return;
     }
-}
 
-const Command = {
-    JOIN: "join",
-    ON_JOINED: "on_joined",
-    ON_FULL: "on_full",
-    ON_PEER_JOINED: "on_peer_joined",
+    if (!MediaHolder.rtcPeerConnection) {
+        Statistics.lastResult = undefined;
+        return;
+    }
 
-    LEAVE: "leave",
-    ON_LEAVE: "on_leave",
-    ON_PEER_LEAVE: "on_peer_leave",
+    const sender = MediaHolder.rtcPeerConnection.getSenders()[0];
+    if (!sender) {
+        Statistics.lastResult = undefined;
+        return;
+    }
+
+    sender.getStats().then(rtcStatsReport => {
+
+        rtcStatsReport.forEach(report => {
+            let bytes;
+            let packets;
+            if (report.type === 'outbound-rtp') {
+                const now = report.timestamp;
+                bytes = report.bytesSent;
+                packets = report.packetsSent;
+
+                if (Statistics.lastResult && Statistics.lastResult.has(report.id)) {
+                    // calculate bitrate, unit: bps
+                    const bitrate = 8 * (bytes - Statistics.lastResult.get(report.id).bytesSent) / (now - Statistics.lastResult.get(report.id).timestamp);
+                    // append to chart
+                    Statistics.bitrateSeries.addPoint(now, bitrate);
+                    Statistics.bitrateGraph.setDataSeries([Statistics.bitrateSeries]);
+                    Statistics.bitrateGraph.updateEndDate();
+                    // calculate number of packets and append to chart
+                    Statistics.packetSeries.addPoint(now, packets - Statistics.lastResult.get(report.id).packetsSent);
+                    Statistics.packetGraph.setDataSeries([Statistics.packetSeries]);
+                    Statistics.packetGraph.updateEndDate();
+                }
+            }
+        });
+
+        Statistics.lastResult = rtcStatsReport;
+    });
 }
 
 const Context = {
     socket: undefined,
-    roomId: String,
-    connectionState: Number,
+    roomId: undefined,
+    connectionState: 0,
 }
 
 Context.updateConnectionState = function (state) {
@@ -144,9 +208,17 @@ Context.updateConnectionState = function (state) {
     if (state === ConnectionState.Initialized) {
         Elements.btnConnect.disabled = false;
         Elements.btnLeave.disabled = true;
+        Elements.selectBandwidth.disabled = true;
+
+        Elements.taChatInput.disabled = true;
+        Elements.btnSendText.disabled = true;
+        Elements.inputFile.disabled = true;
+        Elements.btnSendFile.disabled = true;
+        Elements.btnAbortFileSending.disabled = true;
     } else {
         Elements.btnConnect.disabled = true;
         Elements.btnLeave.disabled = false;
+        Elements.selectBandwidth.disabled = false;
     }
 }
 
@@ -191,6 +263,39 @@ Context.initSocket = function () {
     Context.socket = io();
 }
 
+const ConnectionState = {
+    Initialized: 0,
+    Joined: 1,
+    PeerLeft: 2,
+    PeerJoined: 3,
+}
+
+ConnectionState.name = function (state) {
+    switch (state) {
+        case ConnectionState.Initialized:
+            return "Initialized";
+        case ConnectionState.Joined:
+            return "Joined";
+        case ConnectionState.PeerLeft:
+            return "PeerLeft";
+        case ConnectionState.PeerJoined:
+            return "PeerJoined";
+        default:
+            return "Unknown";
+    }
+}
+
+const Command = {
+    JOIN: "join",
+    ON_JOINED: "on_joined",
+    ON_FULL: "on_full",
+    ON_PEER_JOINED: "on_peer_joined",
+
+    LEAVE: "leave",
+    ON_LEAVE: "on_leave",
+    ON_PEER_LEAVE: "on_peer_leave",
+}
+
 // ============================================================
 // Initialization
 // ============================================================
@@ -204,8 +309,27 @@ function init() {
     Elements.taAnswer = document.querySelector('textarea#answer');
     Elements.divInformation = document.querySelector('div#stateInformation');
     Elements.cbShareDesk = document.querySelector('input#shareDesk');
+    Elements.selectBandwidth = document.querySelector('select#bandwidth');
+    Elements.taChatPanel = document.querySelector('textarea#chatPanel');
+    Elements.taChatInput = document.querySelector('textarea#chatInput');
+    Elements.btnSendText = document.querySelector('button#sendText');
+
+    Elements.divFileBitrate = document.querySelector("div#fileBitrate")
+    Elements.inputFile = document.querySelector("input#fileInput")
+    Elements.spanFileStatus = document.querySelector("span#fileStatus")
+    Elements.aDownloadFile = document.querySelector("a#downloadFile")
+    Elements.progressSending = document.querySelector("progress#sendProgress");
+    Elements.progressReceiving = document.querySelector("progress#receiveProgress")
+    Elements.btnSendFile = document.querySelector("button#sendFile")
+    Elements.btnAbortFileSending = document.querySelector("button#abortButton")
+
     Elements.btnConnect.onclick = initLocalMediaStream
     Elements.btnLeave.onclick = disconnectAndLeave;
+    Elements.selectBandwidth.onchange = switchBandwidth;
+    Elements.btnSendText.onclick = sendChatMessageByWebrtcChannel;
+    Elements.btnSendFile.onclick = sendFileByWebrtcChannel;
+    Elements.btnAbortFileSending.onclick = abortFileSending;
+    Elements.inputFile.onchange = handleFileInputChange;
 
     if (!isWebRTCSupported()) {
         Context.logError("WebRTC is not supported in your browser.");
@@ -246,23 +370,6 @@ function initLocalMediaStream() {
         .catch((error) => {
             Context.logError("assembleLocalMediaStream: " + error)
         })
-}
-
-function isDeskSharable() {
-
-
-    if (isDesktopDevice()) {
-        navigator.mediaDevices.getDisplayMedia({video: true})
-            .then((stream) => {
-                MediaHolder.localStream = stream;
-                Context.logDebug("getDisplayMedia: get desktop stream success.");
-            })
-            .catch((error) => {
-                Context.logError("getDisplayMedia: " + error);
-            });
-        return true;
-    }
-    return false;
 }
 
 async function assembleLocalMediaStream() {
@@ -309,6 +416,8 @@ function startConnection() {
     Context.logDebug("Start connection.");
     setUpMessageHandlers();
     Context.sendCommand(Command.JOIN);
+
+    Statistics.init();
 }
 
 function setUpMessageHandlers() {
@@ -331,6 +440,10 @@ function setUpMessageHandlers() {
             initLocalPeerConnection();
         }
         Context.updateConnectionState(ConnectionState.PeerJoined);
+        // Self init data channel and peer will receive this data channel.
+        initWebrtcChatChannel();
+        initWebrtcFileChannel();
+        // Send media offer
         sendMediaOffer();
     })
 
@@ -379,42 +492,55 @@ function setUpMessageHandlers() {
             return;
         }
 
+        // handle webrtc offer
         if (data.hasOwnProperty('type') && data.type === 'offer') {
             Elements.taOffer.value = data.sdp;
             // peer sets remote description
             MediaHolder.rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data))
-                .catch((error) => {
-                    Context.logError('Peer setting remote description: ' + error);
-                });
-
-            // peer creates answer
-            MediaHolder.rtcPeerConnection.createAnswer()
+                .then(() => {
+                    Context.logDebug('Peer setting remote description success.');
+                    return MediaHolder.rtcPeerConnection.createAnswer()
+                })
                 .then((answer) => {
-                    MediaHolder.rtcPeerConnection.setLocalDescription(answer)
-                        .then(() => {
-                            Elements.taAnswer.value = answer.sdp;
-                            Context.sendMessage(answer);
-                        })
-                        .catch((error) => {
-                            Context.logError('Peer setting local description: ' + error)
-                        })
+                    Context.logDebug('Peer creating answer success.');
+                    return new Promise((resolve, reject) => {
+                        MediaHolder.rtcPeerConnection.setLocalDescription(answer)
+                            .then(() => {
+                                resolve(answer);
+                            })
+                            .catch((error) => {
+                                reject(error);
+                            })
+                    })
+                })
+                .then((answer) => {
+                    Elements.taAnswer.value = answer.sdp;
+                    Context.sendMessage(answer);
+                    Elements.selectBandwidth.disabled = false;
                 })
                 .catch((error) => {
-                    Context.logError('Error creating answer', error);
+                    Context.logError('Peer handle offer failed: ' + error);
                 });
             return;
         }
 
+        // handle webrtc answer
         if (data.hasOwnProperty('type') && data.type === 'answer') {
             // self sets remote description
             Elements.taAnswer.value = data.sdp;
             // answer 对象的格式默认就是：{type: "answer", sdp: "xxxxx"}
-            MediaHolder.rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data)).catch((error) => {
-                Context.logError('Self setting remote description: ' + error);
-            });
+            MediaHolder.rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(data))
+                .then(() => {
+                    Elements.selectBandwidth.disabled = false;
+                    Context.logDebug('Self setting remote description success.');
+                })
+                .catch((error) => {
+                    Context.logError('Self setting remote description: ' + error);
+                });
             return;
         }
 
+        // handle webrtc ice candidate
         if (data.hasOwnProperty('type') && data.type === 'candidate') {
             // self and peer add ice candidate
             const candidate = new RTCIceCandidate({
@@ -425,6 +551,15 @@ function setUpMessageHandlers() {
                 Context.logError('Error adding received ice candidate', error);
             });
             return;
+        }
+
+        // handle webrtc file info
+        if (data.hasOwnProperty('type') && data.type === 'fileInfo') {
+            FileHolder.fileName = data.name;
+            FileHolder.fileType = data.filetype;
+            FileHolder.fileSize = data.size;
+            FileHolder.lastModifyTime = data.lastModify;
+            Elements.progressReceiving.max = FileHolder.fileSize;
         }
 
         Context.logError('The message is invalid!');
@@ -440,6 +575,34 @@ function disconnectAndLeave() {
     Elements.taAnswer.value = "";
 }
 
+/**
+ * Open `chrome://webrtc-internals/` in Chrome to see the WebRTC debug information.
+ * When you changed the bandwidth, you can see the change in the `Bandwidth` column.
+ */
+function switchBandwidth() {
+    Elements.selectBandwidth.disabled = true;
+    const targetBandwidth = Elements.selectBandwidth.options[Elements.selectBandwidth.selectedIndex].value
+    const vSender = MediaHolder.rtcPeerConnection.getSenders().find(sender => sender.track.kind === 'video');
+    const parameters = vSender.getParameters();
+    if (!parameters.encodings) {
+        parameters.encodings = [{}];
+    }
+    if (targetBandwidth === 'unlimited') {
+        delete parameters.encodings[0].maxBitrate;
+    } else {
+        parameters.encodings[0].maxBitrate = targetBandwidth * 1000;
+    }
+    vSender.setParameters(parameters)
+        .then(() => {
+            Elements.selectBandwidth.disabled = false;
+            Context.logDebug('Bandwidth is set to: ' + targetBandwidth + ' kbps');
+        })
+        .catch((error) => {
+            Elements.selectBandwidth.disabled = false;
+            Context.logError('Error setting bandwidth: ' + error);
+        });
+}
+
 // ============================================================
 // WebRTC API
 // ============================================================
@@ -450,6 +613,7 @@ function initLocalPeerConnection() {
         return
     }
     MediaHolder.rtcPeerConnection = new RTCPeerConnection(MediaHolder.peerConnectionConfig);
+
     // 当收集到了链路的时候，会触发这个事件。链路可以是 host, srflx, relay 这三种类型。
     MediaHolder.rtcPeerConnection.onicecandidate = (event) => {
         if (event.candidate) {
@@ -463,6 +627,11 @@ function initLocalPeerConnection() {
         } else {
             Context.logDebug('End of candidates.')
         }
+    }
+
+    // Peer will receive the data channel by this event.
+    MediaHolder.rtcPeerConnection.ondatachannel = (event) => {
+        onReceiveDataChannel(event);
     }
 
     // 当收到远程流的时候，会触发这个事件。
@@ -513,6 +682,7 @@ function closeLocalPeerConnection() {
     Context.logDebug("closeLocalPeerConnection: rtcPeerConnection is closed.")
     MediaHolder.rtcPeerConnection.close();
     MediaHolder.rtcPeerConnection = null;
+    MediaHolder.chatDataChannel = null;
 }
 
 function closeLocalMediaStream() {
@@ -523,4 +693,204 @@ function closeLocalMediaStream() {
         track.stop();
     })
     MediaHolder.localStream = null;
+}
+
+function onReceiveDataChannel(event) {
+    if (!event || !event.channel) {
+        Context.logError('onReceiveDataChannel: event or event.channel is null.');
+        return;
+    }
+    if (event.channel.label === 'chat-channel') {
+        initWebrtcChatChannel(event);
+    } else if (event.channel.label === 'file-channel') {
+        initWebrtcFileChannel(event);
+    }
+}
+
+function initWebrtcChatChannel(event) {
+    Context.logDebug('initWebRtcChatChannel. event: ' + JSON.stringify(event))
+
+    if (!MediaHolder.rtcPeerConnection) {
+        Context.logError('rtcPeerConnection is null.');
+        return;
+    }
+    if (MediaHolder.chatDataChannel) {
+        Context.logError('chatDataChannel has already been created.');
+        return;
+    }
+
+    if (event) {
+        MediaHolder.chatDataChannel = event.channel;
+    } else {
+        MediaHolder.chatDataChannel = MediaHolder.rtcPeerConnection.createDataChannel('chat-channel');
+    }
+
+    MediaHolder.chatDataChannel.onmessage = (event) => {
+        const msg = event.data;
+        if (msg) {
+            Context.logDebug('received webrtc chat msg: ' + msg);
+            Elements.taChatPanel.value += "He/She: " + msg + "\r\n";
+        } else {
+            Context.logError('received webrtc chat msg is null.');
+        }
+    }
+
+    MediaHolder.chatDataChannel.onopen = () => {
+        Context.logDebug('Chat Data channel is open.');
+        Elements.taChatInput.disabled = false;
+        Elements.btnSendText.disabled = false;
+    }
+
+    MediaHolder.chatDataChannel.onclose = () => {
+        Context.logDebug('Chat Data channel is close.');
+        Elements.taChatInput.disabled = true;
+        Elements.btnSendText.disabled = true;
+    }
+}
+
+function sendChatMessageByWebrtcChannel() {
+    if (!MediaHolder.chatDataChannel) {
+        Context.logError('dataChannel is null.');
+        return;
+    }
+    const msg = Elements.taChatInput.value;
+    if (!msg) {
+        Context.logError('msg is null.');
+        return;
+    }
+    Context.logDebug('send webrtc msg: ' + msg);
+    MediaHolder.chatDataChannel.send(msg);
+    Elements.taChatPanel.value += "You: " + msg + "\r\n";
+    Elements.taChatInput.value = "";
+}
+
+function initWebrtcFileChannel(event) {
+    Context.logDebug('initWebRtcFileChannel. event: ' + JSON.stringify(event))
+
+    if (!MediaHolder.rtcPeerConnection) {
+        Context.logError('rtcPeerConnection is null.');
+        return;
+    }
+    if (MediaHolder.fileDataChannel) {
+        Context.logError('fileDataChannel has already been created.');
+        return;
+    }
+
+    if (event) {
+        MediaHolder.fileDataChannel = event.channel;
+    } else {
+        MediaHolder.fileDataChannel = MediaHolder.rtcPeerConnection.createDataChannel('file-channel');
+    }
+
+    MediaHolder.fileDataChannel.onmessage = (event) => {
+        const msg = event.data;
+        if (msg) {
+            receiveFileSlice(msg);
+            Context.logDebug('received webrtc file msg: ' + msg);
+        } else {
+            Context.logError('received webrtc file msg is null.');
+        }
+    }
+
+    MediaHolder.fileDataChannel.onopen = () => {
+        Context.logDebug('File Data channel is open.');
+        Elements.inputFile.disabled = false;
+        Elements.btnAbortFileSending.disabled = false;
+    }
+
+    MediaHolder.fileDataChannel.onclose = () => {
+        Context.logDebug('File Data channel is closed.');
+        Elements.inputFile.disabled = true;
+        Elements.btnSendFile.disabled = true;
+        Elements.btnAbortFileSending.disabled = true;
+    }
+}
+
+function sendFileByWebrtcChannel() {
+    Elements.btnSendFile.disabled = true;
+
+    let offset = 0;
+    const chunkSize = 16384;
+    const file = Elements.inputFile.files[0];
+    Context.logDebug(`File is ${[file.name, file.size, file.type, file.lastModified].join(' ')}`);
+
+    // Handle 0 size files.
+    Elements.spanFileStatus.textContent = '';
+    Elements.aDownloadFile.textContent = '';
+    if (file.size === 0) {
+        Elements.divFileBitrate.innerHTML = '';
+        Elements.spanFileStatus.textContent = 'File is empty, please select a non-empty file';
+        return;
+    }
+
+    Elements.progressSending.max = file.size;
+
+    FileHolder.fileReader = new FileReader();
+    FileHolder.fileReader.onerror = error => Context.logError('Error reading file:' + error);
+    FileHolder.fileReader.onabort = event => Context.logError('File reading aborted:', event);
+    FileHolder.fileReader.onload = e => {
+        Context.logDebug('FileRead.onload: ' + e);
+        MediaHolder.fileDataChannel.send(e.target.result);
+        offset += e.target.result.byteLength;
+        Elements.progressSending.value = offset;
+        if (offset < file.size) {
+            readSlice(offset);
+        }
+    }
+
+    const readSlice = o => {
+        Context.logDebug('readSlice: ' + o);
+        const slice = file.slice(offset, o + chunkSize);
+        FileHolder.fileReader.readAsArrayBuffer(slice);
+    };
+
+    readSlice(0);
+}
+
+function receiveFileSlice(data) {
+    if (!FileHolder.receiveBuffer) {
+        FileHolder.receiveBuffer = [];
+        FileHolder.receivedSize = 0;
+    }
+
+    Context.logDebug(`Received Message ${data.byteLength}`);
+
+    FileHolder.receiveBuffer.push(data);
+    FileHolder.receivedSize += data.byteLength;
+    Elements.progressReceiving.value = FileHolder.receivedSize;
+    if (FileHolder.receivedSize === FileHolder.fileSize) {
+        const received = new Blob(FileHolder.receiveBuffer);
+        MediaHolder.receiveBuffer = [];
+        MediaHolder.receivedSize = 0;
+        Elements.aDownloadFile.href = URL.createObjectURL(received);
+        Elements.aDownloadFile.download = FileHolder.fileName;
+        Elements.aDownloadFile.textContent = `Click to download '${FileHolder.fileName}' (${FileHolder.fileSize} bytes)`;
+        Elements.aDownloadFile.style.display = 'block';
+    }
+}
+
+function abortFileSending() {
+    if (FileHolder.fileReader && FileHolder.fileReader.readyState === 1) {
+        Context.logError('abort read');
+        FileHolder.fileReader.abort();
+    }
+}
+
+function handleFileInputChange() {
+    const file = Elements.inputFile.files[0];
+    if (!file) {
+        Context.logError('No file chosen');
+    } else {
+        // before sending the file, send the file info to the peer.
+        Context.sendMessage({
+            type: 'fileInfo',
+            name: file.name,
+            size: file.size,
+            filetype: file.type,
+            lastModify: file.lastModified
+        });
+
+        Elements.btnSendFile.disabled = false;
+        Elements.progressSending.value = 0;
+    }
 }

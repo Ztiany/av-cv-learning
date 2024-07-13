@@ -6,6 +6,7 @@
     <title>Webrtc Connection</title>
     <link href="style.css" rel="stylesheet"/>
     <style>
+
         .vertical-center {
             display: flex;
             align-items: center;
@@ -18,43 +19,114 @@
             border: 1px solid black;
             margin-top: 20px;
         }
+
+        .half-screen {
+            display: inline-block;
+            width: 50%;
+        }
     </style>
 </head>
 
 <body>
+
 <div>
     <div style="margin-top: 20px">
         <div class="vertical-center">
             <input id="shareDesk" type="checkbox"/>
             <label for="shareDesk">Share Desktop</label>
         </div>
-        <button id="connect">connect</button>
-        <button id="leave" disabled>leave</button>
+        <div class="vertical-center">
+            <button id="connect">connect</button>
+            <button id="leave" disabled>leave</button>
+        </div>
+
+        <div class="vertical-center">
+            <div>
+                <label for="bandwidth">Bandwidth:</label>
+                <select id="bandwidth" disabled>
+                    <option value="unlimited" selected>unlimited</option>
+                    <option value="2000">2000</option>
+                    <option value="1000">1000</option>
+                    <option value="500">500</option>
+                    <option value="250">250</option>
+                    <option value="125">125</option>
+                </select>
+                kbps
+            </div>
+        </div>
     </div>
 
-    <div id="stateInformation" class="log-panel"></div>
+    <div class="half-screen">
+        <div id="stateInformation" class="log-panel"></div>
+        <div id="preview" style="margin-top: 20px">
+            <div>
+                <h2>Local:</h2>
+                <video id="localVideo" autoplay playsinline muted></video>
+                <h2>Offer SDP:</h2>
+                <label for="offer"></label>
+                <textarea id="offer"></textarea>
+            </div>
 
-    <div id="preview" style="margin-top: 20px">
+            <div>
+                <h2>Remote:</h2>
+                <video id="remoteVideo" autoplay playsinline></video>
+                <h2>Answer SDP:</h2>
+                <label for="answer"></label><textarea id="answer"></textarea>
+            </div>
+        </div>
         <div>
-            <h2>Local:</h2>
-            <video id="localVideo" autoplay playsinline muted></video>
-            <h2>Offer SDP:</h2>
-            <label for="offer"></label>
-            <textarea id="offer"></textarea>
+            <div class="graph-container" id="bitrateGraph">
+                <div>Bitrate (kb per second)</div>
+                <canvas id="bitrateCanvas"></canvas>
+            </div>
+            <div class="graph-container" id="packetGraph">
+                <div>Packets sent per second</div>
+                <canvas id="packetCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="half-screen" style="float: right">
+
+        <div id="chatDiv">
+            <label for="chatPanel"></label>
+            <textarea id="chatPanel" disabled></textarea>
+            <label for="chatInput"></label><textarea id="chatInput" disabled></textarea>
+            <button id="sendText" disabled>Send</button>
         </div>
 
-        <div>
-            <h2>Remote:</h2>
-            <video id="remoteVideo" autoplay playsinline></video>
-            <h2>Answer SDP:</h2>
-            <label for="answer"></label><textarea id="answer"></textarea>
+        <div id="fileDiv">
+            <div>
+                <form id="fileInfo">
+                    <input type="file" id="fileInput" name="files" disabled/>
+                </form>
+                <button disabled id="sendFile">Send</button>
+                <button disabled id="abortButton">Abort</button>
+            </div>
+
+            <div class="progress">
+                <div class="label">Send progress:</div>
+                <progress id="sendProgress" max="0" value="0"></progress>
+            </div>
+
+            <div class="progress">
+                <div class="label">Receive progress:</div>
+                <progress id="receiveProgress" max="0" value="0"></progress>
+            </div>
+
+            <div id="fileBitrate"></div>
+            <a id="downloadFile"></a>
+            <span id="fileStatus"></span>
         </div>
+
     </div>
 </div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="client.js"></script>
+<script src="graph.js"></script>
 </body>
 
 </html>
