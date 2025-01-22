@@ -1,9 +1,0 @@
-ext {
-
-    AppConfig = [
-            minSdkVersion    : 23,
-            targetSdkVersion : 27,
-            compileSdkVersion: 33,
-    ]
-
-}

@@ -1,5 +1,0 @@
-rootProject.name = "Android-AV"
-include ':lib-avbase'
-include ':app-main'
-include ':app-rtmp'
-include ':app-webrtc'
